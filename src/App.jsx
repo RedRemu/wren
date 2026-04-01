@@ -751,7 +751,6 @@ export default function App() {
           <Rv d={0.1}><p style={{ fontSize: 11, letterSpacing: 6, color: $.dim, fontFamily: F.s, marginBottom: 8 }}>PROJECT CODENAME</p></Rv>
           <Rv d={0.2}><h1 style={{ fontSize: "clamp(60px, 10vw, 110px)", fontWeight: 400, letterSpacing: -2, lineHeight: 0.95, margin: "0 0 16px 0" }}>W.R.E.N.</h1></Rv>
           <Rv d={0.35}><p style={{ fontSize: "clamp(14px, 2vw, 20px)", color: $.tx2, fontFamily: F.s, fontWeight: 300, letterSpacing: 5, textTransform: "uppercase", margin: "0 0 48px 0" }}>Warden Reliability Engine for Networks</p></Rv>
-          <Rv d={0.65}><p style={{ fontSize: 17, color: $.tx3, fontStyle: "italic" }}>She watches. She warns. She guides.</p></Rv>
           <Rv d={0.75}><p style={{ fontSize: 11, color: $.dim, marginTop: 8, fontFamily: F.s, letterSpacing: 1.5 }}>Powered by A.G.N.E.S.</p></Rv>
         </div>
       </section>
@@ -836,7 +835,7 @@ export default function App() {
           <Rv d={0.12}><p style={{ fontSize: 12, letterSpacing: 5, color: $.dim, fontFamily: F.s, marginBottom: 28, textTransform: "uppercase" }}>In Honour</p></Rv>
           <Rv d={0.2}><p style={{ fontSize: 19, fontStyle: "italic", lineHeight: 1.9, color: $.tx2, marginBottom: 32 }}>W.R.E.N. is named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, from 1939 to 1945.</p></Rv>
           <Rv d={0.32}><p style={{ fontSize: 15, lineHeight: 1.9, color: $.tx3, fontFamily: F.s, fontWeight: 300, marginBottom: 28 }}>They sat in signals rooms, detecting anomalies in the noise and warning of danger before it arrived. They were not the intelligence. They were the bridge between knowledge and action.</p></Rv>
-          <Rv d={0.44}><p style={{ fontSize: 15, lineHeight: 1.9, color: $.tx3, fontFamily: F.s, fontWeight: 300, marginBottom: 32 }}>Many gave their lives. This project carries their name because the work it does, watching for the signals others miss, is the work they did first.</p></Rv>>
+          <Rv d={0.44}><p style={{ fontSize: 15, lineHeight: 1.9, color: $.tx3, fontFamily: F.s, fontWeight: 300, marginBottom: 32 }}>Many gave their lives. This project carries their name because the work it does, watching for the signals others miss, is the work they did first.</p></Rv>
         </div>
       </section>
 
