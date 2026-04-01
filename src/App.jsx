@@ -836,9 +836,7 @@ export default function App() {
           <Rv d={0.12}><p style={{ fontSize: 12, letterSpacing: 5, color: $.dim, fontFamily: F.s, marginBottom: 28, textTransform: "uppercase" }}>In Honour</p></Rv>
           <Rv d={0.2}><p style={{ fontSize: 19, fontStyle: "italic", lineHeight: 1.9, color: $.tx2, marginBottom: 32 }}>W.R.E.N. is named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, from 1939 to 1945.</p></Rv>
           <Rv d={0.32}><p style={{ fontSize: 15, lineHeight: 1.9, color: $.tx3, fontFamily: F.s, fontWeight: 300, marginBottom: 28 }}>They sat in signals rooms, detecting anomalies in the noise and warning of danger before it arrived. They were not the intelligence. They were the bridge between knowledge and action.</p></Rv>
-          <Rv d={0.44}><p style={{ fontSize: 15, lineHeight: 1.9, color: $.tx3, fontFamily: F.s, fontWeight: 300, marginBottom: 32 }}>Many gave their lives. This project carries their name because the work it does, watching for the signals others miss, is the work they did first.</p></Rv>
-          <Rv d={0.56}><p style={{ fontSize: 15, color: $.tx3, fontStyle: "italic" }}>They watched. They warned. They guided.</p></Rv>
-          <Rv d={0.65}><p style={{ fontSize: 13, color: $.dim, fontFamily: F.s, marginTop: 6 }}>We remember.</p></Rv>
+          <Rv d={0.44}><p style={{ fontSize: 15, lineHeight: 1.9, color: $.tx3, fontFamily: F.s, fontWeight: 300, marginBottom: 32 }}>Many gave their lives. This project carries their name because the work it does, watching for the signals others miss, is the work they did first.</p></Rv>>
         </div>
       </section>
 
