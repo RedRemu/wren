@@ -421,7 +421,7 @@ export default function App() {
         <div style={{ position: "absolute", top: "50%", left: "50%", width: 400, height: 400, marginLeft: -200, marginTop: -200, borderRadius: "50%", background: "radial-gradient(circle, rgba(251,191,36,0.03) 0%, transparent 70%)", pointerEvents: "none" }} />
         <div style={{ textAlign: "center", maxWidth: 680, position: "relative" }}>
           <Rv><div style={{ marginBottom: 24 }}><Beacon s={96} interactive={true} /></div></Rv>
-          <Rv d={0.1}><h1 style={{ fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 700, lineHeight: 1.15, margin: "0 0 16px 0", fontFamily: serif }}>Reliability monitoring for smart grid AI</h1></Rv>
+          <Rv d={0.1}><h1 style={{ fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 700, lineHeight: 1.15, margin: "0 0 16px 0", fontFamily: serif }}>Reliability Monitoring for Smart Grid AI</h1></Rv>
           <Rv d={0.25}><p style={{ fontSize: 15, color: $.tx2, lineHeight: 1.8, maxWidth: 500, margin: "0 auto 32px", fontWeight: 300 }}>Detects distribution shift, calibration decay, and adversarial compromise in deployed ML models. Explains what changed. Recommends what to do.</p></Rv>
           <Rv d={0.4}>
             <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
