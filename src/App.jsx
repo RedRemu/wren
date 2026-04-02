@@ -429,7 +429,7 @@ export default function App() {
               <button onClick={function() { go("how"); }} style={{ background: "transparent", border: "1px solid " + $.brd, borderRadius: 8, padding: "14px 32px", fontSize: 14, fontWeight: 500, color: $.tx2, cursor: "pointer" }}>See Architecture</button>
             </div>
           </Rv>
-          <Rv d={0.55}><p style={{ fontSize: 12, color: $.dim, marginTop: 40, fontStyle: "italic", fontFamily: serif }}>She watches. She warns. She guides.</p></Rv>
+          
         </div>
       </section>
 
@@ -545,7 +545,7 @@ export default function App() {
           <Rv d={0.1}><p style={{ fontSize: 12, letterSpacing: 4, color: $.dim, marginBottom: 20 }}>IN HONOUR</p></Rv>
           <Rv d={0.2}><p style={{ fontSize: 16, fontStyle: "italic", lineHeight: 1.9, color: $.tx2, fontFamily: serif, marginBottom: 24 }}>W.R.E.N. is named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, from 1939 to 1945.</p></Rv>
           <Rv d={0.3}><p style={{ fontSize: 13, lineHeight: 1.9, color: $.tx3, marginBottom: 20 }}>They sat in signals rooms, detecting anomalies in the noise and warning of danger before it arrived.</p></Rv>
-          <Rv d={0.4}><p style={{ fontSize: 13, color: $.tx3, fontStyle: "italic" }}>They watched. They warned. They guided.</p></Rv>
+          
         </div>
       </section>
 
