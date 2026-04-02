@@ -420,9 +420,9 @@ export default function App() {
       <section id="hero" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "120px 24px", position: "relative" }}>
         <div style={{ position: "absolute", top: "50%", left: "50%", width: 400, height: 400, marginLeft: -200, marginTop: -200, borderRadius: "50%", background: "radial-gradient(circle, rgba(251,191,36,0.03) 0%, transparent 70%)", pointerEvents: "none" }} />
         <div style={{ textAlign: "center", maxWidth: 680, position: "relative" }}>
-          <Rv><div style={{ marginBottom: 24 }}><Beacon s={64} interactive={true} /></div></Rv>
-          <Rv d={0.1}><h1 style={{ fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 700, lineHeight: 1.15, margin: "0 0 16px 0", fontFamily: serif }}>W.R.E.N. detects reliability drift before failure spreads</h1></Rv>
-          <Rv d={0.25}><p style={{ fontSize: 15, color: $.tx2, lineHeight: 1.8, maxWidth: 520, margin: "0 auto 32px", fontWeight: 300 }}>Monitors AI-driven grid systems for distribution shift, calibration decay, and operational instability. Built to help engineers catch issues early, explain failures clearly, and respond with confidence.</p></Rv>
+          <Rv><div style={{ marginBottom: 24 }}><Beacon s={96} interactive={true} /></div></Rv>
+          <Rv d={0.1}><h1 style={{ fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 700, lineHeight: 1.15, margin: "0 0 16px 0", fontFamily: serif }}>Reliability monitoring for smart grid AI</h1></Rv>
+          <Rv d={0.25}><p style={{ fontSize: 15, color: $.tx2, lineHeight: 1.8, maxWidth: 500, margin: "0 auto 32px", fontWeight: 300 }}>Detects distribution shift, calibration decay, and adversarial compromise in deployed ML models. Explains what changed. Recommends what to do.</p></Rv>
           <Rv d={0.4}>
             <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
               <button onClick={function() { go("demo"); }} style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 8, padding: "14px 32px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Launch Live Demo</button>
@@ -430,6 +430,28 @@ export default function App() {
             </div>
           </Rv>
           <Rv d={0.55}><p style={{ fontSize: 12, color: $.dim, marginTop: 40, fontStyle: "italic", fontFamily: serif }}>She watches. She warns. She guides.</p></Rv>
+        </div>
+      </section>
+
+      {/* ═══ USE-CASE STRIP ═══ */}
+      <section style={{ padding: "48px 24px", borderTop: "1px solid " + $.brd, borderBottom: "1px solid " + $.brd }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, maxWidth: 800, margin: "0 auto", background: $.brd, borderRadius: 10, overflow: "hidden", border: "1px solid " + $.brd }}>
+          {[
+            { icon: "\u26A0", title: "Anomaly Detection", desc: "Three sequential change detectors at different timescales. Page-Hinkley catches drift 26 batches before PSI confirms the source." },
+            { icon: "\u25CE", title: "Drift Watch", desc: "Continuous PSI monitoring against training distribution. Alerts when feature distributions diverge beyond the 0.25 threshold." },
+            { icon: "\u2726", title: "Reliability Scoring", desc: "Conformal prediction provides coverage guarantees. When the model's uncertainty estimates stop being trustworthy, the score tells you." },
+            { icon: "\u2192", title: "Operator Guidance", desc: "Decision engine translates model state into engineering actions. Recalibrate, switch to fallback, increase damping, or alert." },
+          ].map(function(c, i) {
+            return (
+              <Rv key={i} d={0.06 * i}>
+                <div style={{ background: $.bg2, padding: "24px 18px", textAlign: "center", height: "100%" }}>
+                  <div style={{ fontSize: 20, marginBottom: 10, opacity: 0.7 }}>{c.icon}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: $.tx, marginBottom: 8 }}>{c.title}</div>
+                  <div style={{ fontSize: 11, color: $.tx3, lineHeight: 1.6 }}>{c.desc}</div>
+                </div>
+              </Rv>
+            );
+          })}
         </div>
       </section>
 
@@ -441,8 +463,17 @@ export default function App() {
           <Rv d={0.12}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 480, margin: "0 auto" }}>Each scenario simulates a different operational condition. WREN detects, explains, and recommends in real time.</p></Rv>
         </div>
         <Rv d={0.2}><SignatureDemo /></Rv>
-        <div style={{ textAlign: "center", marginTop: 32 }}>
-          <Rv d={0.3}><button onClick={function() { setPage("command"); }} style={{ background: "transparent", border: "1px solid " + $.glow, borderRadius: 8, padding: "12px 28px", fontSize: 13, color: $.glow, fontWeight: 600, cursor: "pointer", letterSpacing: 1 }}>Open Full Command Centre</button></Rv>
+      </section>
+
+      {/* ═══ COMMAND CENTRE CTA ═══ */}
+      <section style={{ padding: "80px 24px", background: $.bg, position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "50%", left: "50%", width: 500, height: 500, marginLeft: -250, marginTop: -250, borderRadius: "50%", background: "radial-gradient(circle, rgba(251,191,36,0.03) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ textAlign: "center", position: "relative", maxWidth: 560, margin: "0 auto" }}>
+          <Rv><div style={{ marginBottom: 20 }}><Beacon s={56} /></div></Rv>
+          <Rv d={0.08}><p style={{ fontFamily: F.m, fontSize: 11, color: $.glow, letterSpacing: 4, marginBottom: 12 }}>THE COMMAND CENTRE</p></Rv>
+          <Rv d={0.15}><h2 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 600, fontFamily: serif, marginBottom: 16 }}>120 batches. Three drift phases. One system watching it all.</h2></Rv>
+          <Rv d={0.22}><p style={{ fontSize: 14, color: $.tx3, lineHeight: 1.8, marginBottom: 28 }}>The full streaming simulation replays every batch of data through stable, drifting, and critical conditions. Auto-plays on entry. Every metric, every chart, every decision updates in real time.</p></Rv>
+          <Rv d={0.3}><button onClick={function() { setPage("command"); }} style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 8, padding: "16px 40px", fontSize: 15, fontWeight: 700, cursor: "pointer", letterSpacing: 1 }}>Enter Command Centre</button></Rv>
         </div>
       </section>
 
@@ -514,7 +545,7 @@ export default function App() {
           <Rv d={0.1}><p style={{ fontSize: 12, letterSpacing: 4, color: $.dim, marginBottom: 20 }}>IN HONOUR</p></Rv>
           <Rv d={0.2}><p style={{ fontSize: 16, fontStyle: "italic", lineHeight: 1.9, color: $.tx2, fontFamily: serif, marginBottom: 24 }}>W.R.E.N. is named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, from 1939 to 1945.</p></Rv>
           <Rv d={0.3}><p style={{ fontSize: 13, lineHeight: 1.9, color: $.tx3, marginBottom: 20 }}>They sat in signals rooms, detecting anomalies in the noise and warning of danger before it arrived.</p></Rv>
-          
+          <Rv d={0.4}><p style={{ fontSize: 13, color: $.tx3, fontStyle: "italic" }}>They watched. They warned. They guided.</p></Rv>
         </div>
       </section>
 
@@ -527,3 +558,4 @@ export default function App() {
     </div>
   );
 }
+
