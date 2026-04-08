@@ -39,7 +39,7 @@ var SCENARIOS = {
 };
 
 /* ═══ DECISION POINTS ═══ */
-var DECISION_POINTS = [
+var ALL_DECISION_POINTS = [
   {
     id:"drift", batch:55, urgency:$.ac, label:"GRADUAL DRIFT DETECTED",
     progressStress:[[0,0,0,0],[1,0,0,0],[1,0,0,1]],
@@ -92,13 +92,93 @@ var DECISION_POINTS = [
     snap:{auc:"0.877",psi:"1.65",cov:"83.0%",aucC:$.rd,psiC:$.rd,covC:$.rd},
     options:[
       {icon:"\u26A0",label:"Alert Operator: Reduce Load",desc:"Escalate to human oversight. Shed load at nodes 2 and 3.",outcome:"good",
-       consequence:"Human oversight takes control during model uncertainty. Load reduction creates stability margin. Grid holds, no cascade.."},
+       consequence:"Human oversight takes control during model uncertainty. Load reduction creates stability margin. Grid holds, no cascade."},
       {icon:"\u25CE",label:"Continue Monitoring",desc:"No action. Observe further before committing.",outcome:"bad",
        consequence:"Cascade risk escalates rapidly. Grid health deteriorates beyond recovery threshold. Emergency shutdown unavoidable."},
     ],
     afterStress:{good:[0,1,0,0],bad:[2,2,2,2]},
   },
+  {
+    id:"sensor_fail", batch:34, urgency:$.ac, label:"SENSOR CORRUPTION",
+    progressStress:[[0,0,0,0],[0,0,1,0],[0,1,1,0]],
+    stressTimes:[0,1500,3000],
+    sequence:[
+      {t:800,  msg:"DIST node telemetry showing intermittent NaN values.",lvl:"warn"},
+      {t:2000, msg:"LOAD node readings diverging from physical expectations.",lvl:"warn"},
+      {t:3200, msg:"Three sensors reporting values outside calibrated range.",lvl:"alert"},
+      {t:4200, msg:"\u25ba OPERATOR ACTION REQUIRED",lvl:"critical"},
+    ],
+    snap:{auc:"0.944",psi:"0.18",cov:"91.2%",aucC:$.ac,psiC:$.gn,covC:$.ac},
+    options:[
+      {icon:"\u26A0",label:"Quarantine Suspect Sensors",desc:"Isolate corrupted inputs. Fall back to validated channels only.",outcome:"good",
+       consequence:"Corrupted readings removed from pipeline. Model operates on reduced but clean data. Accuracy holds at 93.8% on verified channels."},
+      {icon:"\u21BA",label:"Trigger Full Recalibration",desc:"Recalibrate against all current data including suspect readings.",outcome:"bad",
+       consequence:"Recalibration absorbs corrupted data as ground truth. Model learns wrong patterns. Accuracy degrades to 86% within 5 batches."},
+    ],
+    afterStress:{good:[0,0,0,0],bad:[1,2,1,0]},
+  },
+  {
+    id:"load_spike", batch:42, urgency:$.rd, label:"DEMAND SURGE",
+    progressStress:[[0,0,0,0],[0,2,0,0],[1,2,0,1]],
+    stressTimes:[0,1000,2200],
+    sequence:[
+      {t:600,  msg:"LOAD node demand exceeding 95th percentile of training data.",lvl:"warn"},
+      {t:1400, msg:"Prediction latency increasing. Model struggling with out-of-distribution inputs.",lvl:"alert"},
+      {t:2600, msg:"STORE node reserves depleting. Grid balance at risk.",lvl:"alert"},
+      {t:3600, msg:"\u25ba OPERATOR ACTION REQUIRED",lvl:"critical"},
+    ],
+    snap:{auc:"0.931",psi:"0.42",cov:"89.1%",aucC:$.ac,psiC:$.ac,covC:$.ac},
+    options:[
+      {icon:"\u23FC",label:"Shed Non-Critical Load",desc:"Reduce demand on LOAD node to within training bounds.",outcome:"good",
+       consequence:"Demand returns to known operating range. Model predictions stabilise. Coverage recovers to 94%. No cascading impact."},
+      {icon:"\u21C4",label:"Switch to Emergency Model",desc:"Deploy simplified fallback model designed for extreme conditions.",outcome:"bad",
+       consequence:"Fallback model lacks feature coverage for this scenario. Predictions worse than primary model. Grid instability increases for 12 batches."},
+    ],
+    afterStress:{good:[0,0,0,0],bad:[1,2,1,2]},
+  },
+  {
+    id:"false_flood", batch:48, urgency:$.ac, label:"ALERT FLOOD",
+    progressStress:[[0,0,0,0],[1,0,0,0],[1,1,1,0]],
+    stressTimes:[0,1300,2800],
+    sequence:[
+      {t:700,  msg:"PSI micro-spikes across all nodes. 14 alerts in 30 seconds.",lvl:"warn"},
+      {t:1800, msg:"CUSUM triggering on transient patterns. High false positive rate suspected.",lvl:"warn"},
+      {t:2900, msg:"Alert volume overwhelming. Real threats may be masked.",lvl:"alert"},
+      {t:4000, msg:"\u25ba OPERATOR ACTION REQUIRED",lvl:"critical"},
+    ],
+    snap:{auc:"0.952",psi:"0.29",cov:"93.5%",aucC:$.gn,psiC:$.ac,covC:$.ac},
+    options:[
+      {icon:"\u25CE",label:"Raise Alert Threshold",desc:"Temporarily increase detection sensitivity to filter noise.",outcome:"good",
+       consequence:"Alert volume drops 90%. The three real anomalies remain visible. Operators can focus on genuine threats. Grid monitored effectively."},
+      {icon:"\u26A0",label:"Escalate All Alerts",desc:"Treat every alert as genuine. Escalate everything to human review.",outcome:"bad",
+       consequence:"Human operators overwhelmed within minutes. Real threat buried in noise. Critical drift signal missed entirely. Response delayed by 8 batches."},
+    ],
+    afterStress:{good:[0,0,0,0],bad:[1,1,2,1]},
+  },
 ];
+
+/* Shuffle array utility */
+function shuffleArray(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = a[i]; a[i] = a[j]; a[j] = temp;
+  }
+  return a;
+}
+
+/* Pick 3 random scenarios and randomize option order */
+function pickScenarios() {
+  var shuffled = shuffleArray(ALL_DECISION_POINTS);
+  var picked = shuffled.slice(0, 3);
+  return picked.map(function(dp) {
+    if (Math.random() > 0.5) {
+      return Object.assign({}, dp, { options: [dp.options[1], dp.options[0]] });
+    }
+    return dp;
+  });
+}
+
 
 /* ═══ STYLES ═══ */
 function useStyles() {
@@ -108,7 +188,7 @@ function useStyles() {
     l.href = "https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap";
     document.head.appendChild(l);
     var s = document.createElement("style"); s.id = "wrn";
-    s.textContent = "@keyframes wup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}@keyframes wpulse{0%,100%{opacity:1}50%{opacity:.3}}@keyframes wblink{0%,100%{opacity:.5}50%{opacity:1}}@keyframes wsweep{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes bIdlePulse{0%,100%{opacity:.55}50%{opacity:.95}}*{box-sizing:border-box;margin:0;padding:0}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(251,191,36,.1);border-radius:2px}";
+    s.textContent = "@keyframes wup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}@keyframes wpulse{0%,100%{opacity:1}50%{opacity:.3}}@keyframes wblink{0%,100%{opacity:.5}50%{opacity:1}}@keyframes wsweep{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes wshake{0%,100%{transform:translateX(0)}15%,45%,75%{transform:translateX(-3px)}30%,60%,90%{transform:translateX(3px)}}@keyframes bIdlePulse{0%,100%{opacity:.55}50%{opacity:.95}}*{box-sizing:border-box;margin:0;padding:0}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(251,191,36,.1);border-radius:2px}";
     document.head.appendChild(s);
   }, []);
 }
@@ -509,23 +589,37 @@ function GridOperatorSim(props) {
   var _alerts   = useState([]);         var alerts   = _alerts[0];   var setAlerts   = _alerts[1];
   var _canAct   = useState(false);      var canAct   = _canAct[0];   var setCanAct   = _canAct[1];
   var _resolved = useState(false);      var resolved = _resolved[0]; var setResolved = _resolved[1];
+  var _flash    = useState("");         var flash    = _flash[0];    var setFlash    = _flash[1];
+  var _shake    = useState(false);      var shake    = _shake[0];    var setShake    = _shake[1];
+  var _introStep= useState(0);         var introStep= _introStep[0];var setIntroStep= _introStep[1];
+  var _scenarios= useState(pickScenarios); var scenarios= _scenarios[0]; var setScenarios= _scenarios[1];
   var timers    = useRef([]);
   var alertRef  = useRef(null);
 
+  function repick() { setScenarios(pickScenarios()); }
+
   function clrT(){ timers.current.forEach(clearTimeout); timers.current=[]; }
 
+  function triggerFlash(color) {
+    setFlash(color); setTimeout(function(){ setFlash(""); }, 400);
+  }
+  function triggerShake() {
+    setShake(true); setTimeout(function(){ setShake(false); }, 500);
+  }
+
   function beginWatch(dpIdx) {
-    var d = DECISION_POINTS[dpIdx !== undefined ? dpIdx : idx];
+    var d = scenarios[dpIdx !== undefined ? dpIdx : idx];
     clrT();
     setPhase("watch"); setStress([0,0,0,0]); setAlerts([]); setCanAct(false); setChosen(null); setResolved(false);
     var t = [];
     d.progressStress.forEach(function(s,i){
-      t.push(setTimeout(function(){ setStress(s); }, d.stressTimes[i]));
+      t.push(setTimeout(function(){ setStress(s); if(i>0) triggerFlash(d.urgency+"22"); }, d.stressTimes[i]));
     });
     d.sequence.forEach(function(ev){
       t.push(setTimeout(function(){
         setAlerts(function(prev){ return prev.concat([{msg:ev.msg,lvl:ev.lvl}]); });
-        if (ev.lvl==="critical") t.push(setTimeout(function(){ setCanAct(true); }, 600));
+        if (ev.lvl==="alert") triggerFlash($.rd+"18");
+        if (ev.lvl==="critical") { triggerShake(); triggerFlash($.rd+"28"); t.push(setTimeout(function(){ setCanAct(true); }, 800)); }
       }, ev.t));
     });
     timers.current = t;
@@ -533,218 +627,297 @@ function GridOperatorSim(props) {
 
   function choose(i) {
     clrT();
-    var d = DECISION_POINTS[idx];
+    var d = scenarios[idx];
     var opt = d.options[i];
     setChosen(i); setCanAct(false);
     setAlerts(function(prev){ return prev.concat([{msg:"Operator: "+opt.label,lvl:"apply"}]); });
     timers.current.push(setTimeout(function(){
       var ak = opt.outcome==="good" ? "good" : "bad";
       setStress(d.afterStress[ak]);
+      triggerFlash(opt.outcome==="good"?$.gn+"30":$.rd+"30");
+      if(opt.outcome!=="good") triggerShake();
       setAlerts(function(prev){ return prev.concat([{msg:(opt.outcome==="good"?"\u2713 ":"\u2717 ")+opt.consequence,lvl:opt.outcome==="good"?"good":"fail"}]); });
       setDecisions(function(prev){ return prev.concat([{label:opt.label,outcome:opt.outcome,consequence:opt.consequence,batch:d.batch}]); });
-    }, 1800));
-    timers.current.push(setTimeout(function(){ setResolved(true); }, 3400));
+    }, 2000));
+    timers.current.push(setTimeout(function(){ setResolved(true); }, 3800));
   }
 
   function advance() {
     var next = idx + 1;
-    if (next >= DECISION_POINTS.length) { setPhase("debrief"); }
+    if (next >= scenarios.length) { setPhase("debrief"); }
     else { setIdx(next); beginWatch(next); }
   }
 
   useEffect(function(){ return function(){ clrT(); }; }, []);
   useEffect(function(){ if(alertRef.current) alertRef.current.scrollTop=alertRef.current.scrollHeight; }, [alerts]);
 
+  // Staged intro animation
+  useEffect(function() {
+    if (phase !== "intro") return;
+    setIntroStep(0);
+    var t1 = setTimeout(function(){ setIntroStep(1); }, 600);
+    var t2 = setTimeout(function(){ setIntroStep(2); }, 1800);
+    var t3 = setTimeout(function(){ setIntroStep(3); }, 3000);
+    return function(){ clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [phase]);
+
   var correct = decisions.filter(function(d){ return d.outcome==="good"; }).length;
   var oc = function(o){ return o==="good"?$.gn:o==="bad"?$.rd:$.ac; };
-  var ol = function(o){ return o==="good"?"Correct":o==="bad"?"Incorrect":"Acceptable"; };
-  var dp = DECISION_POINTS[idx];
+  var ol = function(o){ return o==="good"?"Correct":o==="bad"?"Wrong":"Partial"; };
+  var dp = scenarios[idx];
   var chosenOpt = chosen !== null ? dp.options[chosen] : null;
-
-  var nav = (
-    <div style={{position:"sticky",top:0,zIndex:50,padding:"10px 24px",background:"rgba(5,9,18,.98)",backdropFilter:"blur(20px)",borderBottom:"1px solid rgba(255,255,255,.04)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-      <div style={{display:"flex",alignItems:"center",gap:10}}>
-        <BeaconSmall s={18}/>
-        <span style={{fontSize:13,fontWeight:700,color:$.glow,fontFamily:F.m}}>W.R.E.N.</span>
-        <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>GRID OPS CENTRE</span>
-      </div>
-      <button onClick={props.onBack} style={{background:"transparent",border:"1px solid rgba(255,255,255,.08)",borderRadius:6,color:$.dim,padding:"5px 14px",fontSize:11,fontFamily:F.s,cursor:"pointer"}}>Exit</button>
-    </div>
-  );
+  var maxStress = Math.max.apply(null, stress);
+  var dangerColor = maxStress===2?$.rd:maxStress===1?$.ac:"transparent";
 
   /* ── INTRO ── */
-  if (phase==="intro") return (
-    <div style={{minHeight:"100vh",background:$.bg,fontFamily:F.s}}>
-      {nav}
-      <div style={{maxWidth:560,margin:"0 auto",padding:"72px 24px",textAlign:"center"}}>
-        <div style={{marginBottom:28,display:"flex",justifyContent:"center"}}><Beacon s={72} glow={0.2} interactive={true}/></div>
-        <p style={{fontFamily:F.m,fontSize:10,color:$.glow,letterSpacing:4,marginBottom:14}}>GRID OPS CENTRE</p>
-        <h2 style={{fontSize:"clamp(22px,4vw,32px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:20,lineHeight:1.4}}>Three incidents on the grid.<br/>You're the operator on watch.<br/>W.R.E.N. has flagged something.</h2>
-        <p style={{fontSize:13,color:$.tx3,lineHeight:1.9,maxWidth:420,margin:"0 auto 12px"}}>Watch the grid break down in real time. Read the live diagnostics. Make the call. See what happens.</p>
-        <p style={{fontSize:12,color:$.dim,fontStyle:"italic",marginBottom:32}}>No score. No timer. Only consequence.</p>
-        <div style={{display:"flex",gap:12,justifyContent:"center"}}>
-          <button onClick={function(){ setIdx(0); beginWatch(0); }} style={{background:$.glow,color:$.bg,border:"none",borderRadius:8,padding:"14px 36px",fontSize:14,fontWeight:700,cursor:"pointer"}}>Start</button>
-          <button onClick={props.onBack} style={{background:"transparent",border:"1px solid "+$.brd,borderRadius:8,padding:"14px 24px",fontSize:14,color:$.tx3,cursor:"pointer"}}>Back</button>
+  if (phase==="intro") {
+
+    return (
+      <div style={{position:"fixed",inset:0,background:"#030710",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",fontFamily:F.s,overflow:"hidden"}}>
+        {/* Ambient grid in background */}
+        <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",opacity:introStep>=1?0.15:0,transition:"opacity 2s ease"}}>
+          <div style={{width:400,maxWidth:"90vw"}}><AnimatedGrid stressed={[0,0,0,0]}/></div>
         </div>
+
+        {/* Content */}
+        <div style={{position:"relative",zIndex:2,textAlign:"center",padding:"0 24px"}}>
+          <div style={{marginBottom:24,opacity:introStep>=1?1:0,transform:introStep>=1?"none":"scale(0.8)",transition:"all 1.2s cubic-bezier(0.16,1,0.3,1)"}}>
+            <Beacon s={64} glow={introStep>=2?0.6:0.1}/>
+          </div>
+
+          <div style={{opacity:introStep>=1?1:0,transform:introStep>=1?"none":"translateY(20px)",transition:"all 1s ease 0.3s"}}>
+            <p style={{fontFamily:F.m,fontSize:10,color:$.glow,letterSpacing:6,marginBottom:20}}>OPERATIONS CENTRE</p>
+          </div>
+
+          <div style={{opacity:introStep>=2?1:0,transform:introStep>=2?"none":"translateY(20px)",transition:"all 1s ease"}}>
+            <h2 style={{fontSize:"clamp(20px,4vw,32px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:10,lineHeight:1.5}}>
+              Your model is deployed.<br/>It is about to start failing.
+            </h2>
+            <p style={{fontSize:13,color:$.tx3,lineHeight:1.8,maxWidth:400,margin:"0 auto",marginBottom:8}}>
+              The AI is live on the grid. Three incidents will degrade its predictions. A.G.N.E.S. will flag what is changing. You decide how to respond.
+            </p>
+            <p style={{fontSize:11,color:$.dim,fontFamily:F.m,marginBottom:0}}>
+              No timer. No score. Only consequence.
+            </p>
+          </div>
+
+          <div style={{opacity:introStep>=3?1:0,transform:introStep>=3?"none":"translateY(12px)",transition:"all 0.8s ease",marginTop:32}}>
+            <button onClick={function(){ setIdx(0); setIntroStep(0); beginWatch(0); }}
+              style={{background:$.glow,color:$.bg,border:"none",borderRadius:10,padding:"16px 52px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:F.s,letterSpacing:0.5}}>
+              Begin Watch
+            </button>
+          </div>
+        </div>
+
+        {/* Exit */}
+        <button onClick={props.onBack} style={{position:"absolute",top:20,right:24,background:"transparent",border:"none",color:$.dim,fontSize:11,fontFamily:F.m,cursor:"pointer",letterSpacing:1}}>EXIT</button>
       </div>
-    </div>
-  );
+    );
+  }
 
   /* ── DEBRIEF ── */
   if (phase==="debrief") return (
-    <div style={{minHeight:"100vh",background:$.bg,fontFamily:F.s}}>
-      {nav}
-      <div style={{maxWidth:600,margin:"0 auto",padding:"52px 24px"}}>
-        <div style={{textAlign:"center",marginBottom:32}}>
-          <div style={{display:"flex",justifyContent:"center",marginBottom:16}}><Beacon s={52} glow={correct===3?0.9:correct>=2?0.5:0.1}/></div>
-          <p style={{fontFamily:F.m,fontSize:10,color:$.glow,letterSpacing:4,marginBottom:10}}>DEBRIEF</p>
-          <h2 style={{fontSize:"clamp(17px,3vw,24px)",fontWeight:600,fontFamily:serif,color:$.tx,lineHeight:1.5}}>
-            {correct===3?"Three for three. The grid held." : correct===2?"Two right. One wrong. The grid survived barely." : correct===1?"One correct call wasn't enough." : "The cascade was inevitable."}
+    <div style={{position:"fixed",inset:0,background:"#030710",fontFamily:F.s,overflowY:"auto"}}>
+      {/* Background grid reflects outcome */}
+      <div style={{position:"fixed",inset:0,display:"flex",alignItems:"center",justifyContent:"center",opacity:0.08}}>
+        <div style={{width:500,maxWidth:"90vw"}}><AnimatedGrid stressed={correct===3?[0,0,0,0]:correct>=2?[1,0,0,1]:[2,2,1,2]}/></div>
+      </div>
+
+      <div style={{position:"relative",zIndex:2,maxWidth:580,margin:"0 auto",padding:"60px 24px"}}>
+        <div style={{textAlign:"center",marginBottom:40}}>
+          <div style={{display:"flex",justifyContent:"center",marginBottom:20}}>
+            <Beacon s={56} glow={correct===3?0.95:correct>=2?0.4:0.05}/>
+          </div>
+          <p style={{fontFamily:F.m,fontSize:9,color:correct===3?$.gn:correct>=2?$.ac:$.rd,letterSpacing:4,marginBottom:14}}>
+            {correct===3?"MODEL INTEGRITY MAINTAINED":correct>=2?"PARTIAL RECOVERY":"MODEL FAILURE"}
+          </p>
+          <h2 style={{fontSize:"clamp(20px,4vw,30px)",fontWeight:600,fontFamily:serif,color:$.tx,lineHeight:1.5,marginBottom:8}}>
+            {correct===3?"Three for three. The model held." : correct===2?"Two right. One wrong. The model survived." : correct===1?"One right wasn't enough." : "The model collapsed."}
           </h2>
+          <p style={{fontSize:12,color:$.dim,fontStyle:"italic"}}>
+            {correct===3?"Every signal read. Every call correct." : correct>=2?"Close. But close isn't safe." : "A.G.N.E.S. warned you."}
+          </p>
         </div>
-        <div style={{display:"flex",gap:8,marginBottom:22}}>
-          {decisions.map(function(d,i){ var c=oc(d.outcome); return (<div key={i} style={{flex:1,background:$.bg2,border:"1px solid "+c+"33",borderRadius:10,padding:"12px",textAlign:"center"}}><div style={{fontFamily:F.m,fontSize:8,color:$.dim,marginBottom:6}}>INCIDENT {i+1}</div><div style={{fontFamily:F.m,fontSize:12,color:c,fontWeight:700}}>{ol(d.outcome)}</div></div>); })}
-        </div>
+
+        {/* Incident cards */}
         {decisions.map(function(d,i){
           var c=oc(d.outcome);
           return (
-            <div key={i} style={{background:$.bg2,border:"1px solid "+c+"1a",borderRadius:12,padding:"18px 20px",marginBottom:10}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-                <div style={{fontFamily:F.m,fontSize:9,color:$.dim}}>INCIDENT {i+1} · BATCH {d.batch}</div>
-                <span style={{fontFamily:F.m,fontSize:9,color:c,background:c+"15",padding:"3px 10px",borderRadius:999}}>{ol(d.outcome)}</span>
+            <div key={i} style={{background:"rgba(255,255,255,.02)",border:"1px solid "+c+"22",borderRadius:12,padding:"20px 22px",marginBottom:12,borderLeft:"3px solid "+c}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                  <div style={{width:28,height:28,borderRadius:"50%",background:c+"14",border:"2px solid "+c+"44",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:c,fontWeight:700}}>
+                    {d.outcome==="good"?"\u2713":"\u2717"}
+                  </div>
+                  <div>
+                    <div style={{fontSize:13,fontWeight:600,color:$.tx}}>{d.label}</div>
+                    <div style={{fontFamily:F.m,fontSize:8,color:$.dim}}>BATCH {d.batch}</div>
+                  </div>
+                </div>
               </div>
-              <div style={{fontSize:12,fontWeight:600,color:$.tx,marginBottom:6}}>{d.label}</div>
-              <div style={{fontSize:11,color:$.tx3,lineHeight:1.7}}>{d.consequence}</div>
+              <div style={{fontSize:12,color:$.tx3,lineHeight:1.8,paddingLeft:38}}>{d.consequence}</div>
             </div>
           );
         })}
-        <div style={{display:"flex",gap:12,justifyContent:"center",marginTop:24}}>
-          <button onClick={function(){ setIdx(0); setDecisions([]); beginWatch(0); }} style={{background:$.glow,color:$.bg,border:"none",borderRadius:8,padding:"12px 28px",fontSize:13,fontWeight:700,cursor:"pointer"}}>Try Again</button>
-          <button onClick={props.onBack} style={{background:"transparent",border:"1px solid "+$.brd,borderRadius:8,padding:"12px 24px",fontSize:13,color:$.tx3,cursor:"pointer"}}>Back</button>
+
+        <div style={{display:"flex",gap:12,justifyContent:"center",marginTop:32}}>
+          <button onClick={function(){ repick(); setIdx(0); setDecisions([]); setIntroStep(0); setPhase("intro"); }}
+            style={{background:$.glow,color:$.bg,border:"none",borderRadius:10,padding:"14px 32px",fontSize:14,fontWeight:700,cursor:"pointer"}}>Try Again</button>
+          <button onClick={props.onBack}
+            style={{background:"transparent",border:"1px solid rgba(255,255,255,.1)",borderRadius:10,padding:"14px 28px",fontSize:14,color:$.tx3,cursor:"pointer"}}>Exit</button>
         </div>
       </div>
     </div>
   );
 
-  /* ── WATCH / DECIDE / RESOLVE the control room ── */
+  /* ── WATCH / DECIDE / RESOLVE ── */
   var statusLabel = !canAct && !chosen ? "MONITORING" : canAct && !chosen ? "ACTION REQUIRED" : chosen && !resolved ? "APPLYING..." : "RESOLVED";
   var statusColor = canAct && !chosen ? dp.urgency : resolved && chosenOpt ? oc(chosenOpt.outcome) : $.glow;
 
   return (
-    <div style={{height:"100vh",background:"#050a14",fontFamily:F.s,color:$.tx,display:"flex",flexDirection:"column",overflow:"hidden"}}>
-      {nav}
+    <div style={{position:"fixed",inset:0,background:"#030710",fontFamily:F.s,color:$.tx,overflow:"hidden",
+      animation:shake?"wshake 0.4s ease":"none"}}>
 
-      {/* incident header */}
-      <div style={{padding:"10px 24px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid rgba(255,255,255,.03)",flexShrink:0}}>
-        <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <div style={{width:7,height:7,borderRadius:"50%",background:statusColor,boxShadow:"0 0 8px "+statusColor,animation:canAct&&!chosen?"wpulse 0.8s ease-in-out infinite":"none"}}/>
-          <span style={{fontFamily:F.m,fontSize:9,color:statusColor,letterSpacing:".06em"}}>{statusLabel}</span>
-          <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>|</span>
-          <span style={{fontFamily:F.m,fontSize:9,color:dp.urgency}}>{dp.label}</span>
-          <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>BATCH {dp.batch}</span>
-        </div>
-        <div style={{display:"flex",gap:5}}>
-          {DECISION_POINTS.map(function(_,i){ return (<div key={i} style={{width:32,height:3,borderRadius:2,background:i<idx?$.glow:i===idx?dp.urgency:"rgba(255,255,255,.06)"}}/>); })}
+      {/* Edge danger glow */}
+      <div style={{position:"absolute",inset:0,pointerEvents:"none",zIndex:20,
+        boxShadow:maxStress>=2
+          ?"inset 0 0 150px "+$.rd+"20, inset 0 0 60px "+$.rd+"10"
+          :maxStress>=1
+            ?"inset 0 0 100px "+$.ac+"12"
+            :"none",
+        transition:"box-shadow 1s ease"}}/>
+
+      {/* Flash overlay */}
+      {flash && <div style={{position:"absolute",inset:0,background:flash,zIndex:25,pointerEvents:"none",animation:"wup 0.3s ease both"}}/>}
+
+      {/* FULL SCREEN GRID as hero */}
+      <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",
+        opacity:canAct&&!chosen?0.35:0.6,transition:"opacity 0.8s ease",
+        filter:canAct&&!chosen?"brightness(0.7)":"none"}}>
+        <div style={{width:"min(600px, 85vw)",transform:canAct&&!chosen?"scale(1.02)":"scale(1)",transition:"transform 0.8s ease"}}>
+          <AnimatedGrid stressed={stress}/>
         </div>
       </div>
 
-      {/* main two-panel layout */}
-      <div style={{display:"grid",gridTemplateColumns:"1.2fr 1fr",flex:1,minHeight:0}}>
+      {/* Top bar */}
+      <div style={{position:"relative",zIndex:10,padding:"14px 24px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <BeaconSmall s={16}/>
+          <span style={{fontFamily:F.m,fontSize:11,color:$.glow,fontWeight:700}}>W.R.E.N.</span>
+          <span style={{fontFamily:F.m,fontSize:8,color:$.dim,letterSpacing:1}}>POWERED BY A.G.N.E.S.</span>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:14}}>
+          <div style={{display:"flex",gap:4}}>
+            {scenarios.map(function(_,i){ return (<div key={i} style={{width:28,height:3,borderRadius:2,background:i<idx?$.glow:i===idx?dp.urgency+"cc":"rgba(255,255,255,.06)",transition:"background .3s"}}/>); })}
+          </div>
+          <button onClick={props.onBack} style={{background:"transparent",border:"none",color:$.dim,fontSize:10,fontFamily:F.m,cursor:"pointer"}}>EXIT</button>
+        </div>
+      </div>
 
-        {/* LEFT: live grid */}
-        <div style={{padding:"20px 16px 16px 24px",display:"flex",flexDirection:"column",borderRight:"1px solid rgba(255,255,255,.04)"}}>
-          <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 8px"}}>
-            <AnimatedGrid stressed={stress}/>
-          </div>
-          {/* metrics strip */}
-          <div style={{display:"flex",gap:8,marginTop:12,flexShrink:0}}>
-            {[
-              {l:"MODEL AUC",v:dp.snap.auc,c:dp.snap.aucC,sub:"↓ from 1.000"},
-              {l:"PSI DRIFT", v:dp.snap.psi,c:dp.snap.psiC,sub:"threshold 0.25"},
-              {l:"COVERAGE", v:dp.snap.cov,c:dp.snap.covC,sub:"target ≥95%"},
-            ].map(function(m){ return (
-              <div key={m.l} style={{flex:1,background:"rgba(255,255,255,.025)",border:"1px solid "+m.c+"28",borderRadius:8,padding:"10px 0",textAlign:"center"}}>
-                <div style={{fontFamily:F.m,fontSize:7,color:$.dim,marginBottom:5,letterSpacing:".04em"}}>{m.l}</div>
-                <div style={{fontFamily:F.m,fontSize:20,fontWeight:700,color:m.c,marginBottom:2}}>{m.v}</div>
-                <div style={{fontFamily:F.m,fontSize:7,color:$.dim,opacity:.6}}>{m.sub}</div>
-              </div>
-            ); })}
-          </div>
+      {/* Status bar */}
+      <div style={{position:"relative",zIndex:10,padding:"0 24px",marginBottom:8}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:8,height:8,borderRadius:"50%",background:statusColor,boxShadow:"0 0 12px "+statusColor,
+            animation:canAct&&!chosen?"wpulse 0.7s ease-in-out infinite":"none",transition:"background .3s"}}/>
+          <span style={{fontFamily:F.m,fontSize:10,color:statusColor,letterSpacing:".08em",fontWeight:600}}>{statusLabel}</span>
+          <span style={{fontFamily:F.m,fontSize:9,color:dp.urgency,opacity:.7}}>{dp.label}</span>
+          <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>BATCH {dp.batch}</span>
+        </div>
+      </div>
+
+      {/* Bottom panel: alerts + actions */}
+      <div style={{position:"absolute",bottom:0,left:0,right:0,zIndex:15,
+        background:"linear-gradient(transparent, rgba(3,7,16,.95) 30%)",
+        paddingTop:60}}>
+
+        {/* Metrics strip */}
+        <div style={{display:"flex",gap:6,padding:"0 24px",marginBottom:12}}>
+          {[
+            {l:"AUC",v:dp.snap.auc,c:dp.snap.aucC},
+            {l:"PSI",v:dp.snap.psi,c:dp.snap.psiC},
+            {l:"COV",v:dp.snap.cov,c:dp.snap.covC},
+          ].map(function(m){ return (
+            <div key={m.l} style={{background:"rgba(255,255,255,.03)",border:"1px solid "+m.c+"22",borderRadius:6,padding:"6px 14px",display:"flex",alignItems:"center",gap:8}}>
+              <span style={{fontFamily:F.m,fontSize:7,color:$.dim,letterSpacing:1}}>{m.l}</span>
+              <span style={{fontFamily:F.m,fontSize:14,fontWeight:700,color:m.c}}>{m.v}</span>
+            </div>
+          ); })}
         </div>
 
-        {/* RIGHT: alert stream + action */}
-        <div style={{display:"flex",flexDirection:"column",overflow:"hidden"}}>
-          {/* alert log */}
-          <div ref={alertRef} style={{flex:1,overflowY:"auto",padding:"16px 20px",display:"flex",flexDirection:"column",gap:10,justifyContent:"flex-end"}}>
-            {alerts.length===0 && (
-              <div style={{fontFamily:F.m,fontSize:10,color:$.dim,textAlign:"center",opacity:.5}}>Awaiting telemetry...</div>
-            )}
-            {alerts.map(function(a,i){
-              var col = a.lvl==="warn"?$.ac : a.lvl==="alert"?$.rd : a.lvl==="critical"?$.rd : a.lvl==="good"?$.gn : a.lvl==="fail"?$.rd : a.lvl==="apply"?$.glow : $.tx3;
-              var isCrit = a.lvl==="critical";
-              return (
-                <div key={i} style={{animation:"wup .25s ease both",borderLeft:"2px solid "+col+(isCrit?"":"44"),paddingLeft:10}}>
-                  {isCrit && <div style={{fontFamily:F.m,fontSize:7,color:$.dim,marginBottom:3,letterSpacing:".04em"}}>W.R.E.N.</div>}
-                  <div style={{fontFamily:F.m,fontSize:isCrit?12:11,color:col,lineHeight:1.65,fontWeight:isCrit?700:400}}>{a.msg}</div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* action zone */}
-          <div style={{padding:"14px 20px 20px",borderTop:"1px solid rgba(255,255,255,.04)",flexShrink:0}}>
-            {!canAct && !chosen && (
-              <div style={{fontFamily:F.m,fontSize:9,color:$.dim,textAlign:"center",padding:"14px 0",animation:"wblink 2s ease-in-out infinite"}}>
-                W.R.E.N. is analysing...
-              </div>
-            )}
-
-            {canAct && !chosen && (
-              <div>
-                <div style={{fontFamily:F.m,fontSize:9,color:dp.urgency,letterSpacing:".06em",marginBottom:10,textAlign:"center"}}>
-                  OPERATOR: CHOOSE YOUR ACTION
-                </div>
-                <div style={{display:"flex",flexDirection:"column",gap:9}}>
-                  {dp.options.map(function(opt,i){
-                    return (
-                      <button key={i} onClick={function(){ choose(i); }}
-                        style={{background:"rgba(255,255,255,.025)",border:"1px solid "+dp.urgency+"44",borderRadius:10,padding:"14px 16px",textAlign:"left",cursor:"pointer",fontFamily:F.s,display:"flex",gap:12,alignItems:"center"}}
-                        onMouseEnter={function(e){ e.currentTarget.style.background=dp.urgency+"14"; e.currentTarget.style.borderColor=dp.urgency; }}
-                        onMouseLeave={function(e){ e.currentTarget.style.background="rgba(255,255,255,.025)"; e.currentTarget.style.borderColor=dp.urgency+"44"; }}>
-                        <span style={{fontSize:22,flexShrink:0,lineHeight:1}}>{opt.icon}</span>
-                        <div>
-                          <div style={{fontSize:13,fontWeight:700,color:$.tx,marginBottom:3}}>{opt.label}</div>
-                          <div style={{fontSize:10,color:$.tx3,lineHeight:1.55}}>{opt.desc}</div>
-                        </div>
-                      </button>
-                    );
-                  })}
+        {/* Alert stream */}
+        <div ref={alertRef} style={{maxHeight:140,overflowY:"auto",padding:"0 24px",marginBottom:12}}>
+          {alerts.length===0 && (
+            <div style={{fontFamily:F.m,fontSize:10,color:$.dim,animation:"wblink 2.5s ease-in-out infinite",padding:"8px 0"}}>
+              A.G.N.E.S. scanning telemetry...
+            </div>
+          )}
+          {alerts.map(function(a,i){
+            var col = a.lvl==="warn"?$.ac : a.lvl==="alert"?$.rd : a.lvl==="critical"?$.rd : a.lvl==="good"?$.gn : a.lvl==="fail"?$.rd : a.lvl==="apply"?$.glow : $.tx3;
+            var isCrit = a.lvl==="critical";
+            return (
+              <div key={i} style={{animation:"wup .2s ease both",marginBottom:6,display:"flex",alignItems:"flex-start",gap:8}}>
+                <div style={{width:4,height:4,borderRadius:"50%",background:col,marginTop:6,flexShrink:0,boxShadow:isCrit?"0 0 6px "+col:"none"}}/>
+                <div style={{fontFamily:F.m,fontSize:isCrit?12:10,color:col,lineHeight:1.6,fontWeight:isCrit?700:400}}>
+                  {isCrit && <span style={{fontSize:7,color:$.dim,letterSpacing:1,marginRight:6}}>W.R.E.N.</span>}
+                  {a.msg}
                 </div>
               </div>
-            )}
+            );
+          })}
+        </div>
 
-            {chosen !== null && !resolved && (
-              <div style={{textAlign:"center",padding:"16px 0"}}>
-                <div style={{fontFamily:F.m,fontSize:10,color:$.glow,animation:"wblink 0.9s ease-in-out infinite"}}>
-                  Applying {dp.options[chosen].label}...
-                </div>
-              </div>
-            )}
+        {/* Action zone */}
+        <div style={{padding:"0 24px 28px"}}>
+          {!canAct && !chosen && (
+            <div style={{fontFamily:F.m,fontSize:9,color:$.dim,textAlign:"center",padding:"8px 0",animation:"wblink 2s ease-in-out infinite"}}>
+              A.G.N.E.S. is analysing...
+            </div>
+          )}
 
-            {chosen !== null && resolved && (
-              <div>
-                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-                  <div style={{width:30,height:30,borderRadius:"50%",background:oc(chosenOpt.outcome)+"14",border:"2px solid "+oc(chosenOpt.outcome)+"55",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:oc(chosenOpt.outcome),fontWeight:700,flexShrink:0}}>
-                    {chosenOpt.outcome==="good"?"\u2713":"\u2717"}
-                  </div>
-                  <span style={{fontFamily:F.m,fontSize:11,color:oc(chosenOpt.outcome),fontWeight:600,lineHeight:1.3}}>{ol(chosenOpt.outcome)} {chosenOpt.label}</span>
-                </div>
-                <button onClick={advance} style={{background:$.glow,color:$.bg,border:"none",borderRadius:8,padding:"13px 0",fontSize:13,fontWeight:700,cursor:"pointer",width:"100%"}}>
-                  {idx===DECISION_POINTS.length-1?"See debrief \u2192":"Next incident \u2192"}
-                </button>
+          {canAct && !chosen && (
+            <div style={{animation:"wup .4s ease both"}}>
+              <div style={{fontFamily:F.m,fontSize:9,color:dp.urgency,letterSpacing:2,marginBottom:12,textAlign:"center",animation:"wpulse 1.5s ease-in-out infinite"}}>
+                YOUR CALL, OPERATOR
               </div>
-            )}
-          </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                {dp.options.map(function(opt,i){
+                  return (
+                    <button key={i} onClick={function(){ choose(i); }}
+                      style={{background:"rgba(255,255,255,.03)",border:"1px solid "+dp.urgency+"33",borderRadius:12,padding:"18px 16px",textAlign:"left",cursor:"pointer",fontFamily:F.s,transition:"all .2s"}}
+                      onMouseEnter={function(e){ e.currentTarget.style.background=dp.urgency+"12"; e.currentTarget.style.borderColor=dp.urgency; e.currentTarget.style.transform="translateY(-2px)"; }}
+                      onMouseLeave={function(e){ e.currentTarget.style.background="rgba(255,255,255,.03)"; e.currentTarget.style.borderColor=dp.urgency+"33"; e.currentTarget.style.transform="none"; }}>
+                      <div style={{fontSize:22,marginBottom:8}}>{opt.icon}</div>
+                      <div style={{fontSize:14,fontWeight:700,color:$.tx,marginBottom:4}}>{opt.label}</div>
+                      <div style={{fontSize:10,color:$.tx3,lineHeight:1.6}}>{opt.desc}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {chosen !== null && !resolved && (
+            <div style={{textAlign:"center",padding:"20px 0"}}>
+              <div style={{fontFamily:F.m,fontSize:11,color:$.glow,animation:"wblink 0.8s ease-in-out infinite",letterSpacing:1}}>
+                APPLYING {dp.options[chosen].label.toUpperCase()}...
+              </div>
+            </div>
+          )}
+
+          {chosen !== null && resolved && (
+            <div style={{animation:"wup .4s ease both"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:12,marginBottom:16}}>
+                <div style={{width:36,height:36,borderRadius:"50%",background:oc(chosenOpt.outcome)+"18",border:"2px solid "+oc(chosenOpt.outcome),display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:oc(chosenOpt.outcome),fontWeight:700}}>
+                  {chosenOpt.outcome==="good"?"\u2713":"\u2717"}
+                </div>
+                <span style={{fontSize:14,color:oc(chosenOpt.outcome),fontWeight:700,fontFamily:F.s}}>{chosenOpt.outcome==="good"?"Model stabilised.":"Model compromised."}</span>
+              </div>
+              <button onClick={advance}
+                style={{background:$.glow,color:$.bg,border:"none",borderRadius:10,padding:"14px 0",fontSize:14,fontWeight:700,cursor:"pointer",width:"100%",letterSpacing:0.5}}>
+                {idx===scenarios.length-1?"See the debrief":"Next incident \u2192"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -994,7 +1167,7 @@ function CommandCentre(props) {
         </div>
       </div>
       <div style={{textAlign:"center",padding:"12px",borderTop:"1px solid "+$.brd}}>
-        <div style={{fontFamily:F.m,fontSize:9,color:$.dim}}>A.G.N.E.S. v4.2 | Husain Ali Al Hashem | University of Portsmouth 2025–2026</div>
+        <div style={{fontFamily:F.m,fontSize:9,color:$.dim}}>A.G.N.E.S. v4.2 | University of Portsmouth 2025–2026</div>
       </div>
     </div>
   );
@@ -1006,7 +1179,7 @@ function CommandCentre(props) {
       <div style={{maxWidth:880,margin:"0 auto",padding:"28px 20px 56px"}}>
         <div style={{marginBottom:28}}>
           <p style={{fontFamily:F.m,fontSize:10,color:$.glow,letterSpacing:4,marginBottom:8}}>A.G.N.E.S. PIPELINE v4.2</p>
-          <h2 style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:8}}>22 automated stages. Every one ran on Husain's machine.</h2>
+          <h2 style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:8}}>22 automated stages. End to end. One pipeline.</h2>
           <p style={{fontSize:12,color:$.tx3,lineHeight:1.75}}>From raw DSGC dataset to deployed browser model. Output of each stage feeds directly into the next.</p>
         </div>
 
@@ -1298,13 +1471,13 @@ function HeroSection(props) {
       <div style={{ position: "relative", zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", padding: "0 24px 30vh", gap: 0 }}>
         {/* Buttons stacked vertically */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "min(260px, 72%)", marginBottom: 14 }}>
-          <button onClick={function() { setPage("operator"); }} style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 10, padding: "13px 0", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: F.s, width: "100%", textAlign: "center" }}>Play the Operator Sim</button>
+          <button onClick={function() { setPage("operator"); }} style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 10, padding: "13px 0", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: F.s, width: "100%", textAlign: "center" }}>Enter Operations Centre</button>
           <button onClick={function() { go("demo"); }} style={{ background: "rgba(8,17,30,.85)", border: "1px solid rgba(251,191,36,.35)", borderRadius: 10, padding: "11px 0", fontSize: 12, fontWeight: 600, color: $.glow, cursor: "pointer", fontFamily: F.s, width: "100%", textAlign: "center", backdropFilter: "blur(8px)" }}>Watch It Work ↓</button>
         </div>
         {/* Description below buttons */}
         <div style={{ maxWidth: 400, textAlign: "center", textShadow: "0 2px 16px #060b14" }}>
           <p style={{ fontFamily: F.s, fontSize: 14, color: $.tx2, lineHeight: 1.7, marginBottom: 6, fontWeight: 500 }}>AI models fail silently after deployment. Data changes, confidence decays, attacks go unnoticed.</p>
-          <p style={{ fontFamily: F.s, fontSize: 13, color: $.tx3, lineHeight: 1.7 }}>W.R.E.N. catches it. Before the model fails, you know.</p>
+          <p style={{ fontFamily: F.s, fontSize: 13, color: $.tx3, lineHeight: 1.7 }}>W.R.E.N. Detects it. Diagnoses it. Recommends what to do next.</p>
         </div>
       </div>
     </section>
@@ -1337,7 +1510,7 @@ export default function App() {
             var labels = { demo: "Watch It Work", proof: "Evidence", honour: "Honour" };
             return (<span key={id} onClick={function() { go(id); }} style={{ fontSize: 11, color: $.tx3, cursor: "pointer", letterSpacing: 1 }} onMouseEnter={function(e) { e.target.style.color = $.glow; }} onMouseLeave={function(e) { e.target.style.color = $.tx3; }}>{labels[id]}</span>);
           })}
-          <button onClick={function() { setPage("operator"); }} style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 6, padding: "7px 16px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Play Operator Sim</button>
+          <button onClick={function() { setPage("operator"); }} style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 6, padding: "7px 16px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Ops Centre</button>
           <button onClick={function() { setPage("command"); }} style={{ background: "transparent", border: "1px solid " + $.brd, color: $.tx2, borderRadius: 6, padding: "7px 16px", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Dashboard</button>
         </div>
       </nav>
@@ -1375,21 +1548,21 @@ export default function App() {
 
           <Rv d={0.16}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, maxWidth: 640, margin: "0 auto" }}>
-            {/* Card 1: Operator Sim */}
+            {/* Card 1: Operations Centre */}
             <div style={{ background: $.bg2, border: "1px solid " + $.brd, borderRadius: 12, padding: "28px 22px", textAlign: "left", cursor: "pointer", transition: "all .3s" }}
               onClick={function() { setPage("operator"); }}
               onMouseEnter={function(e) { e.currentTarget.style.borderColor = $.glow + "55"; e.currentTarget.style.transform = "translateY(-2px)"; }}
               onMouseLeave={function(e) { e.currentTarget.style.borderColor = $.brd; e.currentTarget.style.transform = "none"; }}>
               <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}><Beacon s={44} glow={0.2} interactive={true} /></div>
               <div style={{ fontFamily: F.m, fontSize: 9, color: $.glow, letterSpacing: 3, marginBottom: 8, textAlign: "center" }}>INTERACTIVE</div>
-              <h3 style={{ fontSize: 17, fontWeight: 600, fontFamily: serif, color: $.tx, marginBottom: 8, textAlign: "center" }}>Operator Sim</h3>
-              <p style={{ fontSize: 12, color: $.tx3, lineHeight: 1.7, marginBottom: 16, textAlign: "center" }}>Three incidents hit the grid. You read the diagnostics, study which nodes are stressed, and choose how to respond. Your decisions determine whether the grid holds.</p>
+              <h3 style={{ fontSize: 17, fontWeight: 600, fontFamily: serif, color: $.tx, marginBottom: 8, textAlign: "center" }}>Ops Centre</h3>
+              <p style={{ fontSize: 12, color: $.tx3, lineHeight: 1.7, marginBottom: 16, textAlign: "center" }}>Your model is deployed on the grid. Three incidents degrade its predictions. A.G.N.E.S. flags what is changing. You decide how to respond. Powered by real deployment data.</p>
               <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 16, flexWrap: "wrap" }}>
                 {[{i:"\u21BA",l:"Recalibrate"},{i:"\u21C4",l:"Switch"},{i:"\u26A0",l:"Alert"},{i:"\u23FC",l:"Halt"}].map(function(a) {
                   return (<div key={a.l} style={{ background: $.bg, border: "1px solid " + $.brd, borderRadius: 6, padding: "6px 10px", textAlign: "center" }}><span style={{ fontSize: 12, marginRight: 4 }}>{a.i}</span><span style={{ fontSize: 9, color: $.tx3, fontFamily: F.m }}>{a.l}</span></div>);
                 })}
               </div>
-              <button style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 8, padding: "11px 0", fontSize: 13, fontWeight: 700, cursor: "pointer", width: "100%" }}>Play Now</button>
+              <button style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 8, padding: "11px 0", fontSize: 13, fontWeight: 700, cursor: "pointer", width: "100%" }}>Enter</button>
             </div>
             {/* Card 2: Technical Dashboard */}
             <div style={{ background: $.bg2, border: "1px solid " + $.brd, borderRadius: 12, padding: "28px 22px", textAlign: "left", cursor: "pointer", transition: "all .3s" }}
@@ -1467,7 +1640,7 @@ export default function App() {
       {/* FOOTER */}
       <footer style={{ padding: "24px 28px", borderTop: "1px solid " + $.brd, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}><BeaconSmall s={14} /><span style={{ fontSize: 10, letterSpacing: 2, color: $.dim }}>W.R.E.N.</span></div>
-        <div style={{ fontSize: 10, color: $.dim }}>Husain Ali Al Hashem | University of Portsmouth | 2025-2026</div>
+        <div style={{ fontSize: 10, color: $.dim }}>University of Portsmouth | 2025-2026</div>
         <div style={{ fontSize: 10, color: $.dim, fontStyle: "italic" }}>Powered by A.G.N.E.S. v4.2</div>
       </footer>
     </div>
