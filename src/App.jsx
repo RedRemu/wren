@@ -26,6 +26,7 @@ var SV=[.9488,.9275,.9405,.9264,.929,.9205,.9153,.9109,.904,.9032,.9027,.8993,.8
 var SR=[.9899,.9562,.9522,.9566,.95,.9347,.9333,.9309,.9317,.9331,.9279,.9339,.9358,.9309,.9299,.936,.938,.9422,.9465,.9463,.9467,.9413,.9347,.9391,.9384,.938,.9348,.9305,.9258,.9275,.9284,.9286,.9265,.9215,.927,.9235,.9261,.923,.9212,.9185,.9182,.9179,.9193,.9181,.9177,.9181,.918,.9234,.9261,.9276,.9217,.9199,.9246,.9292,.9173,.9147,.9097,.9101,.9099,.9056,.8963,.8982,.8903,.8883,.8972,.895,.894,.8877,.8865,.8857,.893,.8916,.8967,.894,.897,.8981,.901,.905,.9022,.9036,.8953,.8933,.8898,.886,.8715,.8779,.87,.8646,.8653,.8595,.8585,.8539,.8481,.8492,.8546,.8546,.8544,.8599,.8588,.86,.868,.8684,.8678,.8738,.8752,.8758,.886,.8847,.8904,.8965,.9,.901,.9103,.9039,.9027,.9008,.8976,.893,.8855,.8822];
 var SP=[.10,.08,.09,.11,.12,.08,.08,.08,.12,.08,.10,.09,.11,.10,.13,.11,.09,.10,.10,.08,.10,.11,.10,.10,.08,.11,.11,.10,.11,.12,.10,.08,.08,.12,.07,.13,.09,.12,.11,.08,.07,.09,.08,.14,.09,.14,.10,.12,.11,.16,.15,.18,.12,.16,.18,.35,.22,.26,.23,.19,.27,.26,.31,.31,.30,.41,.57,.42,.30,.38,.44,.48,.40,.59,.38,.47,.60,.66,.43,.62,1.16,.98,.9,1.28,.89,1.22,1.4,.88,1.19,1.21,1.76,1.36,1.1,1.22,1.57,1.8,1.62,1.6,1.9,2.11,2,1.82,1.43,1.79,1.28,1.88,1.79,1.72,2.74,1.76,2.36,2.29,2.31,1.77,1.7,1.87,2.34,2.32,1.94,2.36];
 var SC=[.96,.935,.93,.935,.934,.925,.919,.921,.92,.917,.911,.915,.917,.917,.919,.926,.929,.93,.934,.936,.929,.926,.923,.924,.921,.912,.915,.91,.905,.905,.914,.915,.916,.914,.916,.919,.918,.92,.924,.923,.925,.925,.925,.92,.913,.91,.91,.909,.907,.91,.902,.9,.898,.897,.896,.895,.886,.882,.877,.875,.875,.865,.86,.86,.865,.865,.866,.864,.867,.863,.858,.857,.857,.855,.852,.849,.845,.843,.84,.844,.833,.838,.835,.83,.819,.821,.821,.817,.815,.808,.81,.8,.799,.8,.806,.805,.804,.81,.809,.815,.831,.842,.844,.853,.859,.86,.858,.861,.863,.858,.853,.85,.848,.842,.83,.831,.84,.833,.832,.836];
+var SL=[.9856,.9612,.9558,.9601,.9545,.9398,.9378,.9362,.9355,.9372,.9318,.9382,.9395,.9348,.9335,.9401,.9418,.9458,.9498,.9501,.9504,.9448,.9388,.9425,.9418,.9412,.9385,.9340,.9295,.9312,.9320,.9325,.9300,.9255,.9305,.9272,.9298,.9265,.9248,.9222,.9218,.9215,.9230,.9218,.9213,.9216,.9215,.9270,.9296,.9312,.9252,.9234,.9282,.9328,.9208,.9182,.9132,.9136,.9134,.9090,.8998,.9016,.8938,.8918,.9006,.8984,.8974,.8912,.8900,.8892,.8964,.8950,.9002,.8974,.9004,.9015,.9044,.9084,.9056,.9070,.8988,.8967,.8932,.8894,.8750,.8812,.8734,.8680,.8688,.8630,.8618,.8572,.8514,.8526,.8580,.8580,.8578,.8634,.8622,.8634,.8714,.8718,.8712,.8772,.8786,.8792,.8894,.8880,.8938,.8998,.9034,.9044,.9136,.9072,.9060,.9042,.9010,.8964,.8888,.8856];
 var NS = Array.from({ length: 2000 }, function(_, i) { return Math.sin(i * 127.1 + i * i * .013) * .5 + Math.cos(i * 269.5 - i * .017) * .5; });
 
 /* ═══ SCENARIOS ═══ */
@@ -329,14 +330,26 @@ var SCENE_TIMING = [3000, 4000, 4000, 4500, 4500];
 
 function SignatureDemo() {
   var _sc = useState("nominal"); var scenario = _sc[0]; var setScenario = _sc[1];
-  var _playing = useState(true); var playing = _playing[0]; var setPlaying = _playing[1];
+  var _playing = useState(false); var playing = _playing[0]; var setPlaying = _playing[1];
   var _si = useState(0); var sceneIdx = _si[0]; var setSceneIdx = _si[1];
   var _health = useState(98); var dispHealth = _health[0]; var setDispHealth = _health[1];
   var _alerts = useState([]); var alerts = _alerts[0]; var setAlerts = _alerts[1];
   var _done = useState(false); var done = _done[0]; var setDone = _done[1];
-  var timerRef = useRef(null); var healthRef = useRef(null);
+  var _started = useState(false); var started = _started[0]; var setStarted = _started[1];
+  var timerRef = useRef(null); var healthRef = useRef(null); var wrapRef = useRef(null);
   var sc = SCENARIOS[scenario]; var b = sc.batch;
   var aucData = useMemo(function() { return SH.map(function(v, i) { return { b: i, H: v, S: SV[i] }; }); }, []);
+
+  /* Start playing only when scrolled into view */
+  useEffect(function() {
+    if (started) return;
+    var el = wrapRef.current; if (!el) return;
+    var o = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) { setPlaying(true); setStarted(true); o.disconnect(); }
+    }, { threshold: 0.3 });
+    o.observe(el);
+    return function() { o.disconnect(); };
+  }, [started]);
 
   useEffect(function() {
     if (!playing) return;
@@ -361,7 +374,7 @@ function SignatureDemo() {
   var healthColor = dispHealth > 90 ? $.gn : dispHealth > 75 ? $.ac : $.rd;
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto" }}>
+    <div ref={wrapRef} style={{ maxWidth: 900, margin: "0 auto" }}>
       <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
         {SCENE_ORDER.map(function(key, i) {
           var s = SCENARIOS[key]; var isCurrent = scenario === key; var isPast = SCENE_ORDER.indexOf(scenario) > i;
@@ -757,7 +770,7 @@ function CommandCentre(props) {
   var _demo = useState(false);   var demo  = _demo[0];  var setDemo  = _demo[1];
   var _card = useState(null);    var card  = _card[0];  var setCard  = _card[1];
   var demoRef = useRef(null);
-  var aucData = useMemo(function(){ return SH.map(function(v,i){ return {b:i,H:v,S:SV[i],R:SR[i]}; }); },[]);
+  var aucData = useMemo(function(){ return SH.map(function(v,i){ return {b:i,H:v,S:SV[i],R:SR[i],L:SL[i]}; }); },[]);
   var psiData = useMemo(function(){ return SP.map(function(v,i){ return {b:i,P:v}; }); },[]);
   var covData = useMemo(function(){ return SC.map(function(v,i){ return {b:i,C:v}; }); },[]);
   var phase = batch<40?"stable":batch<80?"drift":"critical";
@@ -814,7 +827,7 @@ function CommandCentre(props) {
       title:"What is this chart telling you?",
       plain:"This is the model's accuracy score over time AUC goes from 0 (random guessing) to 1.0 (perfect). In the lab, the Hybrid model scored 0.9999. Nearly perfect.",
       insight:"But then the real world happened. As the grid data drifts (batch 40), gets attacked (batch 65), and shifts regime entirely (batch 80), accuracy falls to 0.8834. That's not a failure. It is what deployment actually looks like. A static benchmark would never show you this. W.R.E.N. tracks it in real time so you know when to trust the model and when to escalate.",
-      lines:[{c:$.glow,l:"Hybrid: your best model"},{c:"#a78bfa",l:"SVM: smooth boundaries, vulnerable to attacks"},{c:$.gn,l:"RF: weaker on clean data, immune to gradient attacks"}],
+      lines:[{c:$.glow,l:"Hybrid: your best model"},{c:"#a78bfa",l:"SVM: smooth boundaries, vulnerable to attacks"},{c:$.gn,l:"RF: immune to gradient attacks"},{c:"#67e8f9",l:"LGBM: gradient boosting, fast and competitive"}],
     },
     psi:{
       title:"What is PSI telling you?",
@@ -903,7 +916,7 @@ function CommandCentre(props) {
           <span style={{fontFamily:F.m,fontSize:9,color:pCol,opacity:.6}}>| Batch {batch} | AUC {(SH[batch]||0).toFixed(4)} | PSI {(SP[batch]||0).toFixed(2)}</span>
         </div>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
-          <button onClick={function(){if(demo){setDemo(false);}else{setBatch(0);setDemo(true);}}} style={{padding:"4px 12px",borderRadius:5,border:"1px solid "+(demo?$.rd:$.glow),background:demo?$.rdD:$.acD,color:demo?$.rd:$.glow,fontFamily:F.m,fontSize:9,fontWeight:600,cursor:"pointer"}}>{demo?"Pause":"Replay"}</button>
+          <button onClick={function(){if(demo){setDemo(false);}else{setBatch(0);setDemo(true);}}} style={{padding:"4px 12px",borderRadius:5,border:"1px solid "+(demo?$.rd:$.glow),background:demo?$.rdD:$.acD,color:demo?$.rd:$.glow,fontFamily:F.m,fontSize:9,fontWeight:600,cursor:"pointer"}}>{demo?"Pause":batch>=119?"Replay":"Play"}</button>
           <input type="range" min={0} max={119} value={batch} onChange={function(e){setDemo(false);setBatch(+e.target.value);}} style={{width:150,accentColor:$.glow}}/>
           <span style={{fontFamily:F.m,fontSize:11,color:$.glow,fontWeight:700,minWidth:20}}>{batch}</span>
         </div>
@@ -933,18 +946,19 @@ function CommandCentre(props) {
             sub="Three models, three drift phases. Click to understand what you're looking at."
             children={
               <ResponsiveContainer width="100%" height={210}>
-                <LineChart data={aucData} margin={{top:8,right:8,bottom:4,left:0}}>
+                <LineChart data={aucData.slice(0,batch+1)} margin={{top:8,right:8,bottom:4,left:0}}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(251,191,36,.04)"/>
-                  <XAxis dataKey="b" tick={TK} tickLine={false}/>
-                  <YAxis domain={["auto","auto"]} tick={TK} tickLine={false} width={36}/>
+                  <XAxis dataKey="b" tick={TK} tickLine={false} domain={[0,119]} type="number"/>
+                  <YAxis domain={["dataMin - 0.01","dataMax + 0.01"]} tick={TK} tickLine={false} width={36}/>
                   <Tooltip contentStyle={TT}/>
-                  <ReferenceLine x={40} stroke={$.ac} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Drift",position:"insideTopLeft",fill:$.ac,fontSize:8}}/>
-                  <ReferenceLine x={65} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Attack",position:"insideTopLeft",fill:$.rd,fontSize:8}}/>
-                  <ReferenceLine x={80} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Regime",position:"insideTopLeft",fill:$.rd,fontSize:8}}/>
+                  {batch>=40 && <ReferenceLine x={40} stroke={$.ac} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Drift",position:"insideTopLeft",fill:$.ac,fontSize:8}}/>}
+                  {batch>=65 && <ReferenceLine x={65} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Attack",position:"insideTopLeft",fill:$.rd,fontSize:8}}/>}
+                  {batch>=80 && <ReferenceLine x={80} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Regime",position:"insideTopLeft",fill:$.rd,fontSize:8}}/>}
                   <ReferenceLine x={batch} stroke={$.glow} strokeWidth={1.5} strokeOpacity={.9}/>
-                  <Line type="monotone" dataKey="H" stroke={$.glow} strokeWidth={2.5} dot={false} name="Hybrid"/>
-                  <Line type="monotone" dataKey="S" stroke="#a78bfa" strokeWidth={1.2} dot={false} opacity={.5} name="SVM"/>
-                  <Line type="monotone" dataKey="R" stroke={$.gn} strokeWidth={1.2} dot={false} opacity={.5} name="RF"/>
+                  <Line type="monotone" dataKey="H" stroke={$.glow} strokeWidth={2.5} dot={false} name="Hybrid" isAnimationActive={false}/>
+                  <Line type="monotone" dataKey="S" stroke="#a78bfa" strokeWidth={1.2} dot={false} opacity={.5} name="SVM" isAnimationActive={false}/>
+                  <Line type="monotone" dataKey="R" stroke={$.gn} strokeWidth={1.2} dot={false} opacity={.5} name="RF" isAnimationActive={false}/>
+                  <Line type="monotone" dataKey="L" stroke="#67e8f9" strokeWidth={1.2} dot={false} opacity={.5} name="LGBM" isAnimationActive={false}/>
                 </LineChart>
               </ResponsiveContainer>
             }/>
@@ -955,12 +969,12 @@ function CommandCentre(props) {
             sub="Alert threshold: 0.25. Crossed at batch 55, 26 batches early"
             children={
               <ResponsiveContainer width="100%" height={140}>
-                <AreaChart data={psiData} margin={{top:4,right:4,bottom:4,left:0}}>
-                  <XAxis dataKey="b" tick={false} axisLine={false}/>
-                  <YAxis tick={false} axisLine={false} width={0}/>
+                <AreaChart data={psiData.slice(0,batch+1)} margin={{top:14,right:4,bottom:4,left:0}}>
+                  <XAxis dataKey="b" tick={false} axisLine={false} domain={[0,119]} type="number"/>
+                  <YAxis tick={false} axisLine={false} width={0} domain={[0, function(max){ return Math.max(0.35, max*1.1); }]}/>
                   <ReferenceLine y={0.25} stroke={$.rd} strokeDasharray="3 3" strokeOpacity={.5} label={{value:"Alert 0.25",position:"insideTopLeft",fill:$.rd,fontSize:8}}/>
                   <ReferenceLine x={batch} stroke={$.glow} strokeWidth={1.2} strokeOpacity={.7}/>
-                  <Area type="monotone" dataKey="P" stroke={$.ac} fill={$.acD} strokeWidth={2}/>
+                  <Area type="monotone" dataKey="P" stroke={$.ac} fill={$.acD} strokeWidth={2} isAnimationActive={false}/>
                 </AreaChart>
               </ResponsiveContainer>
             }/>
@@ -968,12 +982,12 @@ function CommandCentre(props) {
             sub="Target 95%. Drops to 83% at regime collapse"
             children={
               <ResponsiveContainer width="100%" height={140}>
-                <AreaChart data={covData} margin={{top:4,right:4,bottom:4,left:0}}>
-                  <XAxis dataKey="b" tick={false} axisLine={false}/>
-                  <YAxis domain={[0.75,1]} tick={false} axisLine={false} width={0}/>
-                  <ReferenceLine y={0.95} stroke={$.gn} strokeDasharray="3 3" strokeOpacity={.4} label={{value:"95%",position:"insideTopLeft",fill:$.gn,fontSize:8}}/>
+                <AreaChart data={covData.slice(0,batch+1)} margin={{top:14,right:4,bottom:4,left:0}}>
+                  <XAxis dataKey="b" tick={false} axisLine={false} domain={[0,119]} type="number"/>
+                  <YAxis domain={[function(min){ return Math.min(0.78, min-0.01); }, 1]} tick={false} axisLine={false} width={0}/>
+                  <ReferenceLine y={0.95} stroke={$.gn} strokeDasharray="3 3" strokeOpacity={.4} label={{value:"95% target",position:"insideTopRight",fill:$.gn,fontSize:8}}/>
                   <ReferenceLine x={batch} stroke={$.glow} strokeWidth={1.2} strokeOpacity={.7}/>
-                  <Area type="monotone" dataKey="C" stroke={$.glow} fill={$.glowD} strokeWidth={2}/>
+                  <Area type="monotone" dataKey="C" stroke={$.glow} fill={$.glowD} strokeWidth={2} isAnimationActive={false}/>
                 </AreaChart>
               </ResponsiveContainer>
             }/>
