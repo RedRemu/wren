@@ -1098,7 +1098,14 @@ function CommandCentre(props) {
 function HeroSection(props) {
   var go = props.go; var setPage = props.setPage;
   var _prox = useState(0); var prox = _prox[0]; var setProx = _prox[1];
+  var _mobile = useState(window.innerWidth < 768); var mobile = _mobile[0]; var setMobile = _mobile[1];
   var secRef = useRef(null);
+
+  useEffect(function() {
+    function onResize() { setMobile(window.innerWidth < 768); }
+    window.addEventListener("resize", onResize);
+    return function() { window.removeEventListener("resize", onResize); };
+  }, []);
 
   useEffect(function() {
     function track(cx, cy) {
@@ -1135,7 +1142,7 @@ function HeroSection(props) {
     <section id="hero" ref={secRef} style={{ position: "relative", background: "#060b14", overflow: "hidden", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
 
       {/* ── FULL BACKGROUND SVG ── */}
-      <svg viewBox="0 0 1400 900" preserveAspectRatio="xMidYMax slice" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} aria-hidden="true">
+      <svg viewBox="0 0 1400 900" preserveAspectRatio={mobile ? "xMidYEnd meet" : "xMidYMax slice"} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} aria-hidden="true">
         <defs>
           <style>{`@keyframes lhSweep{0%,100%{transform:rotate(-42deg)}50%{transform:rotate(42deg)}}@keyframes lhSweep2{0%,100%{transform:rotate(-38deg)}50%{transform:rotate(38deg)}}@keyframes lhTw0{0%,100%{opacity:.9}60%{opacity:.2}}@keyframes lhTw1{0%,100%{opacity:.5}40%{opacity:1}}@keyframes lhTw2{0%,100%{opacity:.7}70%{opacity:.15}}@keyframes lhTw3{0%,100%{opacity:.3}50%{opacity:.9}}`}</style>
           <clipPath id="lhSky2"><rect x="0" y="0" width="1400" height="710"/></clipPath>
