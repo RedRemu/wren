@@ -1121,22 +1121,43 @@ function HeroSection(props) {
     <section id="hero" ref={secRef} style={{ position: "relative", background: "#060b14", overflow: "hidden", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
 
       {/* ── FULL BACKGROUND SVG ── */}
-      <svg viewBox="0 0 680 900" preserveAspectRatio="xMidYMax meet" style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", height: "130%", width: "auto", display: "block" }} aria-hidden="true">
+      <svg viewBox="0 0 1400 900" preserveAspectRatio="xMidYMax slice" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} aria-hidden="true">
         <defs>
           <style>{`@keyframes lhSweep{0%,100%{transform:rotate(-42deg)}50%{transform:rotate(42deg)}}@keyframes lhSweep2{0%,100%{transform:rotate(-38deg)}50%{transform:rotate(38deg)}}@keyframes lhTw0{0%,100%{opacity:.9}60%{opacity:.2}}@keyframes lhTw1{0%,100%{opacity:.5}40%{opacity:1}}@keyframes lhTw2{0%,100%{opacity:.7}70%{opacity:.15}}@keyframes lhTw3{0%,100%{opacity:.3}50%{opacity:.9}}`}</style>
-          <clipPath id="lhSky2"><rect x="0" y="0" width="680" height="710"/></clipPath>
+          <clipPath id="lhSky2"><rect x="0" y="0" width="1400" height="710"/></clipPath>
         </defs>
 
         {/* Sky */}
-        <rect x="0" y="0" width="680" height="900" fill="#060b14"/>
+        <rect x="0" y="0" width="1400" height="900" fill="#060b14"/>
+
+        {/* Extra stars for wider view */}
+        <g style={{animation:"lhTw0 3.2s ease-in-out infinite"}}>
+          <circle cx="50" cy="80" r="1.4" fill="#e8d5a3" opacity=".6"/>
+          <circle cx="180" cy="160" r="1.1" fill="#fff" opacity=".5"/>
+          <circle cx="1250" cy="90" r="1.6" fill="#e8d5a3" opacity=".7"/>
+          <circle cx="1340" cy="200" r="1.2" fill="#fff" opacity=".4"/>
+          <circle cx="1100" cy="60" r="1.8" fill="#e8d5a3" opacity=".65"/>
+          <circle cx="250" cy="40" r="1.3" fill="#fff" opacity=".55"/>
+        </g>
+        <g style={{animation:"lhTw1 4.1s ease-in-out infinite"}}>
+          <circle cx="120" cy="120" r="1.5" fill="#e8d5a3" opacity=".5"/>
+          <circle cx="1180" cy="150" r="1.4" fill="#fff" opacity=".5"/>
+          <circle cx="1300" cy="50" r="1.7" fill="#e8d5a3" opacity=".6"/>
+          <g opacity=".7"><circle cx="1220" cy="110" r="2" fill="#e8d5a3"/><line x1="1213" y1="110" x2="1227" y2="110" stroke="#e8d5a3" strokeWidth=".6" opacity=".4"/><line x1="1220" y1="103" x2="1220" y2="117" stroke="#e8d5a3" strokeWidth=".6" opacity=".4"/></g>
+        </g>
+        <g style={{animation:"lhTw2 5.3s ease-in-out infinite"}}>
+          <circle cx="80" cy="250" r="1.2" fill="#fff" opacity=".4"/>
+          <circle cx="1350" cy="130" r="1.3" fill="#e8d5a3" opacity=".55"/>
+          <g opacity=".65"><circle cx="200" cy="100" r="2.2" fill="#e8d5a3"/><line x1="192" y1="100" x2="208" y2="100" stroke="#e8d5a3" strokeWidth=".6" opacity=".4"/><line x1="200" y1="92" x2="200" y2="108" stroke="#e8d5a3" strokeWidth=".6" opacity=".4"/></g>
+        </g>
+
+        {/* All original content shifted to center of wider canvas */}
+        <g transform="translate(360,0)">
 
         {/* Stars */}
-        {/* Stars larger, more dramatic */}
         <g style={{animation:"lhTw0 3.2s ease-in-out infinite"}}>
-          {/* Big sparkle stars with cross */}
           <g opacity=".85"><circle cx="230" cy="92" r="2.2" fill="#e8d5a3"/><line x1="222" y1="92" x2="238" y2="92" stroke="#e8d5a3" strokeWidth=".7" opacity=".5"/><line x1="230" y1="84" x2="230" y2="100" stroke="#e8d5a3" strokeWidth=".7" opacity=".5"/></g>
           <g opacity=".75"><circle cx="590" cy="58" r="2" fill="#e8d5a3"/><line x1="583" y1="58" x2="597" y2="58" stroke="#e8d5a3" strokeWidth=".6" opacity=".45"/><line x1="590" y1="51" x2="590" y2="65" stroke="#e8d5a3" strokeWidth=".6" opacity=".45"/></g>
-          {/* Regular stars */}
           <circle cx="60" cy="50" r="1.6" fill="#e8d5a3" opacity=".8"/>
           <circle cx="180" cy="80" r="1.3" fill="#fff" opacity=".7"/>
           <circle cx="420" cy="35" r="2" fill="#e8d5a3" opacity=".9"/>
@@ -1168,37 +1189,25 @@ function HeroSection(props) {
         <circle cx="95" cy="130" r="34" fill="#0d1826"/><circle cx="90" cy="124" r="24" fill="#060b14"/>
 
         {/* ── PORTSMOUTH SPINNAKER TOWER (left) accurate side profile ── */}
-        {/* Tall straight mast/spire - tapers to point */}
         <polygon points="155,660 163,660 161,330 158,278 155,330" fill="#0d1a2c" opacity=".9"/>
-        {/* Single curved sail gentle arc, stays close to mast */}
         <path d="M 153,650 L 130,646 Q 104,632 88,602 Q 72,568 76,526 Q 80,488 96,460 Q 114,432 138,420 Q 150,415 153,390 Q 138,390 120,402 Q 98,418 84,450 Q 68,488 72,530 Q 76,572 94,606 Q 112,636 148,648 Z" fill="#0c1828" opacity=".88"/>
-        {/* Viewing platform */}
         <ellipse cx="157" cy="390" rx="14" ry="5" fill="#0e1c2e" opacity=".9"/>
-        {/* Ribs subtle, close together */}
         <line x1="98" y1="462" x2="153" y2="450" stroke="#0f1c2c" strokeWidth="1.2" opacity=".4"/>
         <line x1="84" y1="512" x2="153" y2="502" stroke="#0f1c2c" strokeWidth="1.2" opacity=".38"/>
         <line x1="88" y1="562" x2="153" y2="554" stroke="#0f1c2c" strokeWidth="1.2" opacity=".32"/>
-        {/* Base */}
         <rect x="100" y="658" width="62" height="4" fill="#0a1420" opacity=".65" rx="2"/>
 
         {/* ── PORTSMOUTH GUILDHALL (right) ── */}
-        {/* Main body */}
         <rect x="490" y="598" width="168" height="65" fill="#0d1825" opacity=".8" rx="2"/>
-        {/* Pediment / triangular roof */}
         <polygon points="490,598 658,598 574,565" fill="#0f1d2e" opacity=".8"/>
-        {/* Central clock tower */}
         <rect x="558" y="540" width="32" height="62" fill="#0d1927" opacity=".85" rx="2"/>
-        {/* Clock tower top / dome */}
         <path d="M558,540 Q574,518 590,540" fill="#0f1d2e" opacity=".85"/>
         <rect x="565" y="514" width="18" height="28" fill="#0e1c2c" opacity=".8" rx="2"/>
-        {/* Lantern on top */}
         <rect x="570" y="506" width="8" height="12" fill="#0f1d2e" opacity=".8" rx="2"/>
         <line x1="574" y1="506" x2="574" y2="496" stroke="#101e30" strokeWidth="2" opacity=".7"/>
-        {/* Columns */}
         {[504,520,536,552,596,612,628,644].map(function(x, i) {
           return <rect key={i} x={x} y="585" width="5" height="18" fill="#0c1722" opacity=".7" rx="1"/>;
         })}
-        {/* Ground shadow */}
         <rect x="488" y="660" width="172" height="4" fill="#0a1420" opacity=".6" rx="2"/>
 
         {/* W.R.E.N. title */}
@@ -1241,15 +1250,15 @@ function HeroSection(props) {
         <circle cx="340" cy="240" r="6" fill="#fbbf24" opacity={lampOp}/>
         <circle cx="340" cy="240" r="3" fill="#fffde0" opacity=".95"/>
 
-        {/* Ground flat continuous waterfront */}
-        <rect x="0" y="660" width="680" height="240" fill="#08111e"/>
-        <line x1="0" y1="661" x2="680" y2="661" stroke="#152030" strokeWidth="1.5" opacity=".8"/>
+        </g>{/* end translate group */}
 
-        {/* Water surface */}
-        <rect x="0" y="720" width="680" height="180" fill="#050d17"/>
-        <line x1="0" y1="721" x2="680" y2="721" stroke="#0e1f30" strokeWidth="1" opacity=".6"/>
+        {/* Ground flat continuous waterfront - full width */}
+        <rect x="0" y="660" width="1400" height="240" fill="#08111e"/>
+        <line x1="0" y1="661" x2="1400" y2="661" stroke="#152030" strokeWidth="1.5" opacity=".8"/>
 
-        {/* Portsmouth text subtle watermark */}
+        {/* Water surface - full width */}
+        <rect x="0" y="720" width="1400" height="180" fill="#050d17"/>
+        <line x1="0" y1="721" x2="1400" y2="721" stroke="#0e1f30" strokeWidth="1" opacity=".6"/>
 
       </svg>
 
