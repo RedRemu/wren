@@ -30,11 +30,11 @@ var NS = Array.from({ length: 2000 }, function(_, i) { return Math.sin(i * 127.1
 
 /* ═══ SCENARIOS ═══ */
 var SCENARIOS = {
-  nominal: { label: "Normal Operation", batch: 20, desc: "Stable grid. All systems nominal. Model predictions are trustworthy.", status: "STABLE", color: $.gn, health: 98, action: "Continue monitoring at standard interval.", feature: "None. All features within training distribution.", alert: "No alerts", showDrift: false, showRegime: false },
-  gradual: { label: "Gradual Drift", batch: 55, desc: "Tau parameters shifting slowly. Model confidence degrading before accuracy drops.", status: "DRIFT DETECTED", color: $.ac, health: 87, action: "Recalibrate model. Increase damping at Node 2 (LOAD). Reduce trust threshold to 0.90.", feature: "tau_std rising +40%, F_gain_mean shifting from training mean", alert: "PSI crossed 0.25 threshold at batch 55", showDrift: true, showRegime: false },
-  noise: { label: "Sensor Noise", batch: 45, desc: "SCADA sensor corruption injected. Testing whether the model can distinguish noise from real instability.", status: "MONITORING", color: $.ac, health: 92, action: "Increase monitoring frequency to 2x. Verify sensor integrity at Node 1.", feature: "Broad noise across tau and g parameters. Not localised.", alert: "Early CUSUM deviation at batch 34", showDrift: true, showRegime: false },
-  adversarial: { label: "Adversarial Attack", batch: 65, desc: "FGSM perturbation applied to sensor readings. Simulates deliberate manipulation of grid telemetry.", status: "AT RISK", color: $.rd, health: 74, action: "Switch to RF fallback model immediately. SVM boundary has been compromised by gradient attack.", feature: "SVM flip rate at 16.5%. Hybrid stacking absorbs to 3.3%.", alert: "Adversarial signature detected in gradient pattern", showDrift: true, showRegime: false },
-  collapse: { label: "Regime Collapse", batch: 95, desc: "Abrupt parameter shift. Generator response characteristics have fundamentally changed.", status: "CRITICAL", color: $.rd, health: 52, action: "Emergency recalibration via LaSCal pipeline. Alert grid operator. Reduce load at Nodes 2 and 3.", feature: "All features shifted beyond training bounds. Coverage at 82%.", alert: "All three detectors triggered. Regime change confirmed.", showDrift: true, showRegime: true },
+  nominal: { label: "Normal Operation", batch: 20, desc: "Stable grid. All systems nominal. Model predictions are trustworthy.", plain: "Everything is working. The AI model was trained on data that looks like this. Predictions are accurate.", status: "STABLE", color: $.gn, health: 98, action: "Continue monitoring at standard interval.", feature: "None. All features within training distribution.", alert: "No alerts", showDrift: false, showRegime: false },
+  gradual: { label: "Gradual Drift", batch: 55, desc: "Tau parameters shifting slowly. Model confidence degrading before accuracy drops.", plain: "The real world is slowly changing, but the model was trained on old data. It's getting less reliable, but doesn't know it yet.", status: "DRIFT DETECTED", color: $.ac, health: 87, action: "Recalibrate model. Increase damping at Node 2 (LOAD). Reduce trust threshold to 0.90.", feature: "tau_std rising +40%, F_gain_mean shifting from training mean", alert: "PSI crossed 0.25 threshold at batch 55", showDrift: true, showRegime: false },
+  noise: { label: "Sensor Noise", batch: 45, desc: "SCADA sensor corruption injected. Testing whether the model can distinguish noise from real instability.", plain: "A sensor is feeding bad data. Is the grid actually unstable, or is the sensor broken? The system has to tell the difference.", status: "MONITORING", color: $.ac, health: 92, action: "Increase monitoring frequency to 2x. Verify sensor integrity at Node 1.", feature: "Broad noise across tau and g parameters. Not localised.", alert: "Early CUSUM deviation at batch 34", showDrift: true, showRegime: false },
+  adversarial: { label: "Adversarial Attack", batch: 65, desc: "FGSM perturbation applied to sensor readings. Simulates deliberate manipulation of grid telemetry.", plain: "Someone is deliberately feeding fake data to trick the AI. Small, crafted changes that fool the model into making wrong predictions.", status: "AT RISK", color: $.rd, health: 74, action: "Switch to RF fallback model immediately. SVM boundary has been compromised by gradient attack.", feature: "SVM flip rate at 16.5%. Hybrid stacking absorbs to 3.3%.", alert: "Adversarial signature detected in gradient pattern", showDrift: true, showRegime: false },
+  collapse: { label: "Regime Collapse", batch: 95, desc: "Abrupt parameter shift. Generator response characteristics have fundamentally changed.", plain: "The grid itself has fundamentally changed. The world the model was trained for no longer exists. Nothing it learned applies anymore.", status: "CRITICAL", color: $.rd, health: 52, action: "Emergency recalibration via LaSCal pipeline. Alert grid operator. Reduce load at Nodes 2 and 3.", feature: "All features shifted beyond training bounds. Coverage at 82%.", alert: "All three detectors triggered. Regime change confirmed.", showDrift: true, showRegime: true },
 };
 
 /* ═══ DECISION POINTS ═══ */
@@ -53,7 +53,7 @@ var DECISION_POINTS = [
     options:[
       {icon:"\u21BA",label:"Trigger Recalibration",desc:"Reinitialise the LaSCal pipeline against current data distribution.",outcome:"good",
        consequence:"Calibration error stabilises. Coverage recovers toward 94%. Model remains operationally trustworthy through the drift phase."},
-      {icon:"\u25CE",label:"Hold — Continue Monitoring",desc:"No intervention. Continue observing. Do not act yet.",outcome:"bad",
+      {icon:"\u25CE",label:"Hold: Continue Monitoring",desc:"No intervention. Continue observing. Do not act yet.",outcome:"bad",
        consequence:"ECE triples over the next 10 batches. The recalibration window closes. You will need emergency action to recover."},
     ],
     afterStress:{good:[0,0,0,0],bad:[2,0,1,2]},
@@ -90,8 +90,8 @@ var DECISION_POINTS = [
     ],
     snap:{auc:"0.877",psi:"1.65",cov:"83.0%",aucC:$.rd,psiC:$.rd,covC:$.rd},
     options:[
-      {icon:"\u26A0",label:"Alert Operator — Reduce Load",desc:"Escalate to human oversight. Shed load at nodes 2 and 3.",outcome:"good",
-       consequence:"Human oversight takes control during model uncertainty. Load reduction creates stability margin. Grid holds — no cascade.."},
+      {icon:"\u26A0",label:"Alert Operator: Reduce Load",desc:"Escalate to human oversight. Shed load at nodes 2 and 3.",outcome:"good",
+       consequence:"Human oversight takes control during model uncertainty. Load reduction creates stability margin. Grid holds, no cascade.."},
       {icon:"\u25CE",label:"Continue Monitoring",desc:"No action. Observe further before committing.",outcome:"bad",
        consequence:"Cascade risk escalates rapidly. Grid health deteriorates beyond recovery threshold. Emergency shutdown unavoidable."},
     ],
@@ -368,6 +368,10 @@ function SignatureDemo() {
           return (<div key={key} style={{ flex: 1, textAlign: "center" }}><div style={{ height: 3, borderRadius: 2, background: isCurrent ? s.color : isPast ? s.color + "66" : "rgba(255,255,255,.04)", transition: "background .5s", marginBottom: 6 }} /><div style={{ fontFamily: F.m, fontSize: 9, color: isCurrent ? s.color : $.dim, transition: "color .3s", fontWeight: isCurrent ? 600 : 400 }}>{s.label}</div></div>);
         })}
       </div>
+      {/* Plain English narration for newcomers */}
+      <div style={{ background: sc.color + "0a", border: "1px solid " + sc.color + "18", borderRadius: 8, padding: "10px 16px", marginBottom: 14, transition: "all .5s" }}>
+        <div style={{ fontFamily: F.s, fontSize: 12, color: $.tx2, lineHeight: 1.6, fontStyle: "italic" }}>{sc.plain}</div>
+      </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 14 }}>
         <div style={{ background: $.bg2, border: "1px solid " + healthColor + "22", borderRadius: 10, padding: 18, textAlign: "center", transition: "border-color .5s" }}>
           <div style={{ fontFamily: F.m, fontSize: 9, color: $.dim, letterSpacing: ".06em", marginBottom: 8 }}>HEALTH SCORE</div>
@@ -593,7 +597,7 @@ function GridOperatorSim(props) {
           return (
             <div key={i} style={{background:$.bg2,border:"1px solid "+c+"1a",borderRadius:12,padding:"18px 20px",marginBottom:10}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-                <div style={{fontFamily:F.m,fontSize:9,color:$.dim}}>INCIDENT {i+1} — BATCH {d.batch}</div>
+                <div style={{fontFamily:F.m,fontSize:9,color:$.dim}}>INCIDENT {i+1} · BATCH {d.batch}</div>
                 <span style={{fontFamily:F.m,fontSize:9,color:c,background:c+"15",padding:"3px 10px",borderRadius:999}}>{ol(d.outcome)}</span>
               </div>
               <div style={{fontSize:12,fontWeight:600,color:$.tx,marginBottom:6}}>{d.label}</div>
@@ -685,7 +689,7 @@ function GridOperatorSim(props) {
             {canAct && !chosen && (
               <div>
                 <div style={{fontFamily:F.m,fontSize:9,color:dp.urgency,letterSpacing:".06em",marginBottom:10,textAlign:"center"}}>
-                  OPERATOR — CHOOSE YOUR ACTION
+                  OPERATOR: CHOOSE YOUR ACTION
                 </div>
                 <div style={{display:"flex",flexDirection:"column",gap:9}}>
                   {dp.options.map(function(opt,i){
@@ -809,18 +813,18 @@ function CommandCentre(props) {
     auc:{
       title:"What is this chart telling you?",
       plain:"This is the model's accuracy score over time AUC goes from 0 (random guessing) to 1.0 (perfect). In the lab, the Hybrid model scored 0.9999. Nearly perfect.",
-      insight:"But then the real world happened. As the grid data drifts (batch 40), gets attacked (batch 65), and shifts regime entirely (batch 80), accuracy falls to 0.8834. That's not a failure — it's what deployment actually looks like. A static benchmark would never show you this. W.R.E.N. tracks it in real time so you know when to trust the model and when to escalate.",
-      lines:[{c:$.glow,l:"Hybrid — your best model"},{c:"#a78bfa",l:"SVM — smooth boundaries, vulnerable to attacks"},{c:$.gn,l:"RF — weaker on clean data, immune to gradient attacks"}],
+      insight:"But then the real world happened. As the grid data drifts (batch 40), gets attacked (batch 65), and shifts regime entirely (batch 80), accuracy falls to 0.8834. That's not a failure. It is what deployment actually looks like. A static benchmark would never show you this. W.R.E.N. tracks it in real time so you know when to trust the model and when to escalate.",
+      lines:[{c:$.glow,l:"Hybrid: your best model"},{c:"#a78bfa",l:"SVM: smooth boundaries, vulnerable to attacks"},{c:$.gn,l:"RF: weaker on clean data, immune to gradient attacks"}],
     },
     psi:{
       title:"What is PSI telling you?",
       plain:"PSI (Population Stability Index) measures how much the incoming data has changed compared to what the model was trained on. Below 0.1 = stable. Above 0.25 = alert.",
-      insight:"The spike here isn't random. PSI crossed the 0.25 threshold at batch 55 — 26 batches before the model's accuracy visibly dropped. It saw the problem coming. That early warning is the whole point: by the time the model starts failing, you've already had time to act.",
+      insight:"The spike here isn't random. PSI crossed the 0.25 threshold at batch 55, 26 batches before the model's accuracy visibly dropped. It saw the problem coming. That early warning is the whole point: by the time the model starts failing, you've already had time to act.",
     },
     cov:{
       title:"What is Coverage telling you?",
       plain:"Conformal coverage is a mathematical guarantee. It says: at least 95% of the time, the model's prediction interval contains the true answer. It's not a promise about any single prediction it's a statistical guarantee across all predictions.",
-      insight:"When the grid is stable, coverage holds at 96%+. When the data shifts too far outside training (regime collapse, batch 80), it drops to 83%. That means 1 in 6 predictions has an uncertainty the model can't quantify. W.R.E.N. flags this instantly — so operators know when the safety guarantee has expired.",
+      insight:"When the grid is stable, coverage holds at 96%+. When the data shifts too far outside training (regime collapse, batch 80), it drops to 83%. That means 1 in 6 predictions has an uncertainty the model can't quantify. W.R.E.N. flags this instantly so operators know when the safety guarantee has expired.",
     },
   };
 
@@ -851,7 +855,7 @@ function CommandCentre(props) {
         <button onClick={props.onBack} style={{background:"transparent",border:"1px solid rgba(255,255,255,.08)",borderRadius:6,color:$.dim,padding:"5px 14px",fontSize:11,fontFamily:F.s,cursor:"pointer"}}>Exit</button>
       </div>
       <div style={{display:"flex",borderTop:"1px solid rgba(255,255,255,.04)"}}>
-        {[{id:"sim",label:"Simulation"},{id:"pipe",label:"Pipeline — 22 Stages"},{id:"finds",label:"Findings"}].map(function(t){
+        {[{id:"sim",label:"Simulation"},{id:"pipe",label:"Pipeline · 22 Stages"},{id:"finds",label:"Findings"}].map(function(t){
           var a=tab===t.id;
           return (<button key={t.id} onClick={function(){setTab(t.id);setCard(null);}} style={{flex:1,padding:"10px 0",fontFamily:F.m,fontSize:10,fontWeight:a?600:400,color:a?$.glow:$.dim,background:"transparent",border:"none",cursor:"pointer",borderBottom:"2px solid "+(a?$.glow:"transparent"),letterSpacing:".04em",transition:"all .2s"}}>{t.label}</button>);
         })}
@@ -976,7 +980,7 @@ function CommandCentre(props) {
         </div>
       </div>
       <div style={{textAlign:"center",padding:"12px",borderTop:"1px solid "+$.brd}}>
-        <div style={{fontFamily:F.m,fontSize:9,color:$.dim}}>A.G.N.E.S. v4.2 | Husain Ali Al Hashem | University of Portsmouth 2025—2026</div>
+        <div style={{fontFamily:F.m,fontSize:9,color:$.dim}}>A.G.N.E.S. v4.2 | Husain Ali Al Hashem | University of Portsmouth 2025–2026</div>
       </div>
     </div>
   );
@@ -1261,17 +1265,16 @@ function HeroSection(props) {
       </div>
 
       {/* ── CONTENT vertical stack, flows down from lighthouse ── */}
-      <div style={{ position: "relative", zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", padding: "0 24px 22vh", gap: 0 }}>
+      <div style={{ position: "relative", zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", padding: "0 24px 30vh", gap: 0 }}>
         {/* Buttons stacked vertically */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "min(340px, 88%)", marginBottom: 20 }}>
-          <button onClick={function() { go("demo"); }} style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 10, padding: "15px 0", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: F.s, width: "100%", textAlign: "center" }}>Launch Live Demo</button>
-          <button onClick={function() { setPage("operator"); }} style={{ background: "rgba(8,17,30,.85)", border: "1px solid rgba(251,191,36,.45)", borderRadius: 10, padding: "15px 0", fontSize: 14, fontWeight: 600, color: $.glow, cursor: "pointer", fontFamily: F.s, width: "100%", textAlign: "center", backdropFilter: "blur(8px)" }}>Grid Ops Centre</button>
-          <button onClick={function() { go("how"); }} style={{ background: "rgba(8,17,30,.6)", border: "1px solid rgba(251,191,36,.14)", borderRadius: 10, padding: "15px 0", fontSize: 14, fontWeight: 500, color: $.tx3, cursor: "pointer", fontFamily: F.s, width: "100%", textAlign: "center", backdropFilter: "blur(8px)" }}>Architecture</button>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "min(260px, 72%)", marginBottom: 14 }}>
+          <button onClick={function() { setPage("operator"); }} style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 10, padding: "13px 0", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: F.s, width: "100%", textAlign: "center" }}>Play the Operator Sim</button>
+          <button onClick={function() { go("demo"); }} style={{ background: "rgba(8,17,30,.85)", border: "1px solid rgba(251,191,36,.35)", borderRadius: 10, padding: "11px 0", fontSize: 12, fontWeight: 600, color: $.glow, cursor: "pointer", fontFamily: F.s, width: "100%", textAlign: "center", backdropFilter: "blur(8px)" }}>Watch It Work ↓</button>
         </div>
         {/* Description below buttons */}
-        <div style={{ maxWidth: 380, textAlign: "center", textShadow: "0 2px 16px #060b14" }}>
-          <p style={{ fontFamily: F.s, fontSize: 14, color: $.tx2, lineHeight: 1.6, marginBottom: 6, fontWeight: 500 }}>Deployment monitoring for smart grid AI.</p>
-          <p style={{ fontFamily: F.s, fontSize: 13, color: $.tx3, lineHeight: 1.7 }}>Detects. Diagnoses. Responds. Before the model fails silently.</p>
+        <div style={{ maxWidth: 400, textAlign: "center", textShadow: "0 2px 16px #060b14" }}>
+          <p style={{ fontFamily: F.s, fontSize: 14, color: $.tx2, lineHeight: 1.7, marginBottom: 6, fontWeight: 500 }}>AI models fail silently after deployment. Data changes, confidence decays, attacks go unnoticed.</p>
+          <p style={{ fontFamily: F.s, fontSize: 13, color: $.tx3, lineHeight: 1.7 }}>W.R.E.N. catches it. Before the model fails, you know.</p>
         </div>
       </div>
     </section>
@@ -1300,12 +1303,12 @@ export default function App() {
           <span style={{ fontSize: 12, letterSpacing: 2, color: $.glow, fontWeight: 600 }}>W.R.E.N.</span>
         </div>
         <div style={{ display: "flex", gap: 18, alignItems: "center" }}>
-          {["demo", "how", "proof", "honour"].map(function(id) {
-            var labels = { demo: "Live Demo", how: "How It Works", proof: "Evidence", honour: "Honour" };
+          {["demo", "proof", "honour"].map(function(id) {
+            var labels = { demo: "Watch It Work", proof: "Evidence", honour: "Honour" };
             return (<span key={id} onClick={function() { go(id); }} style={{ fontSize: 11, color: $.tx3, cursor: "pointer", letterSpacing: 1 }} onMouseEnter={function(e) { e.target.style.color = $.glow; }} onMouseLeave={function(e) { e.target.style.color = $.tx3; }}>{labels[id]}</span>);
           })}
-          <button onClick={function() { setPage("operator"); }} style={{ background: "transparent", border: "1px solid " + $.brd, color: $.tx2, borderRadius: 6, padding: "7px 16px", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Grid Ops</button>
-          <button onClick={function() { setPage("command"); }} style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 6, padding: "7px 16px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Live Dashboard</button>
+          <button onClick={function() { setPage("operator"); }} style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 6, padding: "7px 16px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Play Operator Sim</button>
+          <button onClick={function() { setPage("command"); }} style={{ background: "transparent", border: "1px solid " + $.brd, color: $.tx2, borderRadius: 6, padding: "7px 16px", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Dashboard</button>
         </div>
       </nav>
 
@@ -1315,10 +1318,10 @@ export default function App() {
       <section style={{ padding: "48px 24px", borderTop: "1px solid " + $.brd, borderBottom: "1px solid " + $.brd }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, maxWidth: 800, margin: "0 auto", background: $.brd, borderRadius: 10, overflow: "hidden", border: "1px solid " + $.brd }}>
           {[
-            { step: "01", title: "Anomaly Detection", desc: "Three sequential change detectors at different timescales. Page Hinkley catches drift 26 batches before PSI confirms the source." },
-            { step: "02", title: "Drift Watch", desc: "Continuous PSI monitoring against training distribution. Alerts when feature distributions diverge beyond the 0.25 threshold." },
-            { step: "03", title: "Reliability Scoring", desc: "Conformal prediction provides coverage guarantees. When the model's uncertainty estimates stop being trustworthy, the score tells you." },
-            { step: "04", title: "Operator Guidance", desc: "Decision engine translates model state into engineering actions. Recalibrate, switch to fallback, increase damping, or alert." },
+            { step: "01", title: "Spot Problems Early", desc: "Three different detectors watch for changes at different speeds. The fastest one catches problems 26 data batches before the others confirm it." },
+            { step: "02", title: "Track Data Drift", desc: "Continuously compares what the model sees now against what it was trained on. Alerts you when reality has drifted too far from the training data." },
+            { step: "03", title: "Know When to Trust It", desc: "Gives each prediction a confidence score with a mathematical guarantee. When the model stops being reliable, this score tells you first." },
+            { step: "04", title: "Know What to Do", desc: "Translates technical model failures into clear actions: recalibrate, switch models, reduce load, or call a human. No guesswork." },
           ].map(function(c, i) { return (<Rv key={i} d={0.06 * i}><div style={{ background: $.bg2, padding: "24px 18px", textAlign: "center", height: "100%" }}><div style={{ fontFamily: F.m, fontSize: 18, fontWeight: 300, color: $.glow, marginBottom: 10 }}>{c.step}</div><div style={{ fontSize: 13, fontWeight: 700, color: $.tx, marginBottom: 8 }}>{c.title}</div><div style={{ fontSize: 11, color: $.tx3, lineHeight: 1.6 }}>{c.desc}</div></div></Rv>); })}
         </div>
       </section>
@@ -1326,55 +1329,72 @@ export default function App() {
       {/* ═══ SIGNATURE DEMO ═══ */}
       <section id="demo" style={{ padding: "80px 24px 100px", background: $.bg2 }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <Rv><p style={{ fontFamily: F.m, fontSize: 11, color: $.glow, letterSpacing: 4, marginBottom: 12 }}>LIVE DEMO</p></Rv>
-          <Rv d={0.08}><h2 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 600, margin: "0 0 12px 0", fontFamily: serif }}>Watch the system detect, explain, and respond.</h2></Rv>
-          <Rv d={0.12}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 480, margin: "0 auto" }}>Five operational conditions unfold in sequence. W.R.E.N. reacts to each in real time.</p></Rv>
+          <Rv><p style={{ fontFamily: F.m, fontSize: 11, color: $.glow, letterSpacing: 4, marginBottom: 12 }}>WATCH IT WORK</p></Rv>
+          <Rv d={0.08}><h2 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 600, margin: "0 0 12px 0", fontFamily: serif }}>A model that scored 99.99% in the lab, deployed to the real world.</h2></Rv>
+          <Rv d={0.12}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 520, margin: "0 auto" }}>Five things go wrong, one after another. Watch the health score drop as W.R.E.N. detects each problem, explains what changed, and recommends what to do.</p></Rv>
         </div>
         <Rv d={0.2}><SignatureDemo /></Rv>
       </section>
 
-      {/* ═══ GRID OPS CTA ═══ */}
+      {/* ═══ GO DEEPER: TWO PATHS ═══ */}
       <section style={{ padding: "80px 24px", background: $.bg, position: "relative", overflow: "hidden" }}>
-        <div style={{ textAlign: "center", position: "relative", maxWidth: 640, margin: "0 auto" }}>
-          <Rv><div style={{ marginBottom: 20, display: "flex", justifyContent: "center" }}><Beacon s={56} glow={0.2} interactive={true} /></div></Rv>
-          <Rv d={0.06}><p style={{ fontFamily: F.m, fontSize: 11, color: $.glow, letterSpacing: 4, marginBottom: 12 }}>GRID OPS CENTRE</p></Rv>
-          <Rv d={0.12}><h2 style={{ fontSize: "clamp(22px, 4vw, 34px)", fontWeight: 600, fontFamily: serif, marginBottom: 16, lineHeight: 1.35 }}>Three incidents. Three calls.<br/>You are the operator.</h2></Rv>
-          <Rv d={0.2}>
-            <p style={{ fontSize: 14, color: $.tx3, lineHeight: 1.85, marginBottom: 20, maxWidth: 480, margin: "0 auto 20px" }}>W.R.E.N. detects a threat. You read the live metrics, study which nodes are stressed, and choose how to intervene. The grid topology shows you what changes.</p>
-            <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: 24 }}>
-              {[{i:"\u21BA",l:"Recalibrate"},{i:"\u21C4",l:"Switch model"},{i:"\u26A0",l:"Alert"},{i:"\u23FC",l:"Halt"}].map(function(a) {
-                return (<div key={a.l} style={{ background: $.bg2, border: "1px solid " + $.brd, borderRadius: 8, padding: "10px 14px", textAlign: "center", minWidth: 80 }}><div style={{ fontSize: 16, marginBottom: 4 }}>{a.i}</div><div style={{ fontSize: 10, color: $.tx3, fontFamily: F.m }}>{a.l}</div></div>);
-              })}
-            </div>
-          </Rv>
-          <Rv d={0.28}><button onClick={function() { setPage("operator"); }} style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 8, padding: "14px 40px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Open Grid Ops Centre</button></Rv>
-        </div>
-      </section>
+        <div style={{ textAlign: "center", maxWidth: 720, margin: "0 auto" }}>
+          <Rv><p style={{ fontFamily: F.m, fontSize: 11, color: $.glow, letterSpacing: 4, marginBottom: 12 }}>GO DEEPER</p></Rv>
+          <Rv d={0.06}><h2 style={{ fontSize: "clamp(22px, 4vw, 34px)", fontWeight: 600, fontFamily: serif, marginBottom: 12 }}>Two ways to experience it.</h2></Rv>
+          <Rv d={0.1}><p style={{ fontSize: 14, color: $.tx3, marginBottom: 32, maxWidth: 460, margin: "0 auto 32px" }}>Play the interactive sim to feel it, or open the technical dashboard to study it.</p></Rv>
 
-      {/* ═══ LIVE DASHBOARD CTA ═══ */}
-      <section style={{ padding: "80px 24px", background: $.bg2, position: "relative", overflow: "hidden" }}>
-        <div style={{ textAlign: "center", position: "relative", maxWidth: 620, margin: "0 auto" }}>
-          <Rv><div style={{ marginBottom: 20, display: "flex", justifyContent: "center" }}><Beacon s={56} glow={0.2} interactive={true} /></div></Rv>
-          <Rv d={0.06}><p style={{ fontFamily: F.m, fontSize: 11, color: $.glow, letterSpacing: 4, marginBottom: 12 }}>LIVE DEPLOYMENT DASHBOARD</p></Rv>
-          <Rv d={0.12}><h2 style={{ fontSize: "clamp(22px, 4vw, 34px)", fontWeight: 600, fontFamily: serif, marginBottom: 16 }}>Watch the model degrade in real time and catch it before it fails.</h2></Rv>
-          <Rv d={0.2}><p style={{ fontSize: 14, color: $.tx3, lineHeight: 1.8, marginBottom: 10, maxWidth: 480, margin: "0 auto 10px" }}>120 batches. Three drift phases. The full streaming simulation shows AUC collapsing, PSI spiking, and conformal coverage breaking. The things a static benchmark can never show you.</p><p style={{ fontSize: 13, color: $.dim, marginBottom: 28, fontStyle: "italic" }}>This is what deployment actually looks like.</p></Rv>
-          <Rv d={0.28}><button onClick={function() { setPage("command"); }} style={{ background: "transparent", color: $.glow, border: "1px solid " + $.glow + "55", borderRadius: 8, padding: "14px 40px", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Open Live Dashboard</button></Rv>
+          <Rv d={0.16}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, maxWidth: 640, margin: "0 auto" }}>
+            {/* Card 1: Operator Sim */}
+            <div style={{ background: $.bg2, border: "1px solid " + $.brd, borderRadius: 12, padding: "28px 22px", textAlign: "left", cursor: "pointer", transition: "all .3s" }}
+              onClick={function() { setPage("operator"); }}
+              onMouseEnter={function(e) { e.currentTarget.style.borderColor = $.glow + "55"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+              onMouseLeave={function(e) { e.currentTarget.style.borderColor = $.brd; e.currentTarget.style.transform = "none"; }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}><Beacon s={44} glow={0.2} interactive={true} /></div>
+              <div style={{ fontFamily: F.m, fontSize: 9, color: $.glow, letterSpacing: 3, marginBottom: 8, textAlign: "center" }}>INTERACTIVE</div>
+              <h3 style={{ fontSize: 17, fontWeight: 600, fontFamily: serif, color: $.tx, marginBottom: 8, textAlign: "center" }}>Operator Sim</h3>
+              <p style={{ fontSize: 12, color: $.tx3, lineHeight: 1.7, marginBottom: 16, textAlign: "center" }}>Three incidents hit the grid. You read the diagnostics, study which nodes are stressed, and choose how to respond. Your decisions determine whether the grid holds.</p>
+              <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 16, flexWrap: "wrap" }}>
+                {[{i:"\u21BA",l:"Recalibrate"},{i:"\u21C4",l:"Switch"},{i:"\u26A0",l:"Alert"},{i:"\u23FC",l:"Halt"}].map(function(a) {
+                  return (<div key={a.l} style={{ background: $.bg, border: "1px solid " + $.brd, borderRadius: 6, padding: "6px 10px", textAlign: "center" }}><span style={{ fontSize: 12, marginRight: 4 }}>{a.i}</span><span style={{ fontSize: 9, color: $.tx3, fontFamily: F.m }}>{a.l}</span></div>);
+                })}
+              </div>
+              <button style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 8, padding: "11px 0", fontSize: 13, fontWeight: 700, cursor: "pointer", width: "100%" }}>Play Now</button>
+            </div>
+            {/* Card 2: Technical Dashboard */}
+            <div style={{ background: $.bg2, border: "1px solid " + $.brd, borderRadius: 12, padding: "28px 22px", textAlign: "left", cursor: "pointer", transition: "all .3s" }}
+              onClick={function() { setPage("command"); }}
+              onMouseEnter={function(e) { e.currentTarget.style.borderColor = $.glow + "55"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+              onMouseLeave={function(e) { e.currentTarget.style.borderColor = $.brd; e.currentTarget.style.transform = "none"; }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}><Beacon s={44} glow={0.15} /></div>
+              <div style={{ fontFamily: F.m, fontSize: 9, color: $.glow, letterSpacing: 3, marginBottom: 8, textAlign: "center" }}>TECHNICAL</div>
+              <h3 style={{ fontSize: 17, fontWeight: 600, fontFamily: serif, color: $.tx, marginBottom: 8, textAlign: "center" }}>Dashboard</h3>
+              <p style={{ fontSize: 12, color: $.tx3, lineHeight: 1.7, marginBottom: 16, textAlign: "center" }}>120 batches of streaming data. Watch AUC collapse, drift indices spike, and coverage break in real time. Explore the full 22-stage pipeline and click any chart for a plain-English explanation.</p>
+              <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 16, flexWrap: "wrap" }}>
+                {["Simulation","Pipeline","Findings"].map(function(t) {
+                  return (<span key={t} style={{ fontFamily: F.m, fontSize: 9, color: $.tx3, background: $.bg, border: "1px solid " + $.brd, padding: "5px 10px", borderRadius: 6 }}>{t}</span>);
+                })}
+              </div>
+              <button style={{ background: "transparent", color: $.glow, border: "1px solid " + $.glow + "55", borderRadius: 8, padding: "11px 0", fontSize: 13, fontWeight: 600, cursor: "pointer", width: "100%" }}>Open Dashboard</button>
+            </div>
+          </div>
+          </Rv>
         </div>
       </section>
 
       {/* ═══ HOW IT WORKS ═══ */}
       <section id="how" style={{ padding: "80px 24px 100px" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <Rv><p style={{ fontFamily: F.m, fontSize: 11, color: $.glow, letterSpacing: 4, marginBottom: 12 }}>ARCHITECTURE</p></Rv>
-          <Rv d={0.08}><h2 style={{ fontSize: "clamp(22px, 3.5vw, 32px)", fontWeight: 600, fontFamily: serif }}>Input. Monitor. Detect. Explain. Respond.</h2></Rv>
+          <Rv><p style={{ fontFamily: F.m, fontSize: 11, color: $.glow, letterSpacing: 4, marginBottom: 12 }}>HOW IT WORKS</p></Rv>
+          <Rv d={0.08}><h2 style={{ fontSize: "clamp(22px, 3.5vw, 32px)", fontWeight: 600, fontFamily: serif }}>Five steps from raw data to operator action.</h2></Rv>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 2, maxWidth: 800, margin: "0 auto", background: $.brd, borderRadius: 10, overflow: "hidden", border: "1px solid " + $.brd }}>
           {[
-            { step: "01", title: "Ingest", desc: "48 physics informed features from 12 raw DSGC parameters." },
-            { step: "02", title: "Monitor", desc: "Streaming telemetry tracked across 120 sequential batches." },
-            { step: "03", title: "Detect", desc: "PSI, CUSUM, and Page Hinkley flag drift at three timescales." },
-            { step: "04", title: "Explain", desc: "SHAP traces which features shifted and why confidence fell." },
-            { step: "05", title: "Respond", desc: "Decision engine recommends recalibration, fallback, or alert." },
+            { step: "01", title: "Ingest", desc: "Raw sensor readings from 12 grid parameters, expanded into 48 physics-based features." },
+            { step: "02", title: "Monitor", desc: "Track every prediction the model makes across 120 sequential data batches." },
+            { step: "03", title: "Detect", desc: "Three different alarm systems watching for change at fast, medium, and slow timescales." },
+            { step: "04", title: "Explain", desc: "Pinpoint exactly which measurements shifted and why the model lost confidence." },
+            { step: "05", title: "Respond", desc: "Recommend a specific action: recalibrate, switch models, reduce load, or alert a human." },
           ].map(function(s, i) { return (<Rv key={i} d={0.08 * i}><div style={{ background: $.bg2, padding: "22px 16px", textAlign: "center", height: "100%" }}><div style={{ fontFamily: F.m, fontSize: 20, fontWeight: 300, color: $.glow, marginBottom: 8 }}>{s.step}</div><div style={{ fontSize: 13, fontWeight: 700, color: $.tx, marginBottom: 6 }}>{s.title}</div><div style={{ fontSize: 11, color: $.tx3, lineHeight: 1.6 }}>{s.desc}</div></div></Rv>); })}
         </div>
         <div style={{ textAlign: "center", marginTop: 24 }}>
@@ -1387,18 +1407,18 @@ export default function App() {
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <Rv><p style={{ fontFamily: F.m, fontSize: 11, color: $.glow, letterSpacing: 4, marginBottom: 12 }}>EVIDENCE</p></Rv>
           <Rv d={0.08}><h2 style={{ fontSize: "clamp(22px, 3.5vw, 32px)", fontWeight: 600, fontFamily: serif }}>Measured. Not claimed.</h2></Rv>
-          <Rv d={0.12}><p style={{ fontSize: 12, color: $.dim, marginTop: 8 }}>From 60,000 sample deployment evaluation.</p></Rv>
+          <Rv d={0.12}><p style={{ fontSize: 12, color: $.dim, marginTop: 8 }}>Tested on 60,000 real samples. Here is what happened.</p></Rv>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, maxWidth: 720, margin: "0 auto" }}>
           {[
-            { label: "Clean Test AUC", value: "0.9999+", sub: "ROC AUC on held out test set" },
-            { label: "Deployment AUC", value: "0.8834", sub: "After drift and regime change" },
-            { label: "Calibration Collapse", value: "214\u00d7", sub: "ECE failed before accuracy dropped" },
-            { label: "Conformal Coverage", value: "99.97%", sub: "Empirical coverage on clean data" },
-            { label: "First Drift Signal", value: "Batch 9", sub: "Page Hinkley earliest detection" },
-            { label: "Flip Rate Reduction", value: "4.3\u00d7", sub: "Hybrid stacking vs SVM alone" },
-            { label: "False Positive Rate", value: "0.05%", sub: "6 in 12,000 test samples" },
-            { label: "Selected Signals", value: "14", sub: "RFECV from 48 engineered features" },
+            { label: "Lab Accuracy", value: "0.9999+", sub: "Near-perfect on clean test data" },
+            { label: "Real World Accuracy", value: "0.8834", sub: "After the world changed" },
+            { label: "Early Warning", value: "214\u00d7", sub: "Confidence failed before accuracy did" },
+            { label: "Prediction Reliability", value: "99.97%", sub: "Predictions you can trust on clean data" },
+            { label: "First Warning", value: "Batch 9", sub: "Spotted trouble this early" },
+            { label: "Attack Resistance", value: "4.3\u00d7", sub: "Better than a single model alone" },
+            { label: "False Alarms", value: "0.05%", sub: "Only 6 out of 12,000 samples" },
+            { label: "Key Signals", value: "14", sub: "Selected from 48 candidates" },
           ].map(function(m, i) { return (<Rv key={i} d={0.05 * i}><div style={{ background: $.bg, border: "1px solid " + $.brd, borderRadius: 10, padding: "16px 14px", textAlign: "center" }}><div style={{ fontSize: 24, fontWeight: 700, color: $.glow, fontFamily: F.m, marginBottom: 4 }}>{m.value}</div><div style={{ fontSize: 11, fontWeight: 600, color: $.tx, marginBottom: 4 }}>{m.label}</div><div style={{ fontSize: 10, color: $.dim, lineHeight: 1.4 }}>{m.sub}</div></div></Rv>); })}
         </div>
       </section>
@@ -1407,9 +1427,9 @@ export default function App() {
       <section id="honour" style={{ padding: "80px 24px", textAlign: "center" }}>
         <div style={{ maxWidth: 460, margin: "0 auto" }}>
           <Rv><div style={{ width: 36, height: 1, background: $.glow, margin: "0 auto 24px", opacity: 0.3 }} /></Rv>
-          <Rv d={0.1}><p style={{ fontSize: 12, letterSpacing: 4, color: $.dim, marginBottom: 20 }}>IN HONOUR</p></Rv>
+          <Rv d={0.1}><p style={{ fontSize: 12, letterSpacing: 4, color: $.dim, marginBottom: 14 }}>IN HONOUR</p></Rv>
           <Rv d={0.2}><p style={{ fontSize: 16, fontStyle: "italic", lineHeight: 1.9, color: $.tx2, fontFamily: serif, marginBottom: 24 }}>W.R.E.N. is named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, from 1939 to 1945.</p></Rv>
-          <Rv d={0.3}><p style={{ fontSize: 13, lineHeight: 1.9, color: $.tx3, marginBottom: 20 }}>They sat in signals rooms, detecting anomalies in the noise and warning of danger before it arrived.</p></Rv>
+          <Rv d={0.3}><p style={{ fontSize: 13, lineHeight: 1.9, color: $.tx3, marginBottom: 14 }}>They sat in signals rooms, detecting anomalies in the noise and warning of danger before it arrived.</p></Rv>
           <Rv d={0.4}><p style={{ fontSize: 13, color: $.tx3, fontStyle: "italic" }}>They watched. They warned. They guided.</p></Rv>
         </div>
       </section>
