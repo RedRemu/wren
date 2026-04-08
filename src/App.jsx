@@ -1467,6 +1467,16 @@ function HeroSection(props) {
         <Wave chaos={chaos * 0.42} h={22} color="#050d17" />
       </div>
 
+      {/* Telemetry signal overlay */}
+      <div style={{ position: "absolute", top: "42%", left: 0, right: 0, height: 40, pointerEvents: "none", zIndex: 5, opacity: 0.25 }}>
+        <svg viewBox="0 0 1200 40" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block" }}>
+          <path fill="none" stroke={$.glow} strokeWidth="1" opacity="0.6">
+            <animate attributeName="d" dur="8s" repeatCount="indefinite"
+              values="M0,20 Q100,18 200,20 T400,20 Q500,16 600,20 T800,20 Q900,22 1000,20 T1200,20;M0,20 Q100,22 200,18 T400,22 Q500,12 550,28 Q560,8 600,20 T800,18 Q900,24 1000,20 T1200,20;M0,20 Q100,18 200,20 T400,20 Q500,16 600,20 T800,20 Q900,22 1000,20 T1200,20"/>
+          </path>
+        </svg>
+      </div>
+
       {/* ── CONTENT vertical stack, flows down from lighthouse ── */}
       <div style={{ position: "relative", zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", padding: "0 24px 30vh", gap: 0 }}>
         {/* Buttons stacked vertically */}
@@ -1477,10 +1487,180 @@ function HeroSection(props) {
         {/* Description below buttons */}
         <div style={{ maxWidth: 400, textAlign: "center", textShadow: "0 2px 16px #060b14" }}>
           <p style={{ fontFamily: F.s, fontSize: 14, color: $.tx2, lineHeight: 1.7, marginBottom: 6, fontWeight: 500 }}>AI models fail silently after deployment. Data changes, confidence decays, attacks go unnoticed.</p>
-          <p style={{ fontFamily: F.s, fontSize: 13, color: $.tx3, lineHeight: 1.7 }}>W.R.E.N. Detects it. Diagnoses it. Recommends what to do next.</p>
+          <p style={{ fontFamily: F.s, fontSize: 13, color: $.tx3, lineHeight: 1.7 }}>W.R.E.N. detects it. Diagnoses it. Recommends what to do next.</p>
         </div>
       </div>
     </section>
+  );
+}
+
+/* ═══ INTERACTIVE STRESS TEST ═══ */
+function StressTestWidget() {
+  var _mode = useState("drift"); var mode = _mode[0]; var setMode = _mode[1];
+  var _level = useState(0); var level = _level[0]; var setLevel = _level[1];
+  var _dragging = useState(false); var dragging = _dragging[0]; var setDragging = _dragging[1];
+
+  // Compute metrics based on stress level and mode
+  var t = level / 100;
+  var metrics = {
+    drift: {
+      auc: (0.9999 - t * t * 0.165).toFixed(4),
+      psi: (0.08 + t * t * 2.3).toFixed(2),
+      cov: ((0.96 - t * t * 0.18) * 100).toFixed(1),
+      aucC: t < 0.4 ? $.gn : t < 0.7 ? $.ac : $.rd,
+      psiC: t * t * 2.3 + 0.08 < 0.25 ? $.gn : t < 0.7 ? $.ac : $.rd,
+      covC: (0.96 - t * t * 0.18) > 0.95 ? $.gn : (0.96 - t * t * 0.18) > 0.85 ? $.ac : $.rd,
+      label: "DISTRIBUTION DRIFT",
+      desc: "Training data no longer matches reality. Features shift gradually.",
+    },
+    noise: {
+      auc: (0.9999 - t * 0.08 - t * t * 0.04).toFixed(4),
+      psi: (0.08 + t * 0.15).toFixed(2),
+      cov: ((0.96 - t * 0.06) * 100).toFixed(1),
+      aucC: t < 0.5 ? $.gn : t < 0.8 ? $.ac : $.rd,
+      psiC: (0.08 + t * 0.15) < 0.25 ? $.gn : $.ac,
+      covC: (0.96 - t * 0.06) > 0.95 ? $.gn : $.ac,
+      label: "SENSOR NOISE",
+      desc: "Corrupted sensor readings injected into the data pipeline.",
+    },
+    attack: {
+      auc: (0.9999 - t * t * t * 0.22).toFixed(4),
+      psi: (0.08 + t * t * 1.8).toFixed(2),
+      cov: ((0.96 - t * t * t * 0.2) * 100).toFixed(1),
+      aucC: t < 0.35 ? $.gn : t < 0.6 ? $.ac : $.rd,
+      psiC: t * t * 1.8 + 0.08 < 0.25 ? $.gn : t < 0.5 ? $.ac : $.rd,
+      covC: (0.96 - t * t * t * 0.2) > 0.95 ? $.gn : (0.96 - t * t * t * 0.2) > 0.85 ? $.ac : $.rd,
+      label: "ADVERSARIAL ATTACK",
+      desc: "FGSM perturbation targeting the SVM decision boundary.",
+    },
+  };
+  var m = metrics[mode];
+  var phase = t < 0.3 ? "stable" : t < 0.65 ? "degrading" : "critical";
+  var phaseCol = phase === "stable" ? $.gn : phase === "degrading" ? $.ac : $.rd;
+
+  // Generate sparkline data
+  var sparkData = [];
+  for (var i = 0; i <= 40; i++) {
+    var st = (i / 40) * t;
+    var noise = Math.sin(i * 3.7) * 0.008 + Math.cos(i * 7.1) * 0.005;
+    var val = mode === "drift" ? 0.9999 - st * st * 0.165 + noise
+      : mode === "noise" ? 0.9999 - st * 0.08 - st * st * 0.04 + noise * 2
+      : 0.9999 - st * st * st * 0.22 + noise;
+    sparkData.push(Math.max(0.75, Math.min(1, val)));
+  }
+
+  return (
+    <div style={{ maxWidth: 700, margin: "0 auto" }}>
+      {/* Mode selector */}
+      <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 24 }}>
+        {[{id:"drift",label:"Drift"},{id:"noise",label:"Noise"},{id:"attack",label:"Attack"}].map(function(md) {
+          var active = mode === md.id;
+          return (
+            <button key={md.id} onClick={function(){ setMode(md.id); setLevel(0); }}
+              style={{ padding: "8px 22px", borderRadius: 8, fontFamily: F.m, fontSize: 11, fontWeight: active ? 700 : 400, cursor: "pointer",
+                color: active ? $.bg : $.tx3, background: active ? $.glow : "rgba(255,255,255,.03)", border: "1px solid " + (active ? $.glow : $.brd),
+                transition: "all .2s", letterSpacing: 0.5 }}>
+              {md.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Main panel */}
+      <div style={{ background: $.bg2, border: "1px solid " + phaseCol + "22", borderRadius: 14, padding: "28px 28px 24px", position: "relative", overflow: "hidden", transition: "border-color .5s" }}>
+
+        {/* Edge glow */}
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", borderRadius: 14,
+          boxShadow: phase === "critical" ? "inset 0 0 60px " + $.rd + "12" : phase === "degrading" ? "inset 0 0 40px " + $.ac + "08" : "none",
+          transition: "box-shadow .8s" }} />
+
+        {/* Status */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, position: "relative" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: phaseCol, boxShadow: "0 0 8px " + phaseCol,
+              animation: phase !== "stable" ? "wpulse 1.2s ease-in-out infinite" : "none", transition: "background .3s" }} />
+            <span style={{ fontFamily: F.m, fontSize: 10, color: phaseCol, letterSpacing: 1, fontWeight: 600 }}>
+              {phase === "stable" ? "STABLE" : phase === "degrading" ? "DEGRADING" : "CRITICAL"}
+            </span>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontFamily: F.m, fontSize: 8, color: $.dim, letterSpacing: 1 }}>{m.label}</div>
+            <div style={{ fontSize: 10, color: $.tx3, marginTop: 2 }}>{m.desc}</div>
+          </div>
+        </div>
+
+        {/* Sparkline */}
+        <div style={{ height: 80, marginBottom: 20, position: "relative" }}>
+          <svg viewBox="0 0 400 80" style={{ width: "100%", height: "100%", display: "block" }} preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="stressGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={phaseCol} stopOpacity="0.15"/>
+                <stop offset="100%" stopColor={phaseCol} stopOpacity="0"/>
+              </linearGradient>
+            </defs>
+            {/* Area fill */}
+            <path d={
+              "M0," + ((1 - sparkData[0]) * 70 + 5) + " " +
+              sparkData.map(function(v, i) { return (i / 40 * 400) + "," + ((1 - v) * 70 + 5); }).join(" L") +
+              " L400,80 L0,80 Z"
+            } fill="url(#stressGrad)" />
+            {/* Line */}
+            <polyline points={sparkData.map(function(v, i) { return (i / 40 * 400) + "," + ((1 - v) * 70 + 5); }).join(" ")}
+              fill="none" stroke={phaseCol} strokeWidth="2" />
+            {/* End dot */}
+            <circle cx="400" cy={(1 - sparkData[sparkData.length - 1]) * 70 + 5} r="4" fill={phaseCol} opacity="0.9" />
+          </svg>
+          <div style={{ position: "absolute", top: 0, left: 0, fontFamily: F.m, fontSize: 7, color: $.dim }}>AUC</div>
+          <div style={{ position: "absolute", bottom: 0, right: 0, fontFamily: F.m, fontSize: 7, color: $.dim }}>
+            STRESS {Math.round(level)}%
+          </div>
+        </div>
+
+        {/* Slider */}
+        <div style={{ marginBottom: 22 }}>
+          <input type="range" min={0} max={100} value={level}
+            onChange={function(e) { setLevel(+e.target.value); }}
+            onMouseDown={function() { setDragging(true); }}
+            onMouseUp={function() { setDragging(false); }}
+            onTouchStart={function() { setDragging(true); }}
+            onTouchEnd={function() { setDragging(false); }}
+            style={{ width: "100%", accentColor: phaseCol, height: 6, cursor: "pointer" }} />
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+            <span style={{ fontFamily: F.m, fontSize: 8, color: $.gn }}>Clean deployment</span>
+            <span style={{ fontFamily: F.m, fontSize: 8, color: $.rd }}>Total failure</span>
+          </div>
+        </div>
+
+        {/* Metrics */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+          {[
+            { l: "MODEL AUC", v: m.auc, c: m.aucC, sub: "Prediction accuracy" },
+            { l: "PSI DRIFT", v: m.psi, c: m.psiC, sub: "Distribution shift" },
+            { l: "COVERAGE", v: m.cov + "%", c: m.covC, sub: "Confidence guarantee" },
+          ].map(function(met) {
+            return (
+              <div key={met.l} style={{ background: "rgba(255,255,255,.02)", border: "1px solid " + met.c + "22", borderRadius: 8, padding: "12px", textAlign: "center", transition: "border-color .3s" }}>
+                <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, letterSpacing: 1, marginBottom: 4 }}>{met.l}</div>
+                <div style={{ fontFamily: F.m, fontSize: 22, fontWeight: 700, color: met.c, transition: "color .3s" }}>{met.v}</div>
+                <div style={{ fontFamily: F.m, fontSize: 8, color: $.dim, marginTop: 2 }}>{met.sub}</div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Insight text */}
+        {t > 0.3 && (
+          <div style={{ marginTop: 16, padding: "10px 14px", background: phaseCol + "08", border: "1px solid " + phaseCol + "18", borderRadius: 8, animation: "wup .3s ease both" }}>
+            <div style={{ fontFamily: F.m, fontSize: 8, color: phaseCol, letterSpacing: 1, marginBottom: 4 }}>A.G.N.E.S. ASSESSMENT</div>
+            <div style={{ fontSize: 11, color: $.tx2, lineHeight: 1.6 }}>
+              {phase === "degrading"
+                ? "Model predictions are losing reliability. Conformal coverage dropping below guaranteed threshold. Recommend increased monitoring frequency."
+                : "Model integrity compromised. Predictions no longer trustworthy. Recommend immediate recalibration or fallback to alternative model."}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -1537,6 +1717,16 @@ export default function App() {
           <Rv d={0.12}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 520, margin: "0 auto" }}>Five things go wrong, one after another. Watch the health score drop as W.R.E.N. detects each problem, explains what changed, and recommends what to do.</p></Rv>
         </div>
         <Rv d={0.2}><SignatureDemo /></Rv>
+      </section>
+
+      {/* ═══ INTERACTIVE STRESS TEST ═══ */}
+      <section style={{ padding: "80px 24px 100px", background: $.bg }}>
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <Rv><p style={{ fontFamily: F.m, fontSize: 11, color: $.glow, letterSpacing: 4, marginBottom: 12 }}>BREAK IT YOURSELF</p></Rv>
+          <Rv d={0.08}><h2 style={{ fontSize: "clamp(22px, 4vw, 34px)", fontWeight: 600, fontFamily: serif, marginBottom: 12 }}>Drag the slider. Watch the model fail.</h2></Rv>
+          <Rv d={0.12}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 480, margin: "0 auto" }}>Inject stress into the deployment pipeline and see how predictions, confidence, and coverage degrade in real time.</p></Rv>
+        </div>
+        <Rv d={0.2}><StressTestWidget /></Rv>
       </section>
 
       {/* ═══ GO DEEPER: TWO PATHS ═══ */}
