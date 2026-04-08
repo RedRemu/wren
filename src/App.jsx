@@ -1343,192 +1343,160 @@ function HeroPreview() {
 
 function HeroSection(props) {
   var go = props.go; var setPage = props.setPage;
-  var _prox = useState(0); var prox = _prox[0]; var setProx = _prox[1];
+  var _stage = useState(0); var stage = _stage[0]; var setStage = _stage[1];
   var secRef = useRef(null);
 
   useEffect(function() {
-    function track(cx, cy) {
-      if (!secRef.current) return;
-      var rect = secRef.current.getBoundingClientRect();
-      var lampX = rect.left + rect.width * 0.5;
-      var lampY = rect.top + rect.height * 0.3;
-      setProx(Math.max(0, Math.min(1, 1 - Math.sqrt(Math.pow(cx - lampX, 2) + Math.pow(cy - lampY, 2)) / 350)));
-    }
-    function onM(e) { track(e.clientX, e.clientY); }
-    function onT(e) { if (e.touches[0]) track(e.touches[0].clientX, e.touches[0].clientY); }
-    window.addEventListener("mousemove", onM);
-    window.addEventListener("touchmove", onT, { passive: true });
-    return function() { window.removeEventListener("mousemove", onM); window.removeEventListener("touchmove", onT); };
+    var t1 = setTimeout(function() { setStage(1); }, 600);
+    var t2 = setTimeout(function() { setStage(2); }, 2000);
+    var t3 = setTimeout(function() { setStage(3); }, 3200);
+    var t4 = setTimeout(function() { setStage(4); }, 4000);
+    var t5 = setTimeout(function() { setStage(5); }, 4600);
+    return function() { [t1,t2,t3,t4,t5].forEach(clearTimeout); };
   }, []);
 
-  var lampOp = 0.6 + prox * 0.4;
-  var glowR = 20 + prox * 24;
-  var glowOp = 0.12 + prox * 0.3;
-  var beamA = 0.03 + prox * 0.07;
+  var lampOp = stage >= 1 ? 0.95 : 0;
+  var glowR = 38;
+  var glowOp = stage >= 1 ? 0.35 : 0;
+  var beamA = stage >= 2 ? 0.08 : 0;
 
   return (
-    <section id="hero" ref={secRef} style={{ position: "relative", background: "#060b14", overflow: "hidden", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+    <section id="hero" ref={secRef} style={{ position: "relative", background: "#030608", overflow: "hidden", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
-      {/* ── FULL LIGHTHOUSE SCENE ── */}
+      {/* Grain */}
+      <div style={{ position: "absolute", inset: 0, opacity: 0.03, pointerEvents: "none", zIndex: 6, backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "200px" }} />
+
+      {/* Sea mist */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "25%", background: "linear-gradient(to top, rgba(5,8,16,0.8), transparent)", pointerEvents: "none", zIndex: 5 }} />
+
+      {/* ── CENTRED LIGHTHOUSE SCENE ── */}
       <svg viewBox="0 0 1400 900" preserveAspectRatio="xMidYMax slice" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} aria-hidden="true">
         <defs>
-          <style>{`@keyframes lhSweepH{0%,100%{transform:rotate(-38deg)}50%{transform:rotate(38deg)}}@keyframes lhTw0{0%,100%{opacity:.9}60%{opacity:.2}}@keyframes lhTw1{0%,100%{opacity:.5}40%{opacity:1}}@keyframes lhTw2{0%,100%{opacity:.7}70%{opacity:.15}}`}</style>
+          <style>{`@keyframes lhTw0{0%,100%{opacity:.9}60%{opacity:.2}}@keyframes lhTw1{0%,100%{opacity:.5}40%{opacity:1}}@keyframes lhTw2{0%,100%{opacity:.7}70%{opacity:.15}}@keyframes sigPulse{0%,100%{opacity:0}15%,85%{opacity:1}}`}</style>
+          <linearGradient id="towerG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#8892a0"/><stop offset="35%" stopColor="#d0d5dc"/><stop offset="55%" stopColor="#e8eaef"/><stop offset="75%" stopColor="#c0c6cf"/><stop offset="100%" stopColor="#7a8494"/></linearGradient>
+          <linearGradient id="bandG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#6b7585"/><stop offset="40%" stopColor="#9aa3b2"/><stop offset="60%" stopColor="#a8b0be"/><stop offset="100%" stopColor="#5e6878"/></linearGradient>
+          <linearGradient id="domeG" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stopColor="#b0b8c4"/><stop offset="50%" stopColor="#d8dce3"/><stop offset="100%" stopColor="#9aa2af"/></linearGradient>
+          <linearGradient id="lampG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#7a8494"/><stop offset="30%" stopColor="#c0c8d2"/><stop offset="50%" stopColor="#dde1e8"/><stop offset="70%" stopColor="#b8c0cc"/><stop offset="100%" stopColor="#6e7888"/></linearGradient>
+          <linearGradient id="railG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#8a94a4"/><stop offset="50%" stopColor="#d0d6de"/><stop offset="100%" stopColor="#8a94a4"/></linearGradient>
           <clipPath id="lhClip"><rect x="0" y="0" width="1400" height="700"/></clipPath>
         </defs>
-        <rect x="0" y="0" width="1400" height="900" fill="#060b14"/>
+        <rect x="0" y="0" width="1400" height="900" fill="#030608"/>
 
         {/* Stars */}
-        <g style={{animation:"lhTw0 3.2s ease-in-out infinite"}}>
+        <g style={{animation:"lhTw0 3.2s ease-in-out infinite"}} opacity={stage>=1?1:0}>
           <circle cx="150" cy="80" r="1.4" fill="#e8d5a3" opacity=".5"/><circle cx="1250" cy="90" r="1.6" fill="#e8d5a3" opacity=".45"/>
           <circle cx="400" cy="50" r="1.8" fill="#e8d5a3" opacity=".6"/><circle cx="1100" cy="60" r="1.3" fill="#fff" opacity=".4"/>
           <circle cx="800" cy="40" r="2" fill="#e8d5a3" opacity=".5"/><circle cx="250" cy="140" r="1.2" fill="#fff" opacity=".35"/>
         </g>
-        <g style={{animation:"lhTw1 4.1s ease-in-out infinite"}}>
+        <g style={{animation:"lhTw1 4.1s ease-in-out infinite"}} opacity={stage>=1?1:0}>
           <circle cx="550" cy="65" r="1.5" fill="#e8d5a3" opacity=".45"/><circle cx="950" cy="80" r="1.4" fill="#fff" opacity=".4"/>
-          <circle cx="1300" cy="120" r="1.7" fill="#e8d5a3" opacity=".4"/><circle cx="100" cy="110" r="1.3" fill="#fff" opacity=".35"/>
-        </g>
-        <g style={{animation:"lhTw2 5.3s ease-in-out infinite"}}>
-          <circle cx="680" cy="55" r="1.6" fill="#e8d5a3" opacity=".4"/><circle cx="350" cy="100" r="1.2" fill="#fff" opacity=".35"/>
+          <circle cx="1300" cy="120" r="1.7" fill="#e8d5a3" opacity=".4"/>
         </g>
 
-        {/* Moon */}
-        <circle cx="320" cy="160" r="40" fill="#0d1826"/><circle cx="314" cy="152" r="28" fill="#060b14"/>
+        {/* Beam - static, from lamp */}
+        <g clipPath="url(#lhClip)" opacity={stage>=2?1:0} style={{transition:"opacity 1.5s ease"}}>
+          <polygon points="700,416 380,-100 1020,-100" fill="#fbbf24" opacity={beamA * 1.3}/>
+          <polygon points="700,416 520,-100 880,-100" fill="#fbbf24" opacity={beamA * 0.7}/>
 
-        {/* Beam */}
-        <g clipPath="url(#lhClip)">
-          <g style={{transformOrigin:"700px 440px",animation:"lhSweepH 6s ease-in-out infinite"}}>
-            <polygon points="700,440 380,-100 1020,-100" fill="#fbbf24" opacity={beamA * 1.3}/>
-            <polygon points="700,440 520,-100 880,-100" fill="#fbbf24" opacity={beamA * 0.7}/>
+          {/* Grid nodes revealed by beam */}
+          <g opacity={beamA * 9} style={{animation:"sigPulse 5.5s ease-in-out infinite"}}>
+            <circle cx="500" cy="200" r="5" fill="none" stroke="#fbbf24" strokeWidth="0.7" opacity=".3"/>
+            <circle cx="500" cy="200" r="1.3" fill="#fbbf24" opacity=".5"/>
+            <circle cx="700" cy="100" r="5.5" fill="none" stroke="#fbbf24" strokeWidth="0.7" opacity=".35"/>
+            <circle cx="700" cy="100" r="1.4" fill="#fbbf24" opacity=".6"/>
+            <circle cx="900" cy="180" r="5" fill="none" stroke="#fbbf24" strokeWidth="0.7" opacity=".28"/>
+            <circle cx="900" cy="180" r="1.3" fill="#fbbf24" opacity=".45"/>
+            <line x1="500" y1="200" x2="700" y2="100" stroke="#fbbf24" strokeWidth="0.5" opacity=".2" strokeDasharray="5 5"/>
+            <line x1="700" y1="100" x2="900" y2="180" stroke="#fbbf24" strokeWidth="0.5" opacity=".16" strokeDasharray="5 5"/>
+            <text x="514" y="195" fill="#fbbf24" fontSize="8" fontFamily="monospace" opacity=".35">GEN</text>
+            <text x="714" y="94" fill="#fbbf24" fontSize="8" fontFamily="monospace" opacity=".3">LOAD</text>
+            <text x="914" y="174" fill="#fbbf24" fontSize="8" fontFamily="monospace" opacity=".25">DIST</text>
+          </g>
+
+          {/* Waveform */}
+          <g opacity={beamA * 7} style={{animation:"sigPulse 6s ease-in-out infinite 1.2s"}}>
+            <path d="M480,280 Q510,270 540,280 T600,280 T660,280 Q690,268 720,280 T780,280 T840,280 Q860,290 880,278 T940,280" fill="none" stroke="#fbbf24" strokeWidth="0.7" opacity=".3"/>
           </g>
         </g>
 
-        {/* Spinnaker Tower left */}
-        <polygon points="475,680 483,680 481,380 478,320 475,380" fill="#0d1a2c" opacity=".85"/>
-        <path d="M473,670 L450,666 Q424,652 408,622 Q392,588 396,546 Q400,508 416,480 Q434,452 458,440 Q470,435 473,410 Q458,410 440,422 Q418,438 404,470 Q388,508 392,550 Q396,592 414,626 Q432,656 468,668Z" fill="#0c1828" opacity=".8"/>
+        {/* Spinnaker Tower */}
+        <g opacity={stage>=1?0.85:0} style={{transition:"opacity 1.5s ease"}}>
+          <polygon points="355,680 363,680 361,380 358,320 355,380" fill="#0d1a2c" opacity=".85"/>
+          <path d="M353,670 L330,666 Q304,652 288,622 Q272,588 276,546 Q280,508 296,480 Q314,452 338,440 Q350,435 353,410 Q338,410 320,422 Q298,438 284,470 Q268,508 272,550 Q276,592 294,626 Q312,656 348,668Z" fill="#0c1828" opacity=".8"/>
+        </g>
 
-        {/* Guildhall right */}
-        <rect x="890" y="618" width="168" height="65" fill="#0d1825" opacity=".75" rx="2"/>
-        <polygon points="890,618 1058,618 974,585" fill="#0f1d2e" opacity=".75"/>
-        <rect x="958" y="560" width="32" height="62" fill="#0d1927" opacity=".8" rx="2"/>
-        <path d="M958,560 Q974,538 990,560" fill="#0f1d2e" opacity=".8"/>
+        {/* Guildhall */}
+        <g opacity={stage>=1?0.75:0} style={{transition:"opacity 1.5s ease"}}>
+          <rect x="1010" y="618" width="168" height="65" fill="#0d1825" opacity=".75" rx="2"/>
+          <polygon points="1010,618 1178,618 1094,585" fill="#0f1d2e" opacity=".75"/>
+          <rect x="1078" y="560" width="32" height="62" fill="#0d1927" opacity=".8" rx="2"/>
+          <path d="M1078,560 Q1094,538 1110,560" fill="#0f1d2e" opacity=".8"/>
+        </g>
 
-        {/* ── LIGHTHOUSE (3D CAD) ── */}
-        <defs>
-          <linearGradient id="towerG" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#8892a0"/>
-            <stop offset="35%" stopColor="#d0d5dc"/>
-            <stop offset="55%" stopColor="#e8eaef"/>
-            <stop offset="75%" stopColor="#c0c6cf"/>
-            <stop offset="100%" stopColor="#7a8494"/>
-          </linearGradient>
-          <linearGradient id="bandG" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#6b7585"/>
-            <stop offset="40%" stopColor="#9aa3b2"/>
-            <stop offset="60%" stopColor="#a8b0be"/>
-            <stop offset="100%" stopColor="#5e6878"/>
-          </linearGradient>
-          <linearGradient id="domeG" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="#b0b8c4"/>
-            <stop offset="50%" stopColor="#d8dce3"/>
-            <stop offset="100%" stopColor="#9aa2af"/>
-          </linearGradient>
-          <linearGradient id="lampG" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#7a8494"/>
-            <stop offset="30%" stopColor="#c0c8d2"/>
-            <stop offset="50%" stopColor="#dde1e8"/>
-            <stop offset="70%" stopColor="#b8c0cc"/>
-            <stop offset="100%" stopColor="#6e7888"/>
-          </linearGradient>
-          <linearGradient id="railG" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#8a94a4"/>
-            <stop offset="50%" stopColor="#d0d6de"/>
-            <stop offset="100%" stopColor="#8a94a4"/>
-          </linearGradient>
-        </defs>
-
-        {/* Tower body */}
-        <polygon points="666,680 734,680 718,440 682,440" fill="url(#towerG)"/>
-        {/* Shadow side */}
-        <polygon points="700,440 718,440 734,680 700,680" fill="#6e7888" opacity=".25"/>
-        {/* Edge highlights */}
-        <line x1="666" y1="680" x2="682" y2="440" stroke="#f0f2f5" strokeWidth="0.6" opacity=".5"/>
-        <line x1="734" y1="680" x2="718" y2="440" stroke="#4a5468" strokeWidth="0.5" opacity=".4"/>
-
-        {/* Bands */}
-        <polygon points="668,530 732,530 729,496 671,496" fill="url(#bandG)" opacity=".9"/>
-        <line x1="671" y1="496" x2="668" y2="530" stroke="#f0f2f5" strokeWidth="0.4" opacity=".35"/>
-        <polygon points="669,600 731,600 728,568 672,568" fill="url(#bandG)" opacity=".85"/>
-        <line x1="672" y1="568" x2="669" y2="600" stroke="#f0f2f5" strokeWidth="0.4" opacity=".3"/>
-
-        {/* Gallery/railing */}
-        <rect x="656" y="432" width="88" height="8" rx="2" fill="url(#railG)"/>
-        <rect x="656" y="432" width="88" height="2" rx="1" fill="#eef0f3" opacity=".5"/>
-        <rect x="656" y="438" width="88" height="1" fill="#5e6878" opacity=".3"/>
-
-        {/* Lamp room */}
-        <rect x="676" y="396" width="48" height="38" rx="2" fill="url(#lampG)"/>
-        <rect x="676" y="396" width="48" height="38" rx="2" fill="#fbbf24" opacity={0.06 + prox * 0.12}/>
-        {/* Glass panes */}
-        <line x1="688" y1="396" x2="688" y2="434" stroke="rgba(255,255,255,.15)" strokeWidth=".6"/>
-        <line x1="700" y1="396" x2="700" y2="434" stroke="rgba(255,255,255,.2)" strokeWidth=".6"/>
-        <line x1="712" y1="396" x2="712" y2="434" stroke="rgba(255,255,255,.15)" strokeWidth=".6"/>
-        {/* Lamp room highlight */}
-        <rect x="677" y="397" width="12" height="36" rx="1" fill="#fff" opacity=".06"/>
-
-        {/* Dome */}
-        <path d="M676,396 Q677,370 700,358 Q723,370 724,396Z" fill="url(#domeG)"/>
-        <path d="M676,396 Q677,370 700,358 Q700,370 700,396Z" fill="#fff" opacity=".08"/>
-        {/* Spire */}
-        <line x1="700" y1="358" x2="700" y2="336" stroke="#c0c8d2" strokeWidth="2"/>
-        <line x1="700" y1="358" x2="700" y2="336" stroke="#fff" strokeWidth="0.5" opacity=".3"/>
-        <circle cx="700" cy="334" r="4" fill="#d0d6de" stroke="#9aa2af" strokeWidth="0.5"/>
-        <circle cx="699" cy="333" r="1.5" fill="#fff" opacity=".3"/>
-        <circle cx="700" cy="334" r="2" fill="#fbbf24" opacity=".7"/>
-
-        {/* Windows - recessed with shadow */}
-        <rect x="692" y="507" width="16" height="20" rx="8" fill="#3a4050" opacity=".4"/>
-        <rect x="693" y="508" width="14" height="18" rx="7" fill="#fbbf24" opacity=".3"/>
-        <rect x="693" y="508" width="7" height="18" rx="4" fill="#fbbf24" opacity=".12"/>
-        <rect x="692" y="577" width="16" height="20" rx="8" fill="#3a4050" opacity=".35"/>
-        <rect x="693" y="578" width="14" height="18" rx="7" fill="#fbbf24" opacity=".22"/>
-        <rect x="693" y="578" width="7" height="18" rx="4" fill="#fbbf24" opacity=".08"/>
-
-        {/* Base */}
-        <rect x="658" y="676" width="84" height="6" rx="2" fill="url(#railG)" opacity=".8"/>
-        <rect x="658" y="676" width="84" height="1.5" rx="1" fill="#eef0f3" opacity=".3"/>
-
-        {/* Lamp glow */}
-        <circle cx="700" cy="416" r={glowR} fill="#fbbf24" opacity={glowOp}/>
-        <circle cx="700" cy="416" r="12" fill="#fbbf24" opacity={0.28 + prox * 0.35}/>
-        <circle cx="700" cy="416" r="5" fill="#fbbf24" opacity={lampOp}/>
-        <circle cx="700" cy="416" r="2.5" fill="#fffde0" opacity=".9"/>
+        {/* ── 3D CAD LIGHTHOUSE centred ── */}
+        <g opacity={stage>=1?1:0} style={{transition:"opacity 1.2s ease"}}>
+          <polygon points="666,680 734,680 718,440 682,440" fill="url(#towerG)"/>
+          <polygon points="700,440 718,440 734,680 700,680" fill="#6e7888" opacity=".25"/>
+          <line x1="666" y1="680" x2="682" y2="440" stroke="#f0f2f5" strokeWidth="0.6" opacity=".5"/>
+          <polygon points="668,530 732,530 729,496 671,496" fill="url(#bandG)" opacity=".9"/>
+          <polygon points="669,600 731,600 728,568 672,568" fill="url(#bandG)" opacity=".85"/>
+          <rect x="656" y="432" width="88" height="8" rx="2" fill="url(#railG)"/>
+          <rect x="656" y="432" width="88" height="2" rx="1" fill="#eef0f3" opacity=".5"/>
+          <rect x="676" y="396" width="48" height="38" rx="2" fill="url(#lampG)"/>
+          <rect x="676" y="396" width="48" height="38" rx="2" fill="#fbbf24" opacity={stage>=1?0.15:0}/>
+          <line x1="688" y1="396" x2="688" y2="434" stroke="rgba(255,255,255,.15)" strokeWidth=".6"/>
+          <line x1="700" y1="396" x2="700" y2="434" stroke="rgba(255,255,255,.2)" strokeWidth=".6"/>
+          <line x1="712" y1="396" x2="712" y2="434" stroke="rgba(255,255,255,.15)" strokeWidth=".6"/>
+          <rect x="677" y="397" width="12" height="36" rx="1" fill="#fff" opacity=".06"/>
+          <path d="M676,396 Q677,370 700,358 Q723,370 724,396Z" fill="url(#domeG)"/>
+          <path d="M676,396 Q677,370 700,358 Q700,370 700,396Z" fill="#fff" opacity=".08"/>
+          <line x1="700" y1="358" x2="700" y2="336" stroke="#c0c8d2" strokeWidth="2"/>
+          <circle cx="700" cy="334" r="4" fill="#d0d6de" stroke="#9aa2af" strokeWidth="0.5"/>
+          <circle cx="699" cy="333" r="1.5" fill="#fff" opacity=".3"/>
+          <circle cx="700" cy="334" r="2" fill="#fbbf24" opacity=".7"/>
+          <rect x="692" y="507" width="16" height="20" rx="8" fill="#3a4050" opacity=".4"/>
+          <rect x="693" y="508" width="14" height="18" rx="7" fill="#fbbf24" opacity=".3"/>
+          <rect x="692" y="577" width="16" height="20" rx="8" fill="#3a4050" opacity=".35"/>
+          <rect x="693" y="578" width="14" height="18" rx="7" fill="#fbbf24" opacity=".22"/>
+          <rect x="658" y="676" width="84" height="6" rx="2" fill="url(#railG)" opacity=".8"/>
+          {/* Lamp glow */}
+          <circle cx="700" cy="416" r={glowR} fill="#fbbf24" opacity={glowOp}/>
+          <circle cx="700" cy="416" r="12" fill="#fbbf24" opacity={stage>=1?0.55:0}/>
+          <circle cx="700" cy="416" r="5" fill="#fbbf24" opacity={lampOp}/>
+          <circle cx="700" cy="416" r="2.5" fill="#fffde0" opacity={stage>=1?0.9:0}/>
+        </g>
 
         {/* Ground */}
-        <rect x="0" y="680" width="1400" height="220" fill="#08111e"/>
-        <line x1="0" y1="681" x2="1400" y2="681" stroke="#152030" strokeWidth="1.5" opacity=".6"/>
-        <rect x="0" y="740" width="1400" height="160" fill="#050d17"/>
+        <rect x="0" y="680" width="1400" height="220" fill="#050810"/>
+        <line x1="0" y1="681" x2="1400" y2="681" stroke="#152030" strokeWidth="1.5" opacity=".5"/>
       </svg>
 
-      {/* ── HEADLINE + BUTTONS ── */}
-      <div style={{ position: "relative", zIndex: 10, textAlign: "center", padding: "0 24px" }}>
+      {/* Headline at bottom of lighthouse, everything under it below */}
+      <div style={{ position: "absolute", bottom: "1vh", left: 0, right: 0, zIndex: 10, textAlign: "center", padding: "0 24px" }}>
 
-        <p style={{ fontFamily: F.m, fontSize: 10, color: $.glow, letterSpacing: 5, marginBottom: 24, opacity: 0, animation: "wup 0.8s ease 0.3s forwards" }}>W.R.E.N.</p>
-
-        <h1 style={{ fontSize: "clamp(32px, 5vw, 58px)", fontWeight: 700, lineHeight: 1.1, letterSpacing: "-0.02em", color: $.tx, fontFamily: F.s, marginBottom: 20, opacity: 0, animation: "wup 0.8s ease 0.5s forwards", textShadow: "0 4px 30px #060b14" }}>
-          Know when your model<br/>stops being trustworthy.
+        <h1 style={{ fontSize: "clamp(30px, 5vw, 56px)", fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.02em", color: $.tx, fontFamily: F.s, marginBottom: 18, textShadow: "0 4px 30px #030608, 0 0 60px rgba(3,6,8,0.8)",
+          opacity: stage >= 3 ? 1 : 0, transform: stage >= 3 ? "none" : "translateY(20px)", transition: "all 1.2s cubic-bezier(0.16,1,0.3,1)" }}>
+          Know when your model<br/>stops being trustworthy
         </h1>
 
-        <p style={{ fontSize: 16, color: $.tx3, lineHeight: 1.6, maxWidth: 440, margin: "0 auto 32px", opacity: 0, animation: "wup 0.8s ease 0.7s forwards", textShadow: "0 2px 20px #060b14" }}>
-          Real-time monitoring for deployed AI under drift, noise, and attack.
+        <p style={{ fontSize: 16, color: $.tx3, lineHeight: 1.65, maxWidth: 440, margin: "0 auto 14px", textShadow: "0 2px 20px #030608",
+          opacity: stage >= 4 ? 1 : 0, transform: stage >= 4 ? "none" : "translateY(14px)", transition: "all 0.8s ease" }}>
+          Real-time monitoring for deployed AI<br/>under drift, noise, and attack
         </p>
 
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", opacity: 0, animation: "wup 0.8s ease 0.9s forwards" }}>
+        <p style={{ fontFamily: F.m, fontSize: 9, color: $.dim, letterSpacing: 1.2, marginBottom: 28,
+          opacity: stage >= 4 ? 1 : 0, transform: stage >= 4 ? "none" : "translateY(10px)", transition: "all 0.8s ease 0.15s" }}>
+          Built in Portsmouth. Inspired by signal rooms.
+        </p>
+
+        <div style={{ display: "flex", gap: 12, justifyContent: "center",
+          opacity: stage >= 5 ? 1 : 0, transform: stage >= 5 ? "none" : "translateY(8px)", transition: "all 0.8s ease" }}>
           <button onClick={function() { setPage("operator"); }}
-            style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 8, padding: "13px 32px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: F.s }}>
+            style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 8, padding: "10px 24px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: F.s }}>
             Enter Ops Centre
           </button>
           <button onClick={function() { go("demo"); }}
-            style={{ background: "rgba(8,17,30,.65)", color: $.tx3, border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "13px 24px", fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: F.s, backdropFilter: "blur(8px)" }}>
+            style={{ background: "rgba(255,255,255,.04)", color: $.tx3, border: "1px solid rgba(255,255,255,.08)", borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F.s, backdropFilter: "blur(8px)" }}>
             See It Live
           </button>
         </div>
@@ -1536,7 +1504,6 @@ function HeroSection(props) {
     </section>
   );
 }
-
 /* ═══ INTERACTIVE STRESS TEST ═══ */
 function StressTestWidget() {
   var _mode = useState("drift"); var mode = _mode[0]; var setMode = _mode[1];
@@ -1724,6 +1691,7 @@ export default function App() {
       {/* NAV */}
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, padding: "14px 36px", display: "flex", justifyContent: "space-between", alignItems: "center", background: scrollY > 60 ? "rgba(10,14,26,.92)" : "transparent", backdropFilter: scrollY > 60 ? "blur(20px)" : "none", borderBottom: scrollY > 60 ? "1px solid rgba(255,255,255,.04)" : "1px solid transparent", transition: "all .5s ease" }}>
         <div onClick={function() { go("hero"); }} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+          <BeaconSmall s={16} />
           <span style={{ fontSize: 13, letterSpacing: 3, color: $.glow, fontWeight: 700, fontFamily: F.m }}>W.R.E.N.</span>
         </div>
         <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
