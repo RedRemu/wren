@@ -1121,7 +1121,7 @@ function HeroSection(props) {
     <section id="hero" ref={secRef} style={{ position: "relative", background: "#060b14", overflow: "hidden", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
 
       {/* ── FULL BACKGROUND SVG ── */}
-      <svg viewBox="0 0 680 900" preserveAspectRatio="xMidYMax meet" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} aria-hidden="true">
+      <svg viewBox="0 0 680 900" preserveAspectRatio="xMidYMax slice" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} aria-hidden="true">
         <defs>
           <style>{`@keyframes lhSweep{0%,100%{transform:rotate(-42deg)}50%{transform:rotate(42deg)}}@keyframes lhSweep2{0%,100%{transform:rotate(-38deg)}50%{transform:rotate(38deg)}}@keyframes lhTw0{0%,100%{opacity:.9}60%{opacity:.2}}@keyframes lhTw1{0%,100%{opacity:.5}40%{opacity:1}}@keyframes lhTw2{0%,100%{opacity:.7}70%{opacity:.15}}@keyframes lhTw3{0%,100%{opacity:.3}50%{opacity:.9}}`}</style>
           <clipPath id="lhSky2"><rect x="0" y="0" width="680" height="710"/></clipPath>
