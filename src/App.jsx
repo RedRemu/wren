@@ -1412,27 +1412,90 @@ function HeroSection(props) {
         <rect x="958" y="560" width="32" height="62" fill="#0d1927" opacity=".8" rx="2"/>
         <path d="M958,560 Q974,538 990,560" fill="#0f1d2e" opacity=".8"/>
 
-        {/* ── LIGHTHOUSE ── */}
-        <polygon points="666,680 734,680 718,440 682,440" fill="#1a2640"/>
-        <polygon points="668,530 732,530 729,496 671,496" fill="#111c2c" opacity=".75"/>
-        <polygon points="669,600 731,600 728,568 672,568" fill="#111c2c" opacity=".7"/>
-        <line x1="666" y1="680" x2="682" y2="440" stroke="#253348" strokeWidth="1" opacity=".8"/>
-        <line x1="734" y1="680" x2="718" y2="440" stroke="#253348" strokeWidth="1" opacity=".8"/>
+        {/* ── LIGHTHOUSE (3D CAD) ── */}
+        <defs>
+          <linearGradient id="towerG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#8892a0"/>
+            <stop offset="35%" stopColor="#d0d5dc"/>
+            <stop offset="55%" stopColor="#e8eaef"/>
+            <stop offset="75%" stopColor="#c0c6cf"/>
+            <stop offset="100%" stopColor="#7a8494"/>
+          </linearGradient>
+          <linearGradient id="bandG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#6b7585"/>
+            <stop offset="40%" stopColor="#9aa3b2"/>
+            <stop offset="60%" stopColor="#a8b0be"/>
+            <stop offset="100%" stopColor="#5e6878"/>
+          </linearGradient>
+          <linearGradient id="domeG" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stopColor="#b0b8c4"/>
+            <stop offset="50%" stopColor="#d8dce3"/>
+            <stop offset="100%" stopColor="#9aa2af"/>
+          </linearGradient>
+          <linearGradient id="lampG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#7a8494"/>
+            <stop offset="30%" stopColor="#c0c8d2"/>
+            <stop offset="50%" stopColor="#dde1e8"/>
+            <stop offset="70%" stopColor="#b8c0cc"/>
+            <stop offset="100%" stopColor="#6e7888"/>
+          </linearGradient>
+          <linearGradient id="railG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#8a94a4"/>
+            <stop offset="50%" stopColor="#d0d6de"/>
+            <stop offset="100%" stopColor="#8a94a4"/>
+          </linearGradient>
+        </defs>
 
-        {/* Lamp housing */}
-        <rect x="660" y="434" width="80" height="6" rx="1" fill="#1e2f45"/>
-        <rect x="676" y="396" width="48" height="40" rx="2" fill="#1e2f45" stroke="#2a3a52" strokeWidth="1"/>
-        <rect x="676" y="396" width="48" height="40" rx="2" fill="#fbbf24" opacity={0.05 + prox * 0.1}/>
-        <line x1="688" y1="396" x2="688" y2="436" stroke="#fbbf24" strokeWidth=".4" opacity=".25"/>
-        <line x1="700" y1="396" x2="700" y2="436" stroke="#fbbf24" strokeWidth=".5" opacity=".35"/>
-        <line x1="712" y1="396" x2="712" y2="436" stroke="#fbbf24" strokeWidth=".4" opacity=".25"/>
-        <path d="M676,396 Q677,372 700,361 Q723,372 724,396Z" fill="#1a2640" stroke="#253348" strokeWidth="1"/>
-        <line x1="700" y1="361" x2="700" y2="344" stroke="#c4a35a" strokeWidth="1.5"/>
-        <circle cx="700" cy="342" r="3.5" fill="#fbbf24" opacity=".85"/>
+        {/* Tower body */}
+        <polygon points="666,680 734,680 718,440 682,440" fill="url(#towerG)"/>
+        {/* Shadow side */}
+        <polygon points="700,440 718,440 734,680 700,680" fill="#6e7888" opacity=".25"/>
+        {/* Edge highlights */}
+        <line x1="666" y1="680" x2="682" y2="440" stroke="#f0f2f5" strokeWidth="0.6" opacity=".5"/>
+        <line x1="734" y1="680" x2="718" y2="440" stroke="#4a5468" strokeWidth="0.5" opacity=".4"/>
 
-        {/* Windows */}
-        <rect x="693" y="508" width="14" height="18" rx="7" fill="#fbbf24" opacity=".22"/>
-        <rect x="693" y="578" width="14" height="18" rx="7" fill="#fbbf24" opacity=".16"/>
+        {/* Bands */}
+        <polygon points="668,530 732,530 729,496 671,496" fill="url(#bandG)" opacity=".9"/>
+        <line x1="671" y1="496" x2="668" y2="530" stroke="#f0f2f5" strokeWidth="0.4" opacity=".35"/>
+        <polygon points="669,600 731,600 728,568 672,568" fill="url(#bandG)" opacity=".85"/>
+        <line x1="672" y1="568" x2="669" y2="600" stroke="#f0f2f5" strokeWidth="0.4" opacity=".3"/>
+
+        {/* Gallery/railing */}
+        <rect x="656" y="432" width="88" height="8" rx="2" fill="url(#railG)"/>
+        <rect x="656" y="432" width="88" height="2" rx="1" fill="#eef0f3" opacity=".5"/>
+        <rect x="656" y="438" width="88" height="1" fill="#5e6878" opacity=".3"/>
+
+        {/* Lamp room */}
+        <rect x="676" y="396" width="48" height="38" rx="2" fill="url(#lampG)"/>
+        <rect x="676" y="396" width="48" height="38" rx="2" fill="#fbbf24" opacity={0.06 + prox * 0.12}/>
+        {/* Glass panes */}
+        <line x1="688" y1="396" x2="688" y2="434" stroke="rgba(255,255,255,.15)" strokeWidth=".6"/>
+        <line x1="700" y1="396" x2="700" y2="434" stroke="rgba(255,255,255,.2)" strokeWidth=".6"/>
+        <line x1="712" y1="396" x2="712" y2="434" stroke="rgba(255,255,255,.15)" strokeWidth=".6"/>
+        {/* Lamp room highlight */}
+        <rect x="677" y="397" width="12" height="36" rx="1" fill="#fff" opacity=".06"/>
+
+        {/* Dome */}
+        <path d="M676,396 Q677,370 700,358 Q723,370 724,396Z" fill="url(#domeG)"/>
+        <path d="M676,396 Q677,370 700,358 Q700,370 700,396Z" fill="#fff" opacity=".08"/>
+        {/* Spire */}
+        <line x1="700" y1="358" x2="700" y2="336" stroke="#c0c8d2" strokeWidth="2"/>
+        <line x1="700" y1="358" x2="700" y2="336" stroke="#fff" strokeWidth="0.5" opacity=".3"/>
+        <circle cx="700" cy="334" r="4" fill="#d0d6de" stroke="#9aa2af" strokeWidth="0.5"/>
+        <circle cx="699" cy="333" r="1.5" fill="#fff" opacity=".3"/>
+        <circle cx="700" cy="334" r="2" fill="#fbbf24" opacity=".7"/>
+
+        {/* Windows - recessed with shadow */}
+        <rect x="692" y="507" width="16" height="20" rx="8" fill="#3a4050" opacity=".4"/>
+        <rect x="693" y="508" width="14" height="18" rx="7" fill="#fbbf24" opacity=".3"/>
+        <rect x="693" y="508" width="7" height="18" rx="4" fill="#fbbf24" opacity=".12"/>
+        <rect x="692" y="577" width="16" height="20" rx="8" fill="#3a4050" opacity=".35"/>
+        <rect x="693" y="578" width="14" height="18" rx="7" fill="#fbbf24" opacity=".22"/>
+        <rect x="693" y="578" width="7" height="18" rx="4" fill="#fbbf24" opacity=".08"/>
+
+        {/* Base */}
+        <rect x="658" y="676" width="84" height="6" rx="2" fill="url(#railG)" opacity=".8"/>
+        <rect x="658" y="676" width="84" height="1.5" rx="1" fill="#eef0f3" opacity=".3"/>
 
         {/* Lamp glow */}
         <circle cx="700" cy="416" r={glowR} fill="#fbbf24" opacity={glowOp}/>
