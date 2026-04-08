@@ -183,6 +183,7 @@ function pickScenarios() {
 /* ═══ STYLES ═══ */
 function useStyles() {
   useEffect(function() {
+    document.title = "W.R.E.N.";
     if (document.getElementById("wrn")) return;
     var l = document.createElement("link"); l.rel = "stylesheet";
     l.href = "https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap";
