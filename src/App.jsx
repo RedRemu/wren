@@ -34,7 +34,7 @@ var SCENARIOS = {
   nominal: { label: "Normal Operation", batch: 20, desc: "Stable grid. All systems nominal. Model predictions are trustworthy.", plain: "Everything is working. The AI model was trained on data that looks like this. Predictions are accurate.", status: "STABLE", color: $.gn, health: 98, action: "Continue monitoring at standard interval.", feature: "None. All features within training distribution.", alert: "No alerts", showDrift: false, showRegime: false },
   gradual: { label: "Gradual Drift", batch: 55, desc: "Tau parameters shifting slowly. Model confidence degrading before accuracy drops.", plain: "The real world is slowly changing, but the model was trained on old data. It's getting less reliable, but doesn't know it yet.", status: "DRIFT DETECTED", color: $.ac, health: 87, action: "Recalibrate model. Increase damping at Node 2 (LOAD). Reduce trust threshold to 0.90.", feature: "tau_std rising +40%, F_gain_mean shifting from training mean", alert: "PSI crossed 0.25 threshold at batch 55", showDrift: true, showRegime: false },
   noise: { label: "Sensor Noise", batch: 45, desc: "SCADA sensor corruption injected. Testing whether the model can distinguish noise from real instability.", plain: "A sensor is feeding bad data. Is the grid actually unstable, or is the sensor broken? The system has to tell the difference.", status: "MONITORING", color: $.ac, health: 92, action: "Increase monitoring frequency to 2x. Verify sensor integrity at Node 1.", feature: "Broad noise across tau and g parameters. Not localised.", alert: "Early CUSUM deviation at batch 34", showDrift: true, showRegime: false },
-  adversarial: { label: "Adversarial Attack", batch: 65, desc: "FGSM perturbation applied to sensor readings. Simulates deliberate manipulation of grid telemetry.", plain: "Someone is deliberately feeding fake data to trick the AI. Small, crafted changes that fool the model into making wrong predictions.", status: "AT RISK", color: $.rd, health: 74, action: "Switch to RF fallback model immediately. SVM boundary has been compromised by gradient attack.", feature: "SVM flip rate at 16.5%. Hybrid stacking absorbs to 3.3%.", alert: "Adversarial signature detected in gradient pattern", showDrift: true, showRegime: false },
+  adversarial: { label: "Adversarial Attack", batch: 65, desc: "FGSM perturbation applied to sensor readings. Simulates adversarial perturbation of grid telemetry.", plain: "This simulates adversarial perturbation. Small mathematical changes are applied to sensor readings to test whether the model holds or flips its predictions.", status: "AT RISK", color: $.rd, health: 74, action: "Switch to RF fallback model immediately. SVM boundary has been compromised by gradient attack.", feature: "SVM flip rate at 16.5%. Hybrid stacking absorbs to 3.3%.", alert: "Adversarial signature detected in gradient pattern", showDrift: true, showRegime: false },
   collapse: { label: "Regime Collapse", batch: 95, desc: "Abrupt parameter shift. Generator response characteristics have fundamentally changed.", plain: "The grid itself has fundamentally changed. The world the model was trained for no longer exists. Nothing it learned applies anymore.", status: "CRITICAL", color: $.rd, health: 52, action: "Emergency recalibration via LaSCal pipeline. Alert grid operator. Reduce load at Nodes 2 and 3.", feature: "All features shifted beyond training bounds. Coverage at 82%.", alert: "All three detectors triggered. Regime change confirmed.", showDrift: true, showRegime: true },
 };
 
@@ -52,9 +52,9 @@ var ALL_DECISION_POINTS = [
     ],
     snap:{auc:"0.927",psi:"0.35",cov:"88.6%",aucC:$.ac,psiC:$.ac,covC:$.ac},
     options:[
-      {icon:"\u21BA",label:"Trigger Recalibration",desc:"Reinitialise the LaSCal pipeline against current data distribution.",outcome:"good",
+      {icon:"",label:"Trigger Recalibration",desc:"Reinitialise the LaSCal pipeline against current data distribution.",outcome:"good",
        consequence:"Calibration error stabilises. Coverage recovers toward 94%. Model remains operationally trustworthy through the drift phase."},
-      {icon:"\u25CE",label:"Hold: Continue Monitoring",desc:"No intervention. Continue observing. Do not act yet.",outcome:"bad",
+      {icon:"",label:"Hold: Continue Monitoring",desc:"No intervention. Continue observing. Do not act yet.",outcome:"bad",
        consequence:"ECE triples over the next 10 batches. The recalibration window closes. You will need emergency action to recover."},
     ],
     afterStress:{good:[0,0,0,0],bad:[2,0,1,2]},
@@ -71,9 +71,9 @@ var ALL_DECISION_POINTS = [
     ],
     snap:{auc:"0.916",psi:"0.57",cov:"86.5%",aucC:$.ac,psiC:$.rd,covC:$.ac},
     options:[
-      {icon:"\u21C4",label:"Switch to RF Fallback",desc:"Route all predictions through the Random Forest model only.",outcome:"good",
+      {icon:"",label:"Switch to RF Fallback",desc:"Route all predictions through the Random Forest model only.",outcome:"good",
        consequence:"Tree models have zero gradient in leaf regions. FGSM immune. Flip rate drops to 0.04%. Grid confidence fully restored."},
-      {icon:"\u21BA",label:"Trigger Recalibration",desc:"Recalibrate the Hybrid model against recent data.",outcome:"bad",
+      {icon:"",label:"Trigger Recalibration",desc:"Recalibrate the Hybrid model against recent data.",outcome:"bad",
        consequence:"Recalibration cannot address adversarial vulnerability. Attack continues. SVM flip rate reaches 19.8%. Grid assessments unreliable."},
     ],
     afterStress:{good:[0,0,0,0],bad:[2,1,2,1]},
@@ -91,9 +91,9 @@ var ALL_DECISION_POINTS = [
     ],
     snap:{auc:"0.877",psi:"1.65",cov:"83.0%",aucC:$.rd,psiC:$.rd,covC:$.rd},
     options:[
-      {icon:"\u26A0",label:"Alert Operator: Reduce Load",desc:"Escalate to human oversight. Shed load at nodes 2 and 3.",outcome:"good",
+      {icon:"",label:"Alert Operator: Reduce Load",desc:"Escalate to human oversight. Shed load at nodes 2 and 3.",outcome:"good",
        consequence:"Human oversight takes control during model uncertainty. Load reduction creates stability margin. Grid holds, no cascade."},
-      {icon:"\u25CE",label:"Continue Monitoring",desc:"No action. Observe further before committing.",outcome:"bad",
+      {icon:"",label:"Continue Monitoring",desc:"No action. Observe further before committing.",outcome:"bad",
        consequence:"Cascade risk escalates rapidly. Grid health deteriorates beyond recovery threshold. Emergency shutdown unavoidable."},
     ],
     afterStress:{good:[0,1,0,0],bad:[2,2,2,2]},
@@ -110,9 +110,9 @@ var ALL_DECISION_POINTS = [
     ],
     snap:{auc:"0.944",psi:"0.18",cov:"91.2%",aucC:$.ac,psiC:$.gn,covC:$.ac},
     options:[
-      {icon:"\u26A0",label:"Quarantine Suspect Sensors",desc:"Isolate corrupted inputs. Fall back to validated channels only.",outcome:"good",
+      {icon:"",label:"Quarantine Suspect Sensors",desc:"Isolate corrupted inputs. Fall back to validated channels only.",outcome:"good",
        consequence:"Corrupted readings removed from pipeline. Model operates on reduced but clean data. Accuracy holds at 93.8% on verified channels."},
-      {icon:"\u21BA",label:"Trigger Full Recalibration",desc:"Recalibrate against all current data including suspect readings.",outcome:"bad",
+      {icon:"",label:"Trigger Full Recalibration",desc:"Recalibrate against all current data including suspect readings.",outcome:"bad",
        consequence:"Recalibration absorbs corrupted data as ground truth. Model learns wrong patterns. Accuracy degrades to 86% within 5 batches."},
     ],
     afterStress:{good:[0,0,0,0],bad:[1,2,1,0]},
@@ -129,9 +129,9 @@ var ALL_DECISION_POINTS = [
     ],
     snap:{auc:"0.931",psi:"0.42",cov:"89.1%",aucC:$.ac,psiC:$.ac,covC:$.ac},
     options:[
-      {icon:"\u23FC",label:"Shed Non-Critical Load",desc:"Reduce demand on LOAD node to within training bounds.",outcome:"good",
+      {icon:"",label:"Shed Non-Critical Load",desc:"Reduce demand on LOAD node to within training bounds.",outcome:"good",
        consequence:"Demand returns to known operating range. Model predictions stabilise. Coverage recovers to 94%. No cascading impact."},
-      {icon:"\u21C4",label:"Switch to Emergency Model",desc:"Deploy simplified fallback model designed for extreme conditions.",outcome:"bad",
+      {icon:"",label:"Switch to Emergency Model",desc:"Deploy simplified fallback model designed for extreme conditions.",outcome:"bad",
        consequence:"Fallback model lacks feature coverage for this scenario. Predictions worse than primary model. Grid instability increases for 12 batches."},
     ],
     afterStress:{good:[0,0,0,0],bad:[1,2,1,2]},
@@ -148,9 +148,9 @@ var ALL_DECISION_POINTS = [
     ],
     snap:{auc:"0.952",psi:"0.29",cov:"93.5%",aucC:$.gn,psiC:$.ac,covC:$.ac},
     options:[
-      {icon:"\u25CE",label:"Raise Alert Threshold",desc:"Temporarily increase detection sensitivity to filter noise.",outcome:"good",
+      {icon:"",label:"Raise Alert Threshold",desc:"Temporarily increase detection sensitivity to filter noise.",outcome:"good",
        consequence:"Alert volume drops 90%. The three real anomalies remain visible. Operators can focus on genuine threats. Grid monitored effectively."},
-      {icon:"\u26A0",label:"Escalate All Alerts",desc:"Treat every alert as genuine. Escalate everything to human review.",outcome:"bad",
+      {icon:"",label:"Escalate All Alerts",desc:"Treat every alert as genuine. Escalate everything to human review.",outcome:"bad",
        consequence:"Human operators overwhelmed within minutes. Real threat buried in noise. Critical drift signal missed entirely. Response delayed by 8 batches."},
     ],
     afterStress:{good:[0,0,0,0],bad:[1,1,2,1]},
@@ -386,6 +386,28 @@ function Topo(props) {
 }
 
 /* ═══ ENTRANCE ═══ */
+function EvidenceCard(props) {
+  var d = props.d; var last = props.last;
+  var _open = useState(false); var open = _open[0]; var setOpen = _open[1];
+  return (
+    <div style={{ marginBottom: 28, paddingBottom: 28, borderBottom: last ? "none" : "1px solid rgba(255,255,255,.04)" }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 12, flexWrap: "wrap" }}>
+        <span style={{ fontFamily: F.m, fontSize: "clamp(20px, 4vw, 26px)", fontWeight: 700, color: d.color, lineHeight: 1 }}>{d.before}</span>
+        <span style={{ fontSize: 14, color: $.dim }}>→</span>
+        <span style={{ fontFamily: F.m, fontSize: "clamp(20px, 4vw, 26px)", fontWeight: 700, color: d.color, lineHeight: 1 }}>{d.after}</span>
+        <span style={{ fontFamily: F.m, fontSize: 8, color: $.dim, letterSpacing: 1, marginLeft: 4 }}>{d.tag.toUpperCase()}</span>
+      </div>
+      <div style={{ fontSize: 14, color: $.tx2, lineHeight: 1.8, marginBottom: 6 }}>{d.plain}</div>
+      <div onClick={function(){setOpen(!open);}} style={{ cursor: "pointer", display: "inline-block" }}>
+        <span style={{ fontFamily: F.m, fontSize: 9, color: $.dim, borderBottom: "1px dotted " + $.dim }}>{open ? "Hide technical detail" : "Technical detail"}</span>
+      </div>
+      {open && (
+        <div style={{ marginTop: 8, fontSize: 11, color: $.dim, lineHeight: 1.6, fontFamily: F.m, animation: "wup .2s ease both" }}>{d.technical}</div>
+      )}
+    </div>
+  );
+}
+
 function Entrance(props) {
   var _s = useState(0); var stage = _s[0]; var setStage = _s[1];
   useEffect(function() {
@@ -923,6 +945,102 @@ function GridOperatorSim(props) {
   );
 }
 
+/* ═══ PIPELINE STAGE VISUALS ═══ */
+function PipeVis(props) {
+  var n = props.n; var color = props.color;
+  var W = 220; var H = 48;
+  var c = color || $.glow;
+
+  // Data loading - dots streaming into a box
+  if (n === 1) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      {[0,1,2,3,4,5,6,7].map(function(i){return <circle key={i} cx={20+i*12} cy={24} r="2.5" fill={c} opacity="0.4"><animate attributeName="opacity" values="0.1;0.8;0.1" dur="1.5s" begin={i*0.15+"s"} repeatCount="indefinite"/></circle>;})}
+      <rect x={130} y={12} width={60} height={24} rx="4" fill="none" stroke={c} strokeWidth="1" opacity="0.3"/>
+      <text x={160} y={28} textAnchor="middle" fill={c} fontSize="8" fontFamily={F.m} opacity="0.5">60K</text>
+    </svg>
+  );
+  // Feature engineering - 12 dots expanding to 48
+  if (n === 2) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      {[0,1,2,3,4,5,6,7,8,9,10,11].map(function(i){return <circle key={i} cx={15+i*5} cy={24} r="2" fill={c} opacity="0.6"/>;})}
+      <text x={85} y={27} fill={c} fontSize="10" fontFamily={F.m} opacity="0.4">→</text>
+      {Array.from({length:24}).map(function(_,i){return <circle key={i} cx={100+(i%12)*8} cy={i<12?16:32} r="1.5" fill={c} opacity="0.35"><animate attributeName="opacity" values="0.15;0.5;0.15" dur="2s" begin={i*0.06+"s"} repeatCount="indefinite"/></circle>;})}
+    </svg>
+  );
+  // Data splitting - bar dividing into 3
+  if (n === 3) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <rect x={10} y={18} width={70} height={12} rx="3" fill={c} opacity="0.2"/>
+      <text x={115} y={27} fill={c} fontSize="10" fontFamily={F.m} opacity="0.4">→</text>
+      <rect x={135} y={18} width={28} height={12} rx="2" fill={$.gn} opacity="0.35"/><text x={149} y={27} textAnchor="middle" fill={$.gn} fontSize="6" fontFamily={F.m}>TRN</text>
+      <rect x={166} y={18} width={20} height={12} rx="2" fill={$.ac} opacity="0.35"/><text x={176} y={27} textAnchor="middle" fill={$.ac} fontSize="6" fontFamily={F.m}>VAL</text>
+      <rect x={189} y={18} width={20} height={12} rx="2" fill={$.rd} opacity="0.35"/><text x={199} y={27} textAnchor="middle" fill={$.rd} fontSize="6" fontFamily={F.m}>TST</text>
+    </svg>
+  );
+  // Feature selection - dots disappearing
+  if (n === 4) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      {Array.from({length:24}).map(function(_,i){var keep=i<7;return <circle key={i} cx={10+(i%12)*8} cy={i<12?16:32} r="2" fill={keep?c:$.dim} opacity={keep?0.7:0.12}>{!keep&&<animate attributeName="r" values="2;0" dur="0.8s" begin={(i*0.05)+"s" } fill="freeze"/>}</circle>;})}
+      <text x={115} y={27} fill={c} fontSize="10" fontFamily={F.m} opacity="0.4">→</text>
+      <text x={140} y={28} fill={c} fontSize="9" fontFamily={F.m} opacity="0.6">14 kept</text>
+    </svg>
+  );
+  // Hyperparameter search - grid with one highlighted
+  if (n === 5) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      {Array.from({length:25}).map(function(_,i){var x=15+(i%5)*14;var y=8+(Math.floor(i/5))*9;var best=i===12;return <rect key={i} x={x} y={y} width={10} height={6} rx="1" fill={best?$.glow:c} opacity={best?0.8:0.12}>{best&&<animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite"/>}</rect>;})}
+      <text x={105} y={27} fill={c} fontSize="10" fontFamily={F.m} opacity="0.4">→</text>
+      <text x={125} y={28} fill={$.glow} fontSize="9" fontFamily={F.m} opacity="0.6">optimal</text>
+    </svg>
+  );
+  // Four base learners - 4 different shapes
+  if (n === 6) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <circle cx={30} cy={24} r="10" fill="none" stroke="#a78bfa" strokeWidth="1.5" opacity="0.5"/><text x={30} y={27} textAnchor="middle" fill="#a78bfa" fontSize="6" fontFamily={F.m}>SVM</text>
+      <rect x={55} y={14} width={20} height={20} rx="3" fill="none" stroke={$.gn} strokeWidth="1.5" opacity="0.5"/><text x={65} y={27} textAnchor="middle" fill={$.gn} fontSize="6" fontFamily={F.m}>RF</text>
+      <polygon points="100,14 110,34 90,34" fill="none" stroke="#67e8f9" strokeWidth="1.5" opacity="0.5"/><text x={100} y={30} textAnchor="middle" fill="#67e8f9" fontSize="5" fontFamily={F.m}>LGB</text>
+      <rect x={120} y={14} width={20} height={20} rx="10" fill="none" stroke={$.ac} strokeWidth="1.5" opacity="0.5"/><text x={130} y={27} textAnchor="middle" fill={$.ac} fontSize="6" fontFamily={F.m}>LR</text>
+    </svg>
+  );
+  // Calibration - crooked line becoming straight
+  if (n === 7) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <path d="M10,38 Q30,10 50,30 Q70,42 90,20" fill="none" stroke={$.rd} strokeWidth="1.2" opacity="0.3" strokeDasharray="3 3"/>
+      <text x={105} y={27} fill={c} fontSize="10" fontFamily={F.m} opacity="0.4">→</text>
+      <line x1={120} y1={38} x2={200} y2={12} stroke={$.gn} strokeWidth="1.5" opacity="0.5"/>
+      <line x1={120} y1={38} x2={200} y2={12} stroke={$.gn} strokeWidth="1" opacity="0.15" strokeDasharray="3 3"/>
+    </svg>
+  );
+  // Stacking ensemble - shapes merging
+  if (n === 8) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <circle cx={25} cy={24} r="8" fill="none" stroke="#a78bfa" strokeWidth="1" opacity="0.4"/>
+      <rect x={50} y={16} width={16} height={16} rx="2" fill="none" stroke={$.gn} strokeWidth="1" opacity="0.4"/>
+      <text x={85} y={27} fill={c} fontSize="10" fontFamily={F.m} opacity="0.4">→</text>
+      <rect x={105} y={10} width={50} height={28} rx="6" fill={$.glow} opacity="0.1" stroke={$.glow} strokeWidth="1.5" opacity="0.4"/>
+      <text x={130} y={28} textAnchor="middle" fill={$.glow} fontSize="8" fontFamily={F.m} opacity="0.6">HYBRID</text>
+    </svg>
+  );
+  // Score bar
+  if (n === 9) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <rect x={10} y={20} width={140} height={8} rx="4" fill="rgba(255,255,255,.06)"/>
+      <rect x={10} y={20} width={139.8} height={8} rx="4" fill={$.gn} opacity="0.4"><animate attributeName="width" from="0" to="139.8" dur="1.2s" fill="freeze"/></rect>
+      <text x={160} y={27} fill={$.gn} fontSize="9" fontFamily={F.m} fontWeight="700" opacity="0.7">0.9999</text>
+    </svg>
+  );
+  // Default - simple pulse dot + label
+  var labels = {10:"10:1 cost",11:"95% bound",12:"p<0.05",13:"plateau",14:"5 folds",15:"F_gain #1",16:"explainable",17:"robust",18:"RF immune","18b":"120 batches",19:"26 early",20:"generalises",21:"stabilised",22:"deployed"};
+  return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <circle cx={20} cy={24} r="6" fill={c} opacity="0.15"><animate attributeName="r" values="4;8;4" dur="2s" repeatCount="indefinite"/></circle>
+      <circle cx={20} cy={24} r="3" fill={c} opacity="0.4"/>
+      <line x1={32} y1={24} x2={90} y2={24} stroke={c} strokeWidth="0.8" opacity="0.15" strokeDasharray="3 3"/>
+      <text x={100} y={28} fill={c} fontSize="10" fontFamily={F.m} opacity="0.5">{labels[n]||""}</text>
+    </svg>
+  );
+}
+
 /* ═══ COMMAND CENTRE ═══ */
 var THREATS = [
   { label: "Power Surge", color: "#f87171", fix: "shield", desc: "Energy spike heading for the network.", node: "GEN", cost: 2 },
@@ -941,6 +1059,11 @@ function CommandCentre(props) {
   var _b    = useState(0);       var batch = _b[0];     var setBatch = _b[1];
   var _demo = useState(false);   var demo  = _demo[0];  var setDemo  = _demo[1];
   var _card = useState(null);    var card  = _card[0];  var setCard  = _card[1];
+  var _pipeStage = useState(22); var pipeStage = _pipeStage[0]; var setPipeStage = _pipeStage[1];
+  var _pipeOpen = useState(null); var pipeOpen = _pipeOpen[0]; var setPipeOpen = _pipeOpen[1];
+  var _pipeRunning = useState(false); var pipeRunning = _pipeRunning[0]; var setPipeRunning = _pipeRunning[1];
+  var pipeTimers = useRef([]);
+  var _findOpen = useState(null); var findOpen = _findOpen[0]; var setFindOpen = _findOpen[1];
   var demoRef = useRef(null);
   var aucData = useMemo(function(){ return SH.map(function(v,i){ return {b:i,H:v,S:SV[i],R:SR[i],L:SL[i]}; }); },[]);
   var psiData = useMemo(function(){ return SP.map(function(v,i){ return {b:i,P:v}; }); },[]);
@@ -954,42 +1077,42 @@ function CommandCentre(props) {
     return function(){ clearInterval(demoRef.current); };
   },[demo]);
 
-  /* ── 18 REAL PIPELINE STAGES from nexus_engine_v4.py ── */
+  /* ── 22 REAL PIPELINE STAGES from nexus_engine_v4.py ── */
   var PIPELINE = [
     {phase:"Data", color:$.gn, stages:[
-      {n:1, name:"Data Loading",                   done:true, desc:"60,000 samples loaded from DSGC dataset. 12 raw electrical parameters. Class balance checked 37% unstable. NaN values detected and median imputed."},
-      {n:2, name:"Physics Feature Engineering",    done:true, desc:"48 physics informed candidates generated. Key v4 features: F_gain_i = τ·g per node, H_net, V_weak, F_gain_mean/std/min. Raw 12 features expanded to 48."},
-      {n:3, name:"Data Splitting",                 done:true, desc:"Stratified train / validation / test split. Class balance preserved across all three partitions. Reproducible seeding applied."},
+      {n:1, name:"Data Loading", plain:"Load 60,000 real power grid measurements. Check for missing values and fix them", desc:"60,000 samples loaded from DSGC dataset. 12 raw electrical parameters. Class balance checked 37% unstable. NaN values detected and median imputed.", input:"Raw CSV", output:"Clean dataset"},
+      {n:2, name:"Physics Feature Engineering", plain:"Turn raw electrical readings into meaningful physics measurements. 12 values become 48", desc:"48 physics informed candidates generated. Key v4 features: F_gain_i = τ·g per node, H_net, V_weak, F_gain_mean/std/min. Raw 12 features expanded to 48.", input:"12 features", output:"48 features"},
+      {n:3, name:"Data Splitting", plain:"Split the data into three groups: one to learn from, one to tune with, one to test on. None overlap", desc:"Stratified train / validation / test split. Class balance preserved across all three partitions. Reproducible seeding applied.", input:"Full dataset", output:"Train / Val / Test"},
     ]},
-    {phase:"Feature Selection & Optimisation", color:"#a78bfa", stages:[
-      {n:4, name:"RFECV Feature Selection",        done:true, desc:"Recursive Feature Elimination with Cross-Validation. Reduced 48 candidates down to 14 optimal features. Eliminates noise and collinear terms. Top retained: F_gain_mean, tau_std, g_mean."},
-      {n:5, name:"Bayesian Hyperparameter Search", done:true, desc:"Optuna TPE sampler. 100 trials per model, run in parallel. Tuned SVM (C, gamma), Random Forest (n_estimators, max_depth), LightGBM (n_estimators, learning_rate). Total search time: ~180s."},
+    {phase:"Feature Selection", color:"#a78bfa", stages:[
+      {n:4, name:"RFECV Feature Selection", plain:"Test all 48 features and keep only the 14 that actually matter. Remove the noise", desc:"Recursive Feature Elimination with Cross-Validation. Reduced 48 candidates down to 14 optimal features. Eliminates noise and collinear terms. Top retained: F_gain_mean, tau_std, g_mean.", input:"48 features", output:"14 features"},
+      {n:5, name:"Bayesian Hyperparameter Search", plain:"Automatically find the best settings for each model. 100 experiments per model, all run in parallel", desc:"Optuna TPE sampler. 100 trials per model, run in parallel. Tuned SVM (C, gamma), Random Forest (n_estimators, max_depth), LightGBM (n_estimators, learning_rate). Total search time: ~180s.", input:"Default settings", output:"Optimal settings"},
     ]},
     {phase:"Model Training", color:$.glow, stages:[
-      {n:6, name:"Four Base Learners",             done:true, desc:"SVM (RBF kernel), Random Forest (300 estimators), LightGBM (gradient boosting), Logistic Regression. All trained on the 14 selected features with optimised hyperparameters."},
-      {n:7, name:"Probability Calibration",        done:true, desc:"Platt scaling (sigmoid) and Isotonic regression applied post hoc. Aligns confidence scores with empirical accuracy. Reduces ECE on validation set."},
-      {n:8, name:"Stacking Hybrid Ensemble",       done:true, desc:"SVM + RF base predictions fed into a LogisticRegression meta learner. Also uses top physics features (F_gain_mean, tau_mean) as meta inputs. Final model outperforms all individual bases."},
+      {n:6, name:"Four Base Learners", plain:"Train four different AI models on the same data. Each learns differently, has different strengths", desc:"SVM (RBF kernel), Random Forest (300 estimators), LightGBM (gradient boosting), Logistic Regression. All trained on the 14 selected features with optimised hyperparameters.", input:"Training data", output:"4 trained models"},
+      {n:7, name:"Probability Calibration", plain:"Make sure when a model says \"90% confident\" it really is right 90% of the time", desc:"Platt scaling (sigmoid) and Isotonic regression applied post hoc. Aligns confidence scores with empirical accuracy. Reduces ECE on validation set.", input:"Raw probabilities", output:"Calibrated probabilities"},
+      {n:8, name:"Stacking Hybrid Ensemble", plain:"Combine the best two models into one that outperforms both. The hybrid uses SVM + RF predictions plus raw physics features", desc:"SVM + RF base predictions fed into a LogisticRegression meta learner. Also uses top physics features (F_gain_mean, tau_mean) as meta inputs. Final model outperforms all individual bases.", input:"SVM + RF outputs", output:"Hybrid model"},
     ]},
     {phase:"Evaluation", color:$.ac, stages:[
-      {n:9,  name:"Test Set Evaluation",           done:true, desc:"Full metrics: AUC, F1, Accuracy, Brier score, ECE. Hybrid AUC: 0.9999. SVM: 0.9899. RF: 0.9899. LGBM comparable. Clean data performance established as deployment baseline."},
-      {n:10, name:"Cost Optimal Threshold",        done:true, desc:"v4: Cost function penalises false negatives 10× more than false positives (grid failure cost >> false alarm cost). Three level risk index: STABLE / BORDERLINE / CRITICAL. Thresholds saved to JSON."},
-      {n:11, name:"Conformal Prediction",          done:true, desc:"Split conformal prediction, α=0.05. Mathematical guarantee: at least 95% of prediction intervals contain the true class on exchangeable data. q_hat quantile computed from validation set."},
-      {n:12, name:"Paired Bootstrap AUC Test",     done:true, desc:"2,000 bootstrap resamples comparing Hybrid vs LightGBM AUC. Delta AUC and 95% confidence interval computed. p value confirms statistical significance of Hybrid improvement."},
-      {n:13, name:"Learning Curve Analysis",       done:true, desc:"AUC vs training set size computed for all models. Shows model is not not data limited performance plateaus before 100% of training data, confirming generalisation."},
-      {n:14, name:"Cross Validation (5 fold)",     done:true, desc:"Stratified 5 fold CV on full train and val set. Hybrid requires nested manual CV (calibration inside each fold). Hybrid CV AUC confirms no overfitting to test set."},
-      {n:15, name:"Permutation Importance",        done:true, desc:"Each feature permuted 5 times. AUC drop measured. F_gain_mean is the dominant feature across all drift phases. The physics formula holds even when statistical guarantees break down."},
+      {n:9,  name:"Test Set Evaluation", plain:"Test all models on data they have never seen. The Hybrid scored 0.9999 out of 1.0, nearly perfect", desc:"Full metrics: AUC, F1, Accuracy, Brier score, ECE. Hybrid AUC: 0.9999. SVM: 0.9899. RF: 0.9899. LGBM comparable. Clean data performance established as deployment baseline.", input:"Test data", output:"AUC: 0.9999"},
+      {n:10, name:"Cost Optimal Threshold", plain:"Missing a real grid failure is 10× worse than a false alarm. Set the decision boundary accordingly", desc:"v4: Cost function penalises false negatives 10× more than false positives (grid failure cost >> false alarm cost). Three level risk index: STABLE / BORDERLINE / CRITICAL. Thresholds saved to JSON.", input:"Cost ratio 10:1", output:"Risk thresholds"},
+      {n:11, name:"Conformal Prediction", plain:"Add a mathematical safety guarantee: at least 95% of predictions must have a reliable confidence bound", desc:"Split conformal prediction, \u03B1=0.05. Mathematical guarantee: at least 95% of prediction intervals contain the true class on exchangeable data. q_hat quantile computed from validation set.", input:"Validation scores", output:"95% guarantee"},
+      {n:12, name:"Paired Bootstrap Test", plain:"Is the Hybrid actually better than the others, or did it just get lucky? Run 2,000 random tests to find out", desc:"2,000 bootstrap resamples comparing Hybrid vs LightGBM AUC. Delta AUC and 95% confidence interval computed. p value confirms statistical significance of Hybrid improvement.", input:"Model predictions", output:"p < 0.05 confirmed"},
+      {n:13, name:"Learning Curve Analysis", plain:"Does the model need more data, or does it have enough? Performance plateaus before using all data, so it generalises well", desc:"AUC vs training set size computed for all models. Shows model is not data limited. Performance plateaus before 100% of training data, confirming generalisation.", input:"Varying data sizes", output:"Plateau confirmed"},
+      {n:14, name:"Cross Validation", plain:"Test the model five different ways by rotating which data it trains on. Makes sure results are not a fluke", desc:"Stratified 5 fold CV on full train and val set. Hybrid requires nested manual CV (calibration inside each fold). Hybrid CV AUC confirms no overfitting to test set.", input:"5 rotations", output:"Stable across all"},
+      {n:15, name:"Permutation Importance", plain:"Scramble each feature one at a time. The physics formula F_gain dominated every single test, proving the model learned real physics", desc:"Each feature permuted 5 times. AUC drop measured. F_gain_mean is the dominant feature across all drift phases. The physics formula holds even when statistical guarantees break down.", input:"Feature scrambling", output:"F_gain_mean #1"},
     ]},
-    {phase:"Robustness & Deployment", color:$.rd, stages:[
-      {n:16, name:"SHAP Explainability",           done:true, desc:"TreeSHAP for RF and LightGBM. KernelSHAP approximation for SVM. Global and local attributions saved. F_gain consistently top ranked model is explainable and physics aligned."},
-      {n:17, name:"Stress Testing",                done:true, desc:"Gaussian noise (4 levels), OOD scaling, boundary sensitivity, Monte Carlo (N=50, 3 noise levels). Hybrid degrades most gracefully under all stress conditions tested."},
-      {n:18, name:"FGSM Adversarial Robustness",   done:true, desc:"Fast Gradient Sign Method at 6 epsilon levels (0.01 to 0.30). SVM (RBF) flip rate: 19.8% at eps=0.1. RF flip rate: 0.04% tree models are immune to gradient attacks due to discrete leaf structure."},
+    {phase:"Robustness", color:$.rd, stages:[
+      {n:16, name:"SHAP Explainability", plain:"Ask the model why it made each decision. Every prediction can be traced back to specific input features", desc:"TreeSHAP for RF and LightGBM. KernelSHAP approximation for SVM. Global and local attributions saved. F_gain consistently top ranked. Model is explainable and physics aligned.", input:"Any prediction", output:"Feature attributions"},
+      {n:17, name:"Stress Testing", plain:"Add noise, scale inputs, push boundaries. The Hybrid degrades most gracefully under every stress condition tested", desc:"Gaussian noise (4 levels), OOD scaling, boundary sensitivity, Monte Carlo (N=50, 3 noise levels). Hybrid degrades most gracefully under all stress conditions tested.", input:"4 noise levels", output:"Hybrid most robust"},
+      {n:18, name:"Adversarial Robustness", plain:"Apply mathematical perturbations to test if models can be pushed into wrong answers. SVM flipped 19.8%. Random Forest held at 0.04%", desc:"Fast Gradient Sign Method at 6 epsilon levels (0.01 to 0.30). SVM (RBF) flip rate: 19.8% at eps=0.1. RF flip rate: 0.04%. Tree models immune due to discrete leaf structure.", input:"FGSM ε=0.01–0.30", output:"RF immune"},
     ]},
     {phase:"Simulation & Export", color:"#67e8f9", stages:[
-      {n:"18b", name:"Streaming Deployment Simulation", done:true, desc:"3 layer, 120 sequential batches. Gradual tau drift from batch 40. FGSM adversarial attack at batch 65. Abrupt regime shift at batch 80. SCADA noise, missing data, quantisation and latency all simulated."},
-      {n:"19", name:"Sequential Change Detection",      done:true, desc:"PSI drift index per batch (threshold 0.25). CUSUM sequential test for cumulative drift. Page Hinkley test for abrupt shifts. PSI fires 26 batches before AUC visibly drops."},
-      {n:"20", name:"Generalisation Suite",             done:true, desc:"Synthetic DSGC operating points generated with varied τ and g ranges. Cross regime evaluation confirms model holds outside training distribution boundaries."},
-      {n:"21", name:"Auto Stabiliser (Adam controller)", done:true, desc:"Gradient based controller adjusts τ and g to push P(unstable) below target threshold. Adam optimiser (lr=0.3, β1=0.9, β2=0.999). Corrective grid control in ≤500 iterations."},
-      {n:"22", name:"Browser Export",                   done:true, desc:"JSON model bundle generated for deployment. Contains SVM/RF/LGBM weights, scaler parameters, feature names, thresholds, calibration data, and run metadata. This webapp reads that bundle."},
+      {n:"18b", name:"Deployment Simulation", plain:"Simulate 120 batches of real-world deployment: gradual drift, adversarial perturbation, and sudden regime change, all at once", desc:"3 layer, 120 sequential batches. Gradual tau drift from batch 40. FGSM adversarial perturbation at batch 65. Abrupt regime shift at batch 80. SCADA noise, missing data, quantisation and latency all simulated.", input:"Clean model", output:"120 batch results"},
+      {n:"19", name:"Change Detection", plain:"Three different alarm systems watching the data stream. PSI caught trouble 26 batches before accuracy visibly dropped", desc:"PSI drift index per batch (threshold 0.25). CUSUM sequential test for cumulative drift. Page Hinkley test for abrupt shifts. PSI fires 26 batches before AUC visibly drops.", input:"Streaming data", output:"Early warnings"},
+      {n:"20", name:"Generalisation Suite", plain:"Generate entirely new operating conditions the model has never seen. Confirm it still works outside its training boundaries", desc:"Synthetic DSGC operating points generated with varied τ and g ranges. Cross regime evaluation confirms model holds outside training distribution boundaries.", input:"New conditions", output:"Still holds"},
+      {n:"21", name:"Auto Stabiliser", plain:"An automatic controller that adjusts grid parameters to push the system back toward stability in under 500 steps", desc:"Gradient based controller adjusts τ and g to push P(unstable) below target threshold. Adam optimiser (lr=0.3, β1=0.9, β2=0.999). Corrective grid control in ≤500 iterations.", input:"Unstable state", output:"Stabilised"},
+      {n:"22", name:"Browser Export", plain:"Package everything into a single file that runs in a web browser. This is what powers the website you are looking at right now", desc:"JSON model bundle generated for deployment. Contains SVM/RF/LGBM weights, scaler parameters, feature names, thresholds, calibration data, and run metadata. This webapp reads that bundle.", input:"Full pipeline", output:"This website"},
     ]},
   ];
 
@@ -1015,17 +1138,17 @@ function CommandCentre(props) {
 
   /* Findings data consequence format */
   var FINDINGS = [
-    {metric:"AUC fell from 0.9999 to 0.8834",   color:$.rd,  icon:"→",
+    {metric:"AUC fell from 0.9999 to 0.8834",   color:$.rd, 
      consequence:"The model was near perfect in the lab. Under real deployment drift, 1 in 9 predictions deteriorated. A model that looks production ready on a static benchmark can still fail silently once deployed. This is the gap W.R.E.N. exists to close."},
-    {metric:"ECE increased 214×",                color:$.rd,  icon:"→",
+    {metric:"ECE increased 214×",                color:$.rd, 
      consequence:"Calibration error is how wrong the model's confidence is. 214× baseline means when it said '90% stable', it was right far less often. Decisions made on uncalibrated confidence are decisions made on false certainty. LaSCal recalibration brought this back under control."},
-    {metric:"PSI crossed 0.25 at batch 55",      color:$.glow,icon:"→",
+    {metric:"PSI crossed 0.25 at batch 55",      color:$.glow,icon:"",
      consequence:"26 batches before accuracy dropped, the data started looking different. PSI caught it first. That 26-batch head start is the difference between a controlled recalibration and an emergency shutdown. Early warning is the economic value of deployment monitoring."},
-    {metric:"RF adversarial flip rate: 0.04%",   color:$.gn,  icon:"→",
-     consequence:"Under FGSM attack (deliberate sensor manipulation), the SVM was flipped 19.8% of the time. The Random Forest: 0.04%. Tree models don't use gradients there's no slope to attack. When adversarial conditions are possible, the fallback model is the RF, not the SVM."},
-    {metric:"Conformal coverage dropped to 83%", color:$.ac,  icon:"→",
+    {metric:"RF adversarial flip rate: 0.04%",   color:$.gn, 
+     consequence:"Under FGSM adversarial testing, the SVM was flipped 19.8% of the time. The Random Forest: 0.04%. Tree models don't use gradients there's no slope to attack. When adversarial conditions are possible, the fallback model is the RF, not the SVM."},
+    {metric:"Conformal coverage dropped to 83%", color:$.ac, 
      consequence:"1 in 6 predictions during regime collapse had no valid uncertainty bound. The conformal guarantee expired. This isn't a model failure it's the model honestly admitting it is out of its depth. A model that tells you when to stop trusting it is more valuable than one that doesn't."},
-    {metric:"F_gain_mean dominated all phases",  color:$.glow,icon:"→",
+    {metric:"F_gain_mean dominated all phases",  color:$.glow,icon:"",
      consequence:"SHAP showed that the physics formula F_gain = τ·g remained the top feature across every drift phase, every attack, every regime. The physics didn't break even when the statistics did. The model's core reasoning was sound only its calibration drifted."},
   ];
 
@@ -1172,47 +1295,119 @@ function CommandCentre(props) {
   );
 
   /* ── TAB: PIPELINE ── */
+
+  function runPipeline() {
+    pipeTimers.current.forEach(clearTimeout);
+    setPipeStage(0); setPipeOpen(null); setPipeRunning(true);
+    var allStages = [];
+    PIPELINE.forEach(function(ph) { ph.stages.forEach(function(s) { allStages.push(s); }); });
+    allStages.forEach(function(_, i) {
+      pipeTimers.current.push(setTimeout(function() {
+        setPipeStage(i + 1);
+        if (i === allStages.length - 1) setPipeRunning(false);
+      }, (i + 1) * 550));
+    });
+  }
+
+  var totalStages = 0;
+  PIPELINE.forEach(function(ph) { totalStages += ph.stages.length; });
+  var progress = Math.round((pipeStage / totalStages) * 100);
+
   if (tab==="pipe") return (
     <div style={{minHeight:"100vh",background:$.bg,fontFamily:F.s,color:$.tx2}}>
       {nav}
       <div style={{maxWidth:880,margin:"0 auto",padding:"28px 20px 56px"}}>
         <div style={{marginBottom:28}}>
           <p style={{fontFamily:F.m,fontSize:10,color:$.glow,letterSpacing:4,marginBottom:8}}>A.G.N.E.S. PIPELINE v4.2</p>
-          <h2 style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:8}}>22 automated stages. End to end. One pipeline.</h2>
-          <p style={{fontSize:12,color:$.tx3,lineHeight:1.75}}>From raw DSGC dataset to deployed browser model. Output of each stage feeds directly into the next.</p>
+          <h2 style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:8}}>22 stages from raw data to deployed model</h2>
+          <p style={{fontSize:13,color:$.tx3,lineHeight:1.75}}>Every stage feeds into the next. Click any stage to see what it does and why</p>
         </div>
 
-        {PIPELINE.map(function(ph){
-          return (
-            <div key={ph.phase} style={{marginBottom:24}}>
-              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
-                <div style={{width:8,height:8,borderRadius:"50%",background:ph.color,flexShrink:0}}/>
-                <span style={{fontFamily:F.m,fontSize:9,color:ph.color,letterSpacing:".06em",fontWeight:600}}>{ph.phase.toUpperCase()}</span>
-                <div style={{flex:1,height:1,background:ph.color,opacity:.12}}/>
-              </div>
-              <div style={{display:"flex",flexDirection:"column",gap:7}}>
-                {ph.stages.map(function(s){
-                  return (
-                    <div key={s.n} style={{background:$.bg2,border:"1px solid "+$.brd,borderRadius:9,padding:"13px 16px",display:"flex",gap:14,alignItems:"flex-start"}}>
-                      <div style={{width:30,height:30,borderRadius:7,background:ph.color+"12",border:"1px solid "+ph.color+"28",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontFamily:F.m,fontSize:10,fontWeight:700,color:ph.color}}>
-                        {s.n}
-                      </div>
-                      <div style={{flex:1}}>
-                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
-                          <div style={{fontSize:13,fontWeight:600,color:$.tx}}>{s.name}</div>
-                          <span style={{fontFamily:F.m,fontSize:8,color:ph.color,background:ph.color+"10",padding:"2px 8px",borderRadius:999,marginLeft:10,flexShrink:0}}>Complete</span>
-                        </div>
-                        <div style={{fontSize:11,color:$.tx3,lineHeight:1.7}}>{s.desc}</div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+        {/* Run button + progress */}
+        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:24}}>
+          <button onClick={runPipeline} disabled={pipeRunning}
+            style={{background:pipeRunning?$.bg2:$.glow,color:pipeRunning?$.dim:$.bg,border:"none",borderRadius:8,padding:"10px 24px",fontSize:12,fontWeight:700,cursor:pipeRunning?"default":"pointer",fontFamily:F.m,letterSpacing:0.5}}>
+            {pipeRunning?"Running...":pipeStage>=totalStages?"Run again":"Run pipeline"}
+          </button>
+          <div style={{flex:1,height:3,background:"rgba(255,255,255,.04)",borderRadius:2,overflow:"hidden"}}>
+            <div style={{width:progress+"%",height:"100%",background:$.glow,borderRadius:2,transition:"width .2s ease"}}/>
+          </div>
+          <span style={{fontFamily:F.m,fontSize:10,color:$.glow,fontWeight:600,minWidth:36}}>{pipeStage}/{totalStages}</span>
+        </div>
 
-        <div style={{background:$.acD,border:"1px solid "+$.glow+"22",borderRadius:10,padding:"16px 20px",textAlign:"center"}}>
+        {(function() {
+          var stageCount = 0;
+          return PIPELINE.map(function(ph) {
+            var phaseStart = stageCount;
+            var phaseComplete = true;
+            ph.stages.forEach(function() { stageCount++; if (stageCount > pipeStage) phaseComplete = false; });
+            var phaseActive = stageCount > pipeStage && phaseStart < pipeStage;
+
+            return (
+              <div key={ph.phase} style={{marginBottom:20,opacity:phaseStart<pipeStage?1:0.3,transition:"opacity .4s ease"}}>
+                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+                  <div style={{width:8,height:8,borderRadius:"50%",background:ph.color,flexShrink:0,animation:phaseActive?"wpulse 1s ease-in-out infinite":"none"}}/>
+                  <span style={{fontFamily:F.m,fontSize:9,color:ph.color,letterSpacing:".06em",fontWeight:600}}>{ph.phase.toUpperCase()}</span>
+                  <div style={{flex:1,height:1,background:ph.color,opacity:.12}}/>
+                  
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  {(function() {
+                    var localCount = phaseStart;
+                    return ph.stages.map(function(s) {
+                      localCount++;
+                      var reached = localCount <= pipeStage;
+                      var current = localCount === pipeStage && pipeRunning;
+                      var isOpen = pipeOpen === s.n;
+                      return (
+                        <div key={s.n}
+                          onClick={function(){if(reached)setPipeOpen(isOpen?null:s.n);}}
+                          style={{background:current?"rgba(251,191,36,.04)":$.bg2,border:"1px solid "+(current?$.glow+"44":isOpen?ph.color+"44":$.brd),borderRadius:9,padding:"12px 14px",cursor:reached?"pointer":"default",transition:"all .3s",opacity:reached?1:0.25,transform:reached?"none":"translateX(8px)"}}>
+                          <div style={{display:"flex",alignItems:"center",gap:12}}>
+                            <div style={{width:32,height:32,borderRadius:8,background:reached?ph.color+"10":"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontFamily:F.m,fontSize:11,fontWeight:700,color:reached?ph.color:$.dim,transition:"all .3s"}}>
+                              {s.n}
+                            </div>
+                            <div style={{flex:1,minWidth:0}}>
+                              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                                <div style={{fontSize:13,fontWeight:600,color:reached?$.tx:$.dim}}>{s.name}</div>
+                                {reached && !isOpen && <span style={{fontFamily:F.m,fontSize:7,color:$.dim}}>→</span>}
+                              </div>
+                              {!isOpen && reached && <div style={{fontSize:11,color:$.tx3,marginTop:2}}>{s.plain}</div>}
+                            </div>
+                            {current && <div style={{width:6,height:6,borderRadius:"50%",background:$.glow,animation:"wpulse 0.6s ease-in-out infinite",flexShrink:0}}/>}
+                          </div>
+
+                          {isOpen && reached && (
+                            <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,.04)",animation:"wup .2s ease both"}}>
+                              {/* Stage visual */}
+                              <div style={{marginBottom:10}}><PipeVis n={s.n} color={ph.color}/></div>
+                              {/* Input → Output */}
+                              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+                                <div style={{background:"rgba(255,255,255,.03)",borderRadius:6,padding:"6px 10px"}}>
+                                  <div style={{fontFamily:F.m,fontSize:7,color:$.dim,letterSpacing:1}}>INPUT</div>
+                                  <div style={{fontFamily:F.m,fontSize:10,color:$.tx2,marginTop:2}}>{s.input}</div>
+                                </div>
+                                <span style={{color:ph.color,fontSize:14}}>→</span>
+                                <div style={{background:ph.color+"08",border:"1px solid "+ph.color+"22",borderRadius:6,padding:"6px 10px"}}>
+                                  <div style={{fontFamily:F.m,fontSize:7,color:ph.color,letterSpacing:1}}>OUTPUT</div>
+                                  <div style={{fontFamily:F.m,fontSize:10,color:$.tx,marginTop:2,fontWeight:600}}>{s.output}</div>
+                                </div>
+                              </div>
+                              {/* Technical detail */}
+                              <div style={{fontSize:11,color:$.dim,lineHeight:1.7,fontFamily:F.m}}>{s.desc}</div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
+            );
+          });
+        })()}
+
+        <div style={{background:$.acD,border:"1px solid "+$.glow+"22",borderRadius:10,padding:"16px 20px",textAlign:"center",marginTop:8}}>
           <div style={{fontFamily:F.m,fontSize:9,color:$.glow,letterSpacing:4,marginBottom:10}}>ENVIRONMENT</div>
           <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
             {["Python 3.13","scikit learn 1.8","LightGBM 4.6","SHAP 0.50","Optuna 4.7","NumPy","Pandas","SciPy"].map(function(t){
@@ -1225,38 +1420,209 @@ function CommandCentre(props) {
   );
 
   /* ── TAB: FINDINGS ── */
+
   return (
     <div style={{minHeight:"100vh",background:$.bg,fontFamily:F.s,color:$.tx2}}>
       {nav}
-      <div style={{maxWidth:780,margin:"0 auto",padding:"28px 20px 56px"}}>
+      <div style={{maxWidth:820,margin:"0 auto",padding:"28px 20px 56px"}}>
         <div style={{marginBottom:28}}>
-          <p style={{fontFamily:F.m,fontSize:10,color:$.glow,letterSpacing:4,marginBottom:8}}>WHAT WE FOUND</p>
-          <h2 style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:8}}>Six numbers. Six things that actually matter.</h2>
-          <p style={{fontSize:12,color:$.tx3,lineHeight:1.75}}>Not every metric. Just what the results mean in practice.</p>
+          <p style={{fontFamily:F.m,fontSize:10,color:$.glow,letterSpacing:4,marginBottom:8}}>RESEARCH FINDINGS</p>
+          <h2 style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:8}}>The data behind every claim</h2>
+          <p style={{fontSize:13,color:$.tx3,lineHeight:1.75}}>Click any finding to see the actual evidence</p>
         </div>
 
-        <div style={{display:"flex",flexDirection:"column",gap:12}}>
-          {FINDINGS.map(function(f,i){
-            return (
-              <div key={i} style={{background:$.bg2,border:"1px solid "+f.color+"28",borderRadius:12,padding:"20px 22px",display:"flex",gap:20,alignItems:"flex-start"}}>
-                <div style={{width:44,height:44,borderRadius:10,background:f.color+"12",border:"1px solid "+f.color+"33",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-                  <span style={{fontFamily:F.m,fontSize:20,fontWeight:700,color:f.color}}>
-                    {i+1}
-                  </span>
-                </div>
-                <div style={{flex:1}}>
-                  <div style={{fontFamily:F.m,fontSize:12,fontWeight:700,color:f.color,marginBottom:6,lineHeight:1.4}}>{f.metric}</div>
-                  <div style={{fontSize:13,color:$.tx3,lineHeight:1.8}}>{f.consequence}</div>
-                </div>
+        {/* Finding 1: AUC degradation */}
+        <div style={{marginBottom:14}}>
+          <div onClick={function(){setFindOpen(findOpen===1?null:1);}} style={{background:$.bg2,border:"1px solid "+(findOpen===1?$.rd+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===1?14:0}}>
+              <div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.rd}}>0.9999 → 0.8834</div>
+                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The model was near-perfect in the lab. Deployment told a different story</div>
               </div>
-            );
-          })}
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===1?"Close":"See proof"}</span>
+            </div>
+            {findOpen===1 && (
+              <div style={{animation:"wup .2s ease both"}}>
+                <ResponsiveContainer width="100%" height={180}>
+                  <LineChart data={aucData} margin={{top:8,right:8,bottom:4,left:0}}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(251,191,36,.04)"/>
+                    <XAxis dataKey="b" tick={TK} tickLine={false}/>
+                    <YAxis domain={[0.84,1]} tick={TK} tickLine={false} width={36}/>
+                    <ReferenceLine x={40} stroke={$.ac} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Drift",fill:$.ac,fontSize:8}}/>
+                    <ReferenceLine x={65} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Attack",fill:$.rd,fontSize:8}}/>
+                    <ReferenceLine x={80} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Regime",fill:$.rd,fontSize:8}}/>
+                    <Line type="monotone" dataKey="H" stroke={$.glow} strokeWidth={2} dot={false} name="Hybrid" isAnimationActive={false}/>
+                    <Line type="monotone" dataKey="S" stroke="#a78bfa" strokeWidth={1} dot={false} opacity={.4} name="SVM" isAnimationActive={false}/>
+                    <Line type="monotone" dataKey="R" stroke={$.gn} strokeWidth={1} dot={false} opacity={.4} name="RF" isAnimationActive={false}/>
+                  </LineChart>
+                </ResponsiveContainer>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7,marginTop:8}}>Every line is a different model watching the same data stream. The vertical dashed lines mark when conditions changed. Between batch 40 and batch 120, 1 in 9 Hybrid predictions degraded. The model had no idea it was getting worse</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Finding 2: ECE / Confidence */}
+        <div style={{marginBottom:14}}>
+          <div onClick={function(){setFindOpen(findOpen===2?null:2);}} style={{background:$.bg2,border:"1px solid "+(findOpen===2?$.rd+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===2?14:0}}>
+              <div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.rd}}>Confidence error increased 214×</div>
+                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The model was still saying "90% sure" while being wrong</div>
+              </div>
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===2?"Close":"See proof"}</span>
+            </div>
+            {findOpen===2 && (
+              <div style={{animation:"wup .2s ease both"}}>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:12}}>
+                  <div style={{background:"rgba(52,211,153,.04)",borderRadius:8,padding:"16px",textAlign:"center"}}>
+                    <div style={{fontFamily:F.m,fontSize:8,color:$.gn,letterSpacing:1,marginBottom:6}}>LAB (CLEAN DATA)</div>
+                    <div style={{fontFamily:F.m,fontSize:28,fontWeight:700,color:$.gn}}>1×</div>
+                    <div style={{fontSize:11,color:$.tx3,marginTop:4}}>Model says 90%, is right 90% of the time</div>
+                  </div>
+                  <div style={{background:"rgba(248,113,113,.04)",borderRadius:8,padding:"16px",textAlign:"center"}}>
+                    <div style={{fontFamily:F.m,fontSize:8,color:$.rd,letterSpacing:1,marginBottom:6}}>DEPLOYED (DRIFT)</div>
+                    <div style={{fontFamily:F.m,fontSize:28,fontWeight:700,color:$.rd}}>214×</div>
+                    <div style={{fontSize:11,color:$.tx3,marginTop:4}}>Model says 90%, is right far less often</div>
+                  </div>
+                </div>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>This is the most dangerous failure mode in ML deployment. The model does not know it is wrong. It keeps outputting high-confidence predictions that no longer match reality. LaSCal recalibration brought this back under control</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Finding 3: PSI Early Warning */}
+        <div style={{marginBottom:14}}>
+          <div onClick={function(){setFindOpen(findOpen===3?null:3);}} style={{background:$.bg2,border:"1px solid "+(findOpen===3?$.glow+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===3?14:0}}>
+              <div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.glow}}>PSI fired 26 batches early</div>
+                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The system spotted trouble before accuracy dropped</div>
+              </div>
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===3?"Close":"See proof"}</span>
+            </div>
+            {findOpen===3 && (
+              <div style={{animation:"wup .2s ease both"}}>
+                <ResponsiveContainer width="100%" height={140}>
+                  <AreaChart data={psiData} margin={{top:8,right:8,bottom:4,left:0}}>
+                    <XAxis dataKey="b" tick={TK} tickLine={false}/>
+                    <YAxis tick={false} axisLine={false} width={0} domain={[0,function(mx){return Math.max(0.4,mx*1.1);}]}/>
+                    <ReferenceLine y={0.25} stroke={$.rd} strokeDasharray="3 3" strokeOpacity={.5} label={{value:"Alert threshold",fill:$.rd,fontSize:8}}/>
+                    <ReferenceLine x={55} stroke={$.glow} strokeWidth={2} strokeOpacity={.5} label={{value:"PSI fires",fill:$.glow,fontSize:8,position:"top"}}/>
+                    <ReferenceLine x={81} stroke={$.rd} strokeWidth={1} strokeOpacity={.3} label={{value:"AUC drops",fill:$.rd,fontSize:8,position:"top"}}/>
+                    <Area type="monotone" dataKey="P" stroke={$.ac} fill={$.acD} strokeWidth={2} isAnimationActive={false}/>
+                  </AreaChart>
+                </ResponsiveContainer>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,marginBottom:8}}>
+                  <div style={{flex:1,height:1,background:$.glow+"33"}}/>
+                  <span style={{fontFamily:F.m,fontSize:11,color:$.glow,fontWeight:700}}>26 batch gap</span>
+                  <div style={{flex:1,height:1,background:$.glow+"33"}}/>
+                </div>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>The amber line is PSI, which measures how different incoming data looks from training data. It crossed the alert threshold at batch 55. Accuracy did not visibly drop until batch 81. That 26-batch window is the time you have to recalibrate, switch models, or alert an operator before the failure becomes visible</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Finding 4: Adversarial Robustness */}
+        <div style={{marginBottom:14}}>
+          <div onClick={function(){setFindOpen(findOpen===4?null:4);}} style={{background:$.bg2,border:"1px solid "+(findOpen===4?$.gn+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===4?14:0}}>
+              <div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.gn}}>SVM 19.8% flipped vs RF 0.04%</div>
+                <div style={{fontSize:13,color:$.tx,marginTop:4}}>Same test, completely different resilience</div>
+              </div>
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===4?"Close":"See proof"}</span>
+            </div>
+            {findOpen===4 && (
+              <div style={{animation:"wup .2s ease both"}}>
+                <div style={{display:"flex",gap:12,marginBottom:12}}>
+                  {[
+                    {name:"SVM",val:19.8,color:"#a78bfa"},
+                    {name:"Hybrid",val:3.3,color:$.glow},
+                    {name:"LGBM",val:1.2,color:"#67e8f9"},
+                    {name:"RF",val:0.04,color:$.gn},
+                  ].map(function(m){return (
+                    <div key={m.name} style={{flex:1,textAlign:"center"}}>
+                      <div style={{height:100,display:"flex",alignItems:"flex-end",justifyContent:"center",marginBottom:6}}>
+                        <div style={{width:"100%",maxWidth:40,height:Math.max(2,m.val/19.8*90),background:m.color,opacity:0.5,borderRadius:"3px 3px 0 0",transition:"height .5s ease"}}/>
+                      </div>
+                      <div style={{fontFamily:F.m,fontSize:12,fontWeight:700,color:m.color}}>{m.val}%</div>
+                      <div style={{fontFamily:F.m,fontSize:8,color:$.dim,marginTop:2}}>{m.name}</div>
+                    </div>
+                  );})}
+                </div>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>Under FGSM adversarial perturbation testing at ε=0.1, the SVM had its predictions flipped almost 20% of the time. The Random Forest held at 0.04%. Tree-based models have no gradient to exploit. This is why the system keeps RF as the automatic fallback when adversarial conditions are detected</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Finding 5: Coverage */}
+        <div style={{marginBottom:14}}>
+          <div onClick={function(){setFindOpen(findOpen===5?null:5);}} style={{background:$.bg2,border:"1px solid "+(findOpen===5?$.ac+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===5?14:0}}>
+              <div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.ac}}>Coverage dropped from 96% to 83%</div>
+                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The safety guarantee expired. 1 in 6 predictions had no bound</div>
+              </div>
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===5?"Close":"See proof"}</span>
+            </div>
+            {findOpen===5 && (
+              <div style={{animation:"wup .2s ease both"}}>
+                <ResponsiveContainer width="100%" height={130}>
+                  <AreaChart data={covData} margin={{top:8,right:8,bottom:4,left:0}}>
+                    <XAxis dataKey="b" tick={TK} tickLine={false}/>
+                    <YAxis domain={[0.78,1]} tick={TK} tickLine={false} width={36}/>
+                    <ReferenceLine y={0.95} stroke={$.gn} strokeDasharray="3 3" strokeOpacity={.5} label={{value:"95% guarantee",fill:$.gn,fontSize:8}}/>
+                    <Area type="monotone" dataKey="C" stroke={$.glow} fill={$.glowD} strokeWidth={2} isAnimationActive={false}/>
+                  </AreaChart>
+                </ResponsiveContainer>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7,marginTop:8}}>Conformal prediction guarantees that at least 95% of predictions have a reliable confidence bound. When the data shifts far enough, that guarantee breaks. At batch 95, coverage was 83%, meaning 1 in 6 predictions had no valid safety net. A model that can tell you when its own guarantee has expired is more valuable than one that cannot</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Finding 6: F_gain */}
+        <div style={{marginBottom:14}}>
+          <div onClick={function(){setFindOpen(findOpen===6?null:6);}} style={{background:$.bg2,border:"1px solid "+(findOpen===6?$.glow+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===6?14:0}}>
+              <div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.glow}}>F_gain dominated every phase</div>
+                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The physics held even when the statistics broke down</div>
+              </div>
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===6?"Close":"See proof"}</span>
+            </div>
+            {findOpen===6 && (
+              <div style={{animation:"wup .2s ease both"}}>
+                <div style={{marginBottom:12}}>
+                  {[
+                    {name:"F_gain_mean",val:100,phase:"All phases"},
+                    {name:"tau_std",val:72,phase:"Drift + Regime"},
+                    {name:"g_mean",val:58,phase:"Stable + Drift"},
+                    {name:"H_net",val:41,phase:"Regime only"},
+                    {name:"V_weak",val:33,phase:"Attack only"},
+                  ].map(function(f){return (
+                    <div key={f.name} style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+                      <div style={{fontFamily:F.m,fontSize:9,color:$.tx2,width:90,textAlign:"right"}}>{f.name}</div>
+                      <div style={{flex:1,height:6,background:"rgba(255,255,255,.04)",borderRadius:3,overflow:"hidden"}}>
+                        <div style={{width:f.val+"%",height:"100%",background:f.name==="F_gain_mean"?$.glow:$.dim,opacity:f.name==="F_gain_mean"?0.6:0.25,borderRadius:3}}/>
+                      </div>
+                      <div style={{fontFamily:F.m,fontSize:8,color:$.dim,width:80}}>{f.phase}</div>
+                    </div>
+                  );})}
+                </div>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>SHAP analysis across every drift phase, every attack, every regime shift. The physics formula F_gain = τ·g was the most important feature in every single condition. When the statistics broke down, the physics still held. The model learned real electrical behaviour, not statistical artifacts</div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div style={{marginTop:28,background:"rgba(248,113,113,.04)",border:"1px solid rgba(248,113,113,.16)",borderRadius:12,padding:"20px 22px"}}>
           <div style={{fontFamily:F.m,fontSize:9,color:$.rd,letterSpacing:".06em",marginBottom:10}}>THE BOTTOM LINE</div>
-          <p style={{fontSize:14,color:$.tx,lineHeight:1.85,fontFamily:serif}}>A model that scores <strong style={{color:$.glow}}>0.9999 AUC</strong> in the lab can still fail silently in the field. The only difference between knowing and not knowing is whether you built the monitoring to detect it.</p>
-          <p style={{fontSize:12,color:$.tx3,lineHeight:1.8,marginTop:8}}>W.R.E.N. is that monitoring system. A.G.N.E.S. is the engine underneath it. Together, they answer the question every deployed ML system should be able to answer: <em>can I still be trusted right now?</em></p>
+          <p style={{fontSize:14,color:$.tx,lineHeight:1.85,fontFamily:serif}}>A model that scores <strong style={{color:$.glow}}>0.9999</strong> in the lab can still fail silently in the field. The only difference between knowing and not knowing is whether you built the monitoring to detect it</p>
         </div>
       </div>
     </div>
@@ -1608,17 +1974,17 @@ function StressTestWidget() {
   var failColor = t < 0.15 ? $.gn : t < 0.3 ? $.gn : t < 0.5 ? $.ac : t < 0.65 ? $.ac : t < 0.8 ? $.rd : $.rd;
 
   // Dynamic takeaway
-  var takeaway = t < 0.15 ? "The model is reliable. Predictions match reality."
-    : t < 0.35 ? "Confidence is degrading faster than accuracy. The model doesn't know it's getting worse."
-    : t < 0.55 ? "Coverage dropping below guarantee. 1 in 20 predictions has no safety bound."
-    : t < 0.75 ? "Predictions are no longer safe to act on. Recalibration or model switch required."
-    : t < 0.9 ? "The model is confidently wrong. Every decision based on it carries risk."
-    : "Total collapse. Nothing the model says can be trusted. Shut it down.";
+  var takeaway = t < 0.15 ? "The model is reliable. What it says matches what is actually happening"
+    : t < 0.35 ? "The model is starting to lose touch with reality, but it does not know that yet. It is still confident"
+    : t < 0.55 ? "The safety guarantee is weakening. Some predictions now have no reliable confidence bound"
+    : t < 0.75 ? "Predictions are no longer safe to act on. A human should be making these decisions now"
+    : t < 0.9 ? "The model is confidently wrong. Every decision based on it carries real risk"
+    : "Nothing the model says can be trusted. It needs to be taken offline";
 
   // Mode explainer
-  var modeExplain = mode === "drift" ? "The real world is slowly changing. The model was trained on old patterns. Its confidence decays before its accuracy does."
-    : mode === "noise" ? "A sensor is feeding corrupted data. Is the grid unstable, or is the sensor broken? The model has to tell the difference."
-    : "Someone is deliberately feeding crafted fake data to trick the model. Small changes, invisible to humans, that flip predictions.";
+  var modeExplain = mode === "drift" ? "The real world is slowly changing but the model was trained on old data. Imagine a weather forecast built on last year's climate. It gets less reliable every day, but it doesn't know that."
+    : mode === "noise" ? "A sensor is sending bad readings. The model sees chaos in the data. Is the power grid actually failing, or is the sensor just broken? The system has to figure out the difference."
+    : "Standard adversarial robustness testing. Small mathematical perturbations applied to inputs to test whether the model can be pushed into wrong predictions. This is a real threat in critical infrastructure.";
 
   return (
     <div style={{ maxWidth: 740, margin: "0 auto" }}>
@@ -1748,7 +2114,7 @@ function StressTestWidget() {
           </div>
           {explain==="pred" && (
             <div style={{ marginTop: 8, padding: "10px 12px", background: "rgba(251,191,36,.04)", borderRadius: 8, animation: "wup .2s ease both" }}>
-              <div style={{ fontSize: 11, color: $.tx2, lineHeight: 1.6 }}>The model outputs a confidence score for each prediction. When deployed data matches training data, that confidence is accurate. When the data drifts, the model stays confident but becomes wrong. This gap between what the model believes and what is true is the core danger of unmonitored deployment.</div>
+              <div style={{ fontSize: 11, color: $.tx2, lineHeight: 1.6 }}>Every time the model makes a prediction, it also says how confident it is. When the data is normal, that confidence is accurate. But when conditions change, something dangerous happens: the model stays confident while becoming wrong. It still says "90% safe" when the real answer is "60% safe." That gap between what the model believes and what is actually true is exactly what W.R.E.N. is built to detect</div>
             </div>
           )}
           <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, textAlign: "center", marginTop: 4 }}>{explain==="pred"?"Click to close":"Click to understand"}</div>
@@ -1775,9 +2141,9 @@ function StressTestWidget() {
         {/* Metrics - clickable */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
           {[
-            { l: "AUC", v: m.auc, c: m.aucC, id: "auc", ex: "Area Under Curve. Measures prediction accuracy from 0 (random) to 1 (perfect). The model scored 0.9999 in the lab. Under stress, it drops. Below 0.88 means 1 in 9 predictions are wrong." },
-            { l: "PSI", v: m.psi, c: m.psiC, id: "psi", ex: "Population Stability Index. Measures how much incoming data has changed from training data. Below 0.1 is stable. Above 0.25 means the data looks different enough to worry. PSI catches problems before accuracy drops." },
-            { l: "COV", v: m.cov + "%", c: m.covC, id: "cov", ex: "Conformal coverage. A mathematical guarantee that at least 95% of predictions contain the true answer. When it drops below 95%, the safety guarantee has expired. At 83%, 1 in 6 predictions has no valid bound." },
+            { l: "AUC", v: m.auc, c: m.aucC, id: "auc", ex: "This is how accurate the model is. 1.0 means perfect, 0.5 means random guessing. It started at 0.9999 (nearly perfect). As you increase stress, watch it drop. Below 0.88, about 1 in 9 predictions are wrong" },
+            { l: "PSI", v: m.psi, c: m.psiC, id: "psi", ex: "This measures how different the incoming data looks compared to what the model was trained on. Below 0.1 means normal. Above 0.25 means the world has changed enough that the model might not cope. The key insight: PSI rises before accuracy falls" },
+            { l: "COV", v: m.cov + "%", c: m.covC, id: "cov", ex: "This is a safety guarantee. It means: at least 95% of predictions have a reliable confidence bound. When it drops below 95%, the guarantee is broken. At 83%, one in six predictions has no safety net at all" },
           ].map(function(met) {
             var open = explain === met.id;
             return (
@@ -1826,22 +2192,11 @@ export default function App() {
 
       <HeroSection go={go} setPage={setPage} />
 
-      {/* ═══ VALUE STRIP ═══ */}
-      <section style={{ padding: "80px 24px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 40, maxWidth: 820, margin: "0 auto" }}>
-          {[
-            { title: "Detect drift early", desc: "Three detectors at different timescales. Catches problems 26 batches before accuracy drops." },
-            { title: "Quantify trust", desc: "Conformal prediction with mathematical guarantees. Know when predictions stop being reliable." },
-            { title: "Recommend action", desc: "Every alert comes with a next step. Recalibrate, switch models, or escalate." },
-          ].map(function(c, i) { return (<Rv key={i} d={0.08 * i}><div style={{ padding: "8px 0" }}><div style={{ fontSize: 16, fontWeight: 700, color: $.tx, marginBottom: 12 }}>{c.title}</div><div style={{ fontSize: 13, color: $.tx3, lineHeight: 1.8 }}>{c.desc}</div></div></Rv>); })}
-        </div>
-      </section>
-
       {/* ═══ FULL DEMO ═══ */}
       <section id="demo" style={{ padding: "80px 24px 80px", background: $.bg2 }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <Rv><h2 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 700, fontFamily: F.s, marginBottom: 16 }}>Watch the system respond</h2></Rv>
-          <Rv d={0.08}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 380, margin: "0 auto" }}>Five conditions. Real metrics. Real degradation.</p></Rv>
+          <Rv><h2 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 700, fontFamily: F.s, marginBottom: 16 }}>Five ways a model fails</h2></Rv>
+          <Rv d={0.08}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 380, margin: "0 auto" }}>Real data from a 120-batch deployment simulation</p></Rv>
         </div>
         <Rv d={0.16}><div style={{ maxWidth: 900, margin: "0 auto" }}><SignatureDemo /></div></Rv>
       </section>
@@ -1849,8 +2204,8 @@ export default function App() {
       {/* ═══ STRESS TEST ═══ */}
       <section style={{ padding: "80px 24px 80px" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <Rv><h2 style={{ fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 700, fontFamily: F.s, marginBottom: 16 }}>Test model resilience</h2></Rv>
-          <Rv d={0.08}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 360, margin: "0 auto" }}>Drag the slider. See what breaks.</p></Rv>
+          <Rv><h2 style={{ fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 700, fontFamily: F.s, marginBottom: 16 }}>Break it yourself</h2></Rv>
+          <Rv d={0.08}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 360, margin: "0 auto" }}>Drag the slider. Watch four models respond differently to the same threat</p></Rv>
         </div>
         <Rv d={0.16}><StressTestWidget /></Rv>
       </section>
@@ -1858,7 +2213,7 @@ export default function App() {
       {/* ═══ EXPLORE ═══ */}
       <section style={{ padding: "80px 24px" }}>
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
-          <Rv><h2 style={{ fontSize: "clamp(24px, 4vw, 34px)", fontWeight: 700, fontFamily: F.s, textAlign: "center", marginBottom: 48 }}>Explore deeper</h2></Rv>
+          <Rv><h2 style={{ fontSize: "clamp(24px, 4vw, 34px)", fontWeight: 700, fontFamily: F.s, textAlign: "center", marginBottom: 48 }}>Go deeper</h2></Rv>
           <Rv d={0.1}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
             <div onClick={function() { setPage("operator"); }}
@@ -1867,7 +2222,7 @@ export default function App() {
               onMouseLeave={function(e) { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
               <div style={{ fontFamily: F.m, fontSize: 9, color: $.dim, letterSpacing: 1.5, marginBottom: 12 }}>Interactive</div>
               <div style={{ fontSize: 18, fontWeight: 700, color: $.tx, marginBottom: 10 }}>Operations Centre</div>
-              <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.75, marginBottom: 20 }}>Three incidents. Real diagnostics. Your call.</p>
+              <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.75, marginBottom: 20 }}>The model is failing. A.G.N.E.S. tells you why. You decide what to do</p>
               <span style={{ fontFamily: F.m, fontSize: 11, color: $.glow, fontWeight: 600 }}>Enter →</span>
             </div>
             <div onClick={function() { setPage("command"); }}
@@ -1886,17 +2241,25 @@ export default function App() {
 
       {/* ═══ EVIDENCE ═══ */}
       <section id="proof" style={{ padding: "80px 24px 80px", background: $.bg2 }}>
-        <div style={{ textAlign: "center", marginBottom: 52 }}>
-          <Rv><h2 style={{ fontSize: "clamp(24px, 3.5vw, 34px)", fontWeight: 700, fontFamily: F.s, marginBottom: 14 }}>Measured. Not claimed</h2></Rv>
-          <Rv d={0.08}><p style={{ fontSize: 14, color: $.dim }}>60,000 samples. Four models. 120 deployment batches.</p></Rv>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, maxWidth: 740, margin: "0 auto" }}>
+        <div style={{ maxWidth: 600, margin: "0 auto" }}>
+          <Rv><h2 style={{ fontSize: "clamp(24px, 3.5vw, 34px)", fontWeight: 700, fontFamily: F.s, marginBottom: 40 }}>What we found</h2></Rv>
+
           {[
-            { label: "Lab Accuracy", value: "0.9999+", sub: "Near-perfect on clean data" },
-            { label: "Deployed Accuracy", value: "0.8834", sub: "After the world changed" },
-            { label: "Early Warning", value: "214\u00d7", sub: "Confidence failed before accuracy" },
-            { label: "First Signal", value: "Batch 9", sub: "Spotted trouble this early" },
-          ].map(function(m, i) { return (<Rv key={i} d={0.06 * i}><div style={{ background: $.bg, borderRadius: 12, padding: "28px 16px", textAlign: "center" }}><div style={{ fontSize: 32, fontWeight: 700, color: $.glow, fontFamily: F.m, marginBottom: 10, lineHeight: 1 }}>{m.value}</div><div style={{ fontSize: 11, fontWeight: 600, color: $.tx, marginBottom: 6 }}>{m.label}</div><div style={{ fontSize: 10, color: $.dim, lineHeight: 1.4, maxWidth: 120, margin: "0 auto" }}>{m.sub}</div></div></Rv>); })}
+            { before: "99.99%", after: "88.34%", tag: "Accuracy", color: $.rd,
+              plain: "In the lab, the model got almost every prediction right. Once deployed into the real world, 1 in 9 predictions went wrong. The model did not know it was getting worse",
+              technical: "AUC dropped from 0.9999 to 0.8834 across 120 streaming batches under distribution drift, adversarial perturbation, and regime shift" },
+            { before: "Accurate", after: "214× wrong", tag: "Confidence", color: $.rd,
+              plain: "When the model said \"I am 90% sure this is safe,\" it used to be right. After deployment, that confidence became 214 times less reliable. It was still saying 90% while being wrong",
+              technical: "Expected Calibration Error (ECE) increased 214× from baseline. Post-hoc LaSCal recalibration recovered alignment" },
+            { before: "Problem visible", after: "26 batches earlier", tag: "Early warning", color: $.glow,
+              plain: "The accuracy only visibly dropped at batch 81. But the system spotted something was wrong at batch 55, twenty-six steps earlier. That early warning is the whole point",
+              technical: "PSI crossed the 0.25 alert threshold 26 batches before AUC degradation became statistically significant" },
+            { before: "19.8% flipped", after: "0.04% flipped", tag: "Attack resistance", color: $.gn,
+              plain: "Under standard adversarial robustness testing, one model's predictions flipped almost 20% of the time. A different model held at 0.04%. Same test, different architecture, completely different resilience",
+              technical: "SVM RBF flip rate 19.8% under FGSM at ε=0.1. Random Forest flip rate 0.04%, immune due to discrete leaf structure" },
+          ].map(function(d, i) { return (
+            <Rv key={i} d={0.06 * i}><EvidenceCard d={d} last={i===3} /></Rv>
+          ); })}
         </div>
       </section>
 
@@ -1904,7 +2267,7 @@ export default function App() {
       <section id="honour" style={{ padding: "60px 24px 80px", textAlign: "center" }}>
         <div style={{ maxWidth: 420, margin: "0 auto" }}>
           <Rv><div style={{ width: 24, height: 1, background: $.glow, margin: "0 auto 28px", opacity: 0.15 }} /></Rv>
-          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939-1945.</p></Rv>
+          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939–1945.</p></Rv>
           <Rv d={0.2}><p style={{ fontSize: 13, lineHeight: 1.9, color: $.dim }}>They sat in signals rooms, detecting anomalies in the noise and warning of danger before it arrived.</p></Rv>
         </div>
       </section>
