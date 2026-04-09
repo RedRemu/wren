@@ -690,7 +690,7 @@ function GridOperatorSim(props) {
 
           <div style={{opacity:introStep>=2?1:0,transform:introStep>=2?"none":"translateY(20px)",transition:"all 1s ease"}}>
             <h2 style={{fontSize:"clamp(20px,4vw,32px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:10,lineHeight:1.5}}>
-              Your model is deployed.<br/>It is about to start failing.
+              The model is deployed.<br/>It is about to start failing.
             </h2>
             <p style={{fontSize:13,color:$.tx3,lineHeight:1.8,maxWidth:400,margin:"0 auto",marginBottom:8}}>
               The AI is live on the grid. Three incidents will degrade its predictions. A.G.N.E.S. will flag what is changing. You decide how to respond.
@@ -1422,16 +1422,16 @@ function HeroSection(props) {
 
         {/* Spinnaker Tower */}
         <g opacity={stage>=1?0.85:0} style={{transition:"opacity 1.5s ease"}}>
-          <polygon points="355,680 363,680 361,380 358,320 355,380" fill="#0d1a2c" opacity=".85"/>
-          <path d="M353,670 L330,666 Q304,652 288,622 Q272,588 276,546 Q280,508 296,480 Q314,452 338,440 Q350,435 353,410 Q338,410 320,422 Q298,438 284,470 Q268,508 272,550 Q276,592 294,626 Q312,656 348,668Z" fill="#0c1828" opacity=".8"/>
+          <polygon points="435,680 443,680 441,380 438,320 435,380" fill="#0d1a2c" opacity=".85"/>
+          <path d="M433,670 L410,666 Q384,652 368,622 Q352,588 356,546 Q360,508 376,480 Q394,452 418,440 Q430,435 433,410 Q418,410 400,422 Q378,438 364,470 Q348,508 352,550 Q356,592 374,626 Q392,656 428,668Z" fill="#0c1828" opacity=".8"/>
         </g>
 
         {/* Guildhall */}
         <g opacity={stage>=1?0.75:0} style={{transition:"opacity 1.5s ease"}}>
-          <rect x="1010" y="618" width="168" height="65" fill="#0d1825" opacity=".75" rx="2"/>
-          <polygon points="1010,618 1178,618 1094,585" fill="#0f1d2e" opacity=".75"/>
-          <rect x="1078" y="560" width="32" height="62" fill="#0d1927" opacity=".8" rx="2"/>
-          <path d="M1078,560 Q1094,538 1110,560" fill="#0f1d2e" opacity=".8"/>
+          <rect x="930" y="618" width="168" height="65" fill="#0d1825" opacity=".75" rx="2"/>
+          <polygon points="930,618 1098,618 1014,585" fill="#0f1d2e" opacity=".75"/>
+          <rect x="998" y="560" width="32" height="62" fill="#0d1927" opacity=".8" rx="2"/>
+          <path d="M998,560 Q1014,538 1030,560" fill="#0f1d2e" opacity=".8"/>
         </g>
 
         {/* ── 3D CAD LIGHTHOUSE centred ── */}
@@ -1473,31 +1473,34 @@ function HeroSection(props) {
       </svg>
 
       {/* Headline at bottom of lighthouse, everything under it below */}
-      <div style={{ position: "absolute", bottom: "1vh", left: 0, right: 0, zIndex: 10, textAlign: "center", padding: "0 24px" }}>
+      <div style={{ position: "absolute", bottom: "1vh", left: 0, right: 0, zIndex: 10, textAlign: "center", padding: "0 16px" }}>
 
-        <h1 style={{ fontSize: "clamp(30px, 5vw, 56px)", fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.02em", color: $.tx, fontFamily: F.s, marginBottom: 18, textShadow: "0 4px 30px #030608, 0 0 60px rgba(3,6,8,0.8)",
+        <h1 style={{ fontSize: "clamp(22px, 5vw, 56px)", fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.02em", color: $.tx, fontFamily: F.s, marginBottom: "clamp(8px, 2vw, 18px)", textShadow: "0 4px 30px #030608, 0 0 60px rgba(3,6,8,0.8)",
           opacity: stage >= 3 ? 1 : 0, transform: stage >= 3 ? "none" : "translateY(20px)", transition: "all 1.2s cubic-bezier(0.16,1,0.3,1)" }}>
-          Know when your model<br/>stops being trustworthy
+          Know when the model<br/>stops being trustworthy
         </h1>
 
-        <p style={{ fontSize: 16, color: $.tx3, lineHeight: 1.65, maxWidth: 440, margin: "0 auto 14px", textShadow: "0 2px 20px #030608",
+        {/* Signal line */}
+        <div style={{ width: stage >= 4 ? "clamp(50px, 10vw, 100px)" : 0, height: 1, background: "linear-gradient(90deg, " + $.glow + "66, transparent)", margin: "0 auto clamp(8px, 1.5vw, 14px)", transition: "width 1.2s cubic-bezier(0.16,1,0.3,1)" }} />
+
+        <p style={{ fontSize: "clamp(12px, 2.5vw, 16px)", color: $.tx3, lineHeight: 1.6, maxWidth: 440, margin: "0 auto clamp(6px, 1.5vw, 14px)", textShadow: "0 2px 20px #030608",
           opacity: stage >= 4 ? 1 : 0, transform: stage >= 4 ? "none" : "translateY(14px)", transition: "all 0.8s ease" }}>
           Real-time monitoring for deployed AI<br/>under drift, noise, and attack
         </p>
 
-        <p style={{ fontFamily: F.m, fontSize: 9, color: $.dim, letterSpacing: 1.2, marginBottom: 28,
+        <p style={{ fontFamily: F.m, fontSize: "clamp(7px, 1.2vw, 9px)", color: $.dim, letterSpacing: 1.2, marginBottom: "clamp(14px, 3vw, 28px)",
           opacity: stage >= 4 ? 1 : 0, transform: stage >= 4 ? "none" : "translateY(10px)", transition: "all 0.8s ease 0.15s" }}>
           Built in Portsmouth. Inspired by signal rooms.
         </p>
 
-        <div style={{ display: "flex", gap: 12, justifyContent: "center",
+        <div style={{ display: "flex", gap: "clamp(6px, 1.5vw, 12px)", justifyContent: "center",
           opacity: stage >= 5 ? 1 : 0, transform: stage >= 5 ? "none" : "translateY(8px)", transition: "all 0.8s ease" }}>
           <button onClick={function() { setPage("operator"); }}
-            style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 8, padding: "10px 24px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: F.s }}>
+            style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 8, padding: "clamp(8px, 1.5vw, 10px) clamp(16px, 3vw, 24px)", fontSize: "clamp(11px, 1.8vw, 13px)", fontWeight: 700, cursor: "pointer", fontFamily: F.s }}>
             Enter Ops Centre
           </button>
           <button onClick={function() { go("demo"); }}
-            style={{ background: "rgba(255,255,255,.04)", color: $.tx3, border: "1px solid rgba(255,255,255,.08)", borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: F.s, backdropFilter: "blur(8px)" }}>
+            style={{ background: "rgba(255,255,255,.04)", color: $.tx3, border: "1px solid rgba(255,255,255,.08)", borderRadius: 8, padding: "clamp(8px, 1.5vw, 10px) clamp(14px, 2.5vw, 20px)", fontSize: "clamp(11px, 1.8vw, 13px)", fontWeight: 500, cursor: "pointer", fontFamily: F.s, backdropFilter: "blur(8px)" }}>
             See It Live
           </button>
         </div>
@@ -1508,8 +1511,9 @@ function HeroSection(props) {
 /* ═══ INTERACTIVE STRESS TEST ═══ */
 function StressTestWidget() {
   var _mode = useState("drift"); var mode = _mode[0]; var setMode = _mode[1];
-  var _level = useState(0); var level = _level[0]; var setLevel = _level[1];
+  var _level = useState(25); var level = _level[0]; var setLevel = _level[1];
   var _dragging = useState(false); var dragging = _dragging[0]; var setDragging = _dragging[1];
+  var _explain = useState(null); var explain = _explain[0]; var setExplain = _explain[1];
 
   // Compute metrics based on stress level and mode
   var t = level / 100;
@@ -1549,25 +1553,81 @@ function StressTestWidget() {
   var phase = t < 0.3 ? "stable" : t < 0.65 ? "degrading" : "critical";
   var phaseCol = phase === "stable" ? $.gn : phase === "degrading" ? $.ac : $.rd;
 
-  // Generate sparkline data
-  var sparkData = [];
+  // Generate multi-model sparkline data
+  var sparkHybrid = [], sparkSVM = [], sparkRF = [], sparkLGBM = [];
   for (var i = 0; i <= 40; i++) {
     var st = (i / 40) * t;
     var noise = Math.sin(i * 3.7) * 0.008 + Math.cos(i * 7.1) * 0.005;
-    var val = mode === "drift" ? 0.9999 - st * st * 0.165 + noise
+    // Hybrid - best, degrades gracefully
+    var hVal = mode === "drift" ? 0.9999 - st * st * 0.165 + noise
       : mode === "noise" ? 0.9999 - st * 0.08 - st * st * 0.04 + noise * 2
       : 0.9999 - st * st * st * 0.22 + noise;
-    sparkData.push(Math.max(0.75, Math.min(1, val)));
+    // SVM - degrades fast, especially under attack
+    var svmVal = mode === "drift" ? 0.9488 - st * st * 0.22 + noise * 1.5
+      : mode === "noise" ? 0.9488 - st * 0.12 - st * st * 0.06 + noise * 2.5
+      : 0.9488 - st * st * 0.35 + noise;
+    // RF - holds under attack, decent under drift
+    var rfVal = mode === "drift" ? 0.9899 - st * st * 0.18 + noise
+      : mode === "noise" ? 0.9899 - st * 0.06 - st * st * 0.03 + noise * 1.5
+      : 0.9899 - st * st * st * 0.04 + noise;
+    // LGBM - between hybrid and SVM
+    var lgbmVal = mode === "drift" ? 0.9856 - st * st * 0.19 + noise * 1.2
+      : mode === "noise" ? 0.9856 - st * 0.09 - st * st * 0.05 + noise * 1.8
+      : 0.9856 - st * st * st * 0.18 + noise;
+    sparkHybrid.push(Math.max(0.7, Math.min(1, hVal)));
+    sparkSVM.push(Math.max(0.7, Math.min(1, svmVal)));
+    sparkRF.push(Math.max(0.7, Math.min(1, rfVal)));
+    sparkLGBM.push(Math.max(0.7, Math.min(1, lgbmVal)));
   }
+  var sparkData = sparkHybrid;
+
+  // Grid stress based on level
+  var gridStress = t < 0.3 ? [0,0,0,0] : t < 0.5 ? [1,0,0,0] : t < 0.65 ? [1,1,0,1] : t < 0.8 ? [2,1,1,1] : [2,2,2,2];
+
+  // Trust threshold
+  var TRUST_LINE = 0.90;
+  var currentAUC = sparkHybrid[sparkHybrid.length - 1];
+  var crossedThreshold = currentAUC < TRUST_LINE;
+
+  // Batches to failure estimate
+  var batchesToFailure = t < 0.1 ? 120 : t < 0.3 ? Math.round(80 - t * 200) : t < 0.6 ? Math.round(30 - t * 40) : t < 0.85 ? Math.round(8 - t * 6) : 0;
+  batchesToFailure = Math.max(0, batchesToFailure);
+
+  // Intervention effect - what recalibration would do
+  var afterAUC = Math.min(0.98, parseFloat(m.auc) + 0.06 + (1 - t) * 0.03).toFixed(4);
+  var afterCov = Math.min(96, parseFloat(m.cov) + 5 + (1 - t) * 3).toFixed(1);
+
+  // Model prediction vs reality
+  var modelSays = Math.max(52, Math.round(98 - t * t * 46));
+  var reality = Math.max(38, Math.round(98 - t * 55));
+  var gap = Math.abs(modelSays - reality);
+  var trustable = gap < 5;
+
+  // Failure mode label
+  var failMode = t < 0.15 ? "Stable" : t < 0.3 ? "Nominal drift" : t < 0.5 ? "Degrading" : t < 0.65 ? "Miscalibrated" : t < 0.8 ? "Unsafe" : "Failure";
+  var failColor = t < 0.15 ? $.gn : t < 0.3 ? $.gn : t < 0.5 ? $.ac : t < 0.65 ? $.ac : t < 0.8 ? $.rd : $.rd;
+
+  // Dynamic takeaway
+  var takeaway = t < 0.15 ? "The model is reliable. Predictions match reality."
+    : t < 0.35 ? "Confidence is degrading faster than accuracy. The model doesn't know it's getting worse."
+    : t < 0.55 ? "Coverage dropping below guarantee. 1 in 20 predictions has no safety bound."
+    : t < 0.75 ? "Predictions are no longer safe to act on. Recalibration or model switch required."
+    : t < 0.9 ? "The model is confidently wrong. Every decision based on it carries risk."
+    : "Total collapse. Nothing the model says can be trusted. Shut it down.";
+
+  // Mode explainer
+  var modeExplain = mode === "drift" ? "The real world is slowly changing. The model was trained on old patterns. Its confidence decays before its accuracy does."
+    : mode === "noise" ? "A sensor is feeding corrupted data. Is the grid unstable, or is the sensor broken? The model has to tell the difference."
+    : "Someone is deliberately feeding crafted fake data to trick the model. Small changes, invisible to humans, that flip predictions.";
 
   return (
-    <div style={{ maxWidth: 700, margin: "0 auto" }}>
+    <div style={{ maxWidth: 740, margin: "0 auto" }}>
       {/* Mode selector */}
       <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 24 }}>
         {[{id:"drift",label:"Drift"},{id:"noise",label:"Noise"},{id:"attack",label:"Attack"}].map(function(md) {
           var active = mode === md.id;
           return (
-            <button key={md.id} onClick={function(){ setMode(md.id); setLevel(0); }}
+            <button key={md.id} onClick={function(){ setMode(md.id); }}
               style={{ padding: "8px 22px", borderRadius: 8, fontFamily: F.m, fontSize: 11, fontWeight: active ? 700 : 400, cursor: "pointer",
                 color: active ? $.bg : $.tx3, background: active ? $.glow : "rgba(255,255,255,.03)", border: "1px solid " + (active ? $.glow : $.brd),
                 transition: "all .2s", letterSpacing: 0.5 }}>
@@ -1578,56 +1638,32 @@ function StressTestWidget() {
       </div>
 
       {/* Main panel */}
-      <div style={{ background: $.bg2, borderRadius: 14, padding: "28px 28px 24px", position: "relative", overflow: "hidden", transition: "all .5s" }}>
+      <div style={{ background: $.bg2, borderRadius: 14, padding: "24px 24px 20px", position: "relative", overflow: "hidden", transition: "all .5s" }}>
 
         {/* Edge glow */}
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none", borderRadius: 14,
-          boxShadow: phase === "critical" ? "inset 0 0 60px " + $.rd + "12" : phase === "degrading" ? "inset 0 0 40px " + $.ac + "08" : "none",
+          boxShadow: phase === "critical" ? "inset 0 0 80px " + $.rd + "18" : phase === "degrading" ? "inset 0 0 50px " + $.ac + "0a" : "none",
           transition: "box-shadow .8s" }} />
 
-        {/* Status */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, position: "relative" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <Beacon s={28} glow={phase === "stable" ? 0.6 : phase === "degrading" ? 0.25 : 0.03} />
-            <span style={{ fontFamily: F.m, fontSize: 10, color: phaseCol, letterSpacing: 1, fontWeight: 600 }}>
-              {phase === "stable" ? "STABLE" : phase === "degrading" ? "DEGRADING" : "CRITICAL"}
-            </span>
+        {/* Slider row */}
+        <div style={{ marginBottom: 18, position: "relative" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <Beacon s={22} glow={phase === "stable" ? 0.6 : phase === "degrading" ? 0.25 : 0.03} />
+              <span style={{ fontFamily: F.m, fontSize: 10, color: failColor, letterSpacing: 1, fontWeight: 600 }}>{failMode.toUpperCase()}</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              {batchesToFailure > 0 && t > 0.1 && (
+                <span style={{ fontFamily: F.m, fontSize: 9, color: batchesToFailure < 10 ? $.rd : batchesToFailure < 30 ? $.ac : $.dim, transition: "color .3s" }}>
+                  ~{batchesToFailure} batches to failure
+                </span>
+              )}
+              {batchesToFailure === 0 && t > 0.1 && (
+                <span style={{ fontFamily: F.m, fontSize: 9, color: $.rd, fontWeight: 700, animation: "wpulse 1s ease-in-out infinite" }}>FAILED</span>
+              )}
+              <span style={{ fontFamily: F.m, fontSize: 13, color: phaseCol, fontWeight: 700 }}>{Math.round(level)}%</span>
+            </div>
           </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontFamily: F.m, fontSize: 8, color: $.dim, letterSpacing: 1 }}>{m.label}</div>
-            <div style={{ fontSize: 10, color: $.tx3, marginTop: 2 }}>{m.desc}</div>
-          </div>
-        </div>
-
-        {/* Sparkline */}
-        <div style={{ height: 80, marginBottom: 20, position: "relative" }}>
-          <svg viewBox="0 0 400 80" style={{ width: "100%", height: "100%", display: "block" }} preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="stressGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={phaseCol} stopOpacity="0.15"/>
-                <stop offset="100%" stopColor={phaseCol} stopOpacity="0"/>
-              </linearGradient>
-            </defs>
-            {/* Area fill */}
-            <path d={
-              "M0," + ((1 - sparkData[0]) * 70 + 5) + " " +
-              sparkData.map(function(v, i) { return (i / 40 * 400) + "," + ((1 - v) * 70 + 5); }).join(" L") +
-              " L400,80 L0,80 Z"
-            } fill="url(#stressGrad)" />
-            {/* Line */}
-            <polyline points={sparkData.map(function(v, i) { return (i / 40 * 400) + "," + ((1 - v) * 70 + 5); }).join(" ")}
-              fill="none" stroke={phaseCol} strokeWidth="2" />
-            {/* End dot */}
-            <circle cx="400" cy={(1 - sparkData[sparkData.length - 1]) * 70 + 5} r="4" fill={phaseCol} opacity="0.9" />
-          </svg>
-          <div style={{ position: "absolute", top: 0, left: 0, fontFamily: F.m, fontSize: 7, color: $.dim }}>AUC</div>
-          <div style={{ position: "absolute", bottom: 0, right: 0, fontFamily: F.m, fontSize: 7, color: $.dim }}>
-            STRESS {Math.round(level)}%
-          </div>
-        </div>
-
-        {/* Slider */}
-        <div style={{ marginBottom: 22 }}>
           <input type="range" min={0} max={100} value={level}
             onChange={function(e) { setLevel(+e.target.value); }}
             onMouseDown={function() { setDragging(true); }}
@@ -1635,40 +1671,127 @@ function StressTestWidget() {
             onTouchStart={function() { setDragging(true); }}
             onTouchEnd={function() { setDragging(false); }}
             style={{ width: "100%", accentColor: phaseCol, height: 6, cursor: "pointer" }} />
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-            <span style={{ fontFamily: F.m, fontSize: 8, color: $.gn }}>Clean deployment</span>
-            <span style={{ fontFamily: F.m, fontSize: 8, color: $.rd }}>Total failure</span>
+        </div>
+
+        {/* Mode explainer */}
+        <div style={{ fontSize: 11, color: $.tx3, lineHeight: 1.5, marginBottom: 16, fontStyle: "italic", opacity: 0.75 }}>
+          {modeExplain}
+        </div>
+
+        {/* Grid + Chart side by side */}
+        <div style={{ display: "grid", gridTemplateColumns: "130px 1fr", gap: 14, marginBottom: 14 }}>
+          {/* Grid topology */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Topo batch={0} stressed={gridStress} size={4} maxW={120} />
+          </div>
+          {/* Multi-model chart */}
+          <div style={{ position: "relative" }}>
+            <svg viewBox="0 0 440 90" style={{ width: "100%", height: 90, display: "block" }} preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="stressGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={phaseCol} stopOpacity="0.1"/>
+                  <stop offset="100%" stopColor={phaseCol} stopOpacity="0"/>
+                </linearGradient>
+              </defs>
+              {/* Trust threshold */}
+              <line x1="0" y1={((1-TRUST_LINE)*80+5)} x2="400" y2={((1-TRUST_LINE)*80+5)} stroke={crossedThreshold?$.rd:$.ac} strokeWidth={crossedThreshold?"1":"0.5"} strokeDasharray="4 4" opacity={crossedThreshold?0.6:0.2}/>
+              {crossedThreshold && <rect x="0" y={((1-TRUST_LINE)*80+5)} width="400" height={90-((1-TRUST_LINE)*80+5)} fill={$.rd} opacity="0.03"/>}
+              <text x="404" y={((1-TRUST_LINE)*80+8)} fill={crossedThreshold?$.rd:$.dim} fontSize="6" fontFamily="monospace" opacity={crossedThreshold?0.7:0.3}>TRUST</text>
+              {/* SVM line - fails first */}
+              <polyline points={sparkSVM.map(function(v, i) { return (i / 40 * 400) + "," + ((1 - v) * 80 + 5); }).join(" ")}
+                fill="none" stroke="#a78bfa" strokeWidth="1.2" opacity="0.5" />
+              {/* RF line - holds under attack */}
+              <polyline points={sparkRF.map(function(v, i) { return (i / 40 * 400) + "," + ((1 - v) * 80 + 5); }).join(" ")}
+                fill="none" stroke={$.gn} strokeWidth="1.2" opacity="0.5" />
+              {/* LGBM line */}
+              <polyline points={sparkLGBM.map(function(v, i) { return (i / 40 * 400) + "," + ((1 - v) * 80 + 5); }).join(" ")}
+                fill="none" stroke="#67e8f9" strokeWidth="1.2" opacity="0.45" />
+              {/* Hybrid area */}
+              <path d={
+                "M0," + ((1 - sparkHybrid[0]) * 80 + 5) + " " +
+                sparkHybrid.map(function(v, i) { return (i / 40 * 400) + "," + ((1 - v) * 80 + 5); }).join(" L") +
+                " L400,90 L0,90 Z"
+              } fill="url(#stressGrad)" />
+              {/* Hybrid line - your best model */}
+              <polyline points={sparkHybrid.map(function(v, i) { return (i / 40 * 400) + "," + ((1 - v) * 80 + 5); }).join(" ")}
+                fill="none" stroke={$.glow} strokeWidth="2" />
+              <circle cx="400" cy={(1 - sparkHybrid[sparkHybrid.length - 1]) * 80 + 5} r="3.5" fill={$.glow} opacity="0.9" />
+            </svg>
+            <div style={{ position: "absolute", top: 0, left: 0, fontFamily: F.m, fontSize: 7, color: $.dim }}>AUC</div>
+            {/* Legend */}
+            <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 3 }}><div style={{ width: 10, height: 2, background: $.glow, borderRadius: 1 }}/><span style={{ fontFamily: F.m, fontSize: 7, color: $.dim }}>Hybrid</span></div>
+              <div style={{ display: "flex", alignItems: "center", gap: 3 }}><div style={{ width: 10, height: 2, background: "#a78bfa", borderRadius: 1 }}/><span style={{ fontFamily: F.m, fontSize: 7, color: $.dim }}>SVM</span></div>
+              <div style={{ display: "flex", alignItems: "center", gap: 3 }}><div style={{ width: 10, height: 2, background: $.gn, borderRadius: 1 }}/><span style={{ fontFamily: F.m, fontSize: 7, color: $.dim }}>RF</span></div>
+              <div style={{ display: "flex", alignItems: "center", gap: 3 }}><div style={{ width: 10, height: 2, background: "#67e8f9", borderRadius: 1 }}/><span style={{ fontFamily: F.m, fontSize: 7, color: $.dim }}>LGBM</span></div>
+            </div>
           </div>
         </div>
 
-        {/* Metrics */}
+        {/* Prediction vs Reality - clickable */}
+        <div onClick={function(){setExplain(explain==="pred"?null:"pred");}} style={{ cursor: "pointer", marginBottom: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 10, alignItems: "center" }}>
+            <div style={{ background: "rgba(255,255,255,.025)", borderRadius: 8, padding: "10px 14px", textAlign: "center" }}>
+              <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, letterSpacing: 1, marginBottom: 4 }}>MODEL SAYS</div>
+              <div style={{ fontFamily: F.m, fontSize: 24, fontWeight: 700, color: trustable ? $.gn : $.ac, transition: "color .3s" }}>{modelSays}%</div>
+              <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim }}>stable</div>
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontFamily: F.m, fontSize: 18, color: trustable ? $.gn : gap > 15 ? $.rd : $.ac, fontWeight: 700, transition: "color .3s" }}>{trustable ? "=" : "\u2260"}</div>
+              <div style={{ fontFamily: F.m, fontSize: 7, color: trustable ? $.gn : $.rd, marginTop: 2 }}>{trustable ? "MATCH" : "GAP: " + gap}</div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,.025)", borderRadius: 8, padding: "10px 14px", textAlign: "center" }}>
+              <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, letterSpacing: 1, marginBottom: 4 }}>REALITY</div>
+              <div style={{ fontFamily: F.m, fontSize: 24, fontWeight: 700, color: reality > 80 ? $.gn : reality > 60 ? $.ac : $.rd, transition: "color .3s" }}>{reality}%</div>
+              <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim }}>stable</div>
+            </div>
+          </div>
+          {explain==="pred" && (
+            <div style={{ marginTop: 8, padding: "10px 12px", background: "rgba(251,191,36,.04)", borderRadius: 8, animation: "wup .2s ease both" }}>
+              <div style={{ fontSize: 11, color: $.tx2, lineHeight: 1.6 }}>The model outputs a confidence score for each prediction. When deployed data matches training data, that confidence is accurate. When the data drifts, the model stays confident but becomes wrong. This gap between what the model believes and what is true is the core danger of unmonitored deployment.</div>
+            </div>
+          )}
+          <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, textAlign: "center", marginTop: 4 }}>{explain==="pred"?"Click to close":"Click to understand"}</div>
+        </div>
+
+        {/* Dynamic takeaway */}
+        <div style={{ fontSize: 12, color: failColor, lineHeight: 1.5, marginBottom: 10, transition: "color .3s", fontWeight: t > 0.6 ? 600 : 400 }}>
+          {takeaway}
+        </div>
+
+        {/* Intervention effect - what would recalibration do */}
+        {t > 0.25 && (
+          <div style={{ display: "flex", gap: 8, marginBottom: 14, animation: "wup .3s ease both" }}>
+            <div style={{ flex: 1, background: "rgba(52,211,153,.04)", border: "1px solid " + $.gn + "22", borderRadius: 8, padding: "8px 12px" }}>
+              <div style={{ fontFamily: F.m, fontSize: 7, color: $.gn, letterSpacing: 1, marginBottom: 4 }}>IF RECALIBRATED NOW</div>
+              <div style={{ display: "flex", gap: 12 }}>
+                <div><span style={{ fontFamily: F.m, fontSize: 9, color: $.dim }}>AUC </span><span style={{ fontFamily: F.m, fontSize: 11, color: m.aucC }}>{m.auc}</span><span style={{ fontSize: 10, color: $.dim }}> → </span><span style={{ fontFamily: F.m, fontSize: 11, color: $.gn, fontWeight: 700 }}>{afterAUC}</span></div>
+                <div><span style={{ fontFamily: F.m, fontSize: 9, color: $.dim }}>COV </span><span style={{ fontFamily: F.m, fontSize: 11, color: m.covC }}>{m.cov}%</span><span style={{ fontSize: 10, color: $.dim }}> → </span><span style={{ fontFamily: F.m, fontSize: 11, color: $.gn, fontWeight: 700 }}>{afterCov}%</span></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Metrics - clickable */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
           {[
-            { l: "MODEL AUC", v: m.auc, c: m.aucC, sub: "Prediction accuracy" },
-            { l: "PSI DRIFT", v: m.psi, c: m.psiC, sub: "Distribution shift" },
-            { l: "COVERAGE", v: m.cov + "%", c: m.covC, sub: "Confidence guarantee" },
+            { l: "AUC", v: m.auc, c: m.aucC, id: "auc", ex: "Area Under Curve. Measures prediction accuracy from 0 (random) to 1 (perfect). The model scored 0.9999 in the lab. Under stress, it drops. Below 0.88 means 1 in 9 predictions are wrong." },
+            { l: "PSI", v: m.psi, c: m.psiC, id: "psi", ex: "Population Stability Index. Measures how much incoming data has changed from training data. Below 0.1 is stable. Above 0.25 means the data looks different enough to worry. PSI catches problems before accuracy drops." },
+            { l: "COV", v: m.cov + "%", c: m.covC, id: "cov", ex: "Conformal coverage. A mathematical guarantee that at least 95% of predictions contain the true answer. When it drops below 95%, the safety guarantee has expired. At 83%, 1 in 6 predictions has no valid bound." },
           ].map(function(met) {
+            var open = explain === met.id;
             return (
-              <div key={met.l} style={{ background: "rgba(255,255,255,.025)", borderRadius: 10, padding: "14px", textAlign: "center" }}>
-                <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, letterSpacing: 1, marginBottom: 4 }}>{met.l}</div>
-                <div style={{ fontFamily: F.m, fontSize: 22, fontWeight: 700, color: met.c, transition: "color .3s" }}>{met.v}</div>
-                <div style={{ fontFamily: F.m, fontSize: 8, color: $.dim, marginTop: 2 }}>{met.sub}</div>
+              <div key={met.l} onClick={function(){setExplain(open?null:met.id);}} style={{ background: open ? "rgba(251,191,36,.04)" : "rgba(255,255,255,.025)", borderRadius: 8, padding: "10px", textAlign: "center", cursor: "pointer", transition: "background .2s", border: "1px solid " + (open ? $.glow + "33" : "transparent") }}>
+                <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, letterSpacing: 1, marginBottom: 3 }}>{met.l}</div>
+                <div style={{ fontFamily: F.m, fontSize: 20, fontWeight: 700, color: met.c, transition: "color .3s" }}>{met.v}</div>
+                {open && (
+                  <div style={{ marginTop: 6, fontSize: 10, color: $.tx2, lineHeight: 1.5, textAlign: "left", animation: "wup .2s ease both" }}>{met.ex}</div>
+                )}
+                {!open && <div style={{ fontFamily: F.m, fontSize: 6, color: $.dim, marginTop: 3 }}>Click to learn</div>}
               </div>
             );
           })}
         </div>
-
-        {/* Insight text */}
-        {t > 0.3 && (
-          <div style={{ marginTop: 16, padding: "12px 16px", background: phaseCol + "06", borderRadius: 8, animation: "wup .3s ease both" }}>
-            <div style={{ fontFamily: F.m, fontSize: 8, color: phaseCol, letterSpacing: 1, marginBottom: 4 }}>A.G.N.E.S. ASSESSMENT</div>
-            <div style={{ fontSize: 11, color: $.tx2, lineHeight: 1.6 }}>
-              {phase === "degrading"
-                ? "Model predictions are losing reliability. Conformal coverage dropping below guaranteed threshold. Recommend increased monitoring frequency."
-                : "Model integrity compromised. Predictions no longer trustworthy. Recommend immediate recalibration or fallback to alternative model."}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
@@ -1717,7 +1840,7 @@ export default function App() {
       {/* ═══ FULL DEMO ═══ */}
       <section id="demo" style={{ padding: "80px 24px 80px", background: $.bg2 }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <Rv><h2 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 700, fontFamily: F.s, marginBottom: 16 }}>Watch the system respond.</h2></Rv>
+          <Rv><h2 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 700, fontFamily: F.s, marginBottom: 16 }}>Watch the system respond</h2></Rv>
           <Rv d={0.08}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 380, margin: "0 auto" }}>Five conditions. Real metrics. Real degradation.</p></Rv>
         </div>
         <Rv d={0.16}><div style={{ maxWidth: 900, margin: "0 auto" }}><SignatureDemo /></div></Rv>
@@ -1726,7 +1849,7 @@ export default function App() {
       {/* ═══ STRESS TEST ═══ */}
       <section style={{ padding: "80px 24px 80px" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <Rv><h2 style={{ fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 700, fontFamily: F.s, marginBottom: 16 }}>Test model resilience.</h2></Rv>
+          <Rv><h2 style={{ fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 700, fontFamily: F.s, marginBottom: 16 }}>Test model resilience</h2></Rv>
           <Rv d={0.08}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 360, margin: "0 auto" }}>Drag the slider. See what breaks.</p></Rv>
         </div>
         <Rv d={0.16}><StressTestWidget /></Rv>
@@ -1735,7 +1858,7 @@ export default function App() {
       {/* ═══ EXPLORE ═══ */}
       <section style={{ padding: "80px 24px" }}>
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
-          <Rv><h2 style={{ fontSize: "clamp(24px, 4vw, 34px)", fontWeight: 700, fontFamily: F.s, textAlign: "center", marginBottom: 48 }}>Explore deeper.</h2></Rv>
+          <Rv><h2 style={{ fontSize: "clamp(24px, 4vw, 34px)", fontWeight: 700, fontFamily: F.s, textAlign: "center", marginBottom: 48 }}>Explore deeper</h2></Rv>
           <Rv d={0.1}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
             <div onClick={function() { setPage("operator"); }}
@@ -1764,7 +1887,7 @@ export default function App() {
       {/* ═══ EVIDENCE ═══ */}
       <section id="proof" style={{ padding: "80px 24px 80px", background: $.bg2 }}>
         <div style={{ textAlign: "center", marginBottom: 52 }}>
-          <Rv><h2 style={{ fontSize: "clamp(24px, 3.5vw, 34px)", fontWeight: 700, fontFamily: F.s, marginBottom: 14 }}>Measured. Not claimed.</h2></Rv>
+          <Rv><h2 style={{ fontSize: "clamp(24px, 3.5vw, 34px)", fontWeight: 700, fontFamily: F.s, marginBottom: 14 }}>Measured. Not claimed</h2></Rv>
           <Rv d={0.08}><p style={{ fontSize: 14, color: $.dim }}>60,000 samples. Four models. 120 deployment batches.</p></Rv>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, maxWidth: 740, margin: "0 auto" }}>
@@ -1781,7 +1904,7 @@ export default function App() {
       <section id="honour" style={{ padding: "60px 24px 80px", textAlign: "center" }}>
         <div style={{ maxWidth: 420, margin: "0 auto" }}>
           <Rv><div style={{ width: 24, height: 1, background: $.glow, margin: "0 auto 28px", opacity: 0.15 }} /></Rv>
-          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939–1945.</p></Rv>
+          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939-1945.</p></Rv>
           <Rv d={0.2}><p style={{ fontSize: 13, lineHeight: 1.9, color: $.dim }}>They sat in signals rooms, detecting anomalies in the noise and warning of danger before it arrived.</p></Rv>
         </div>
       </section>
