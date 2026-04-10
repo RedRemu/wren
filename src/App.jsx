@@ -712,13 +712,13 @@ function GridOperatorSim(props) {
 
           <div style={{opacity:introStep>=2?1:0,transform:introStep>=2?"none":"translateY(20px)",transition:"all 1s ease"}}>
             <h2 style={{fontSize:"clamp(20px,4vw,32px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:10,lineHeight:1.5}}>
-              The model is deployed.<br/>It is about to start failing.
+              The model is deployed.<br/>Three things are about to go wrong.
             </h2>
-            <p style={{fontSize:13,color:$.tx3,lineHeight:1.8,maxWidth:400,margin:"0 auto",marginBottom:8}}>
-              The AI is live on the grid. Three incidents will degrade its predictions. A.G.N.E.S. will flag what is changing. You decide how to respond.
+            <p style={{fontSize:13,color:$.tx3,lineHeight:1.8,maxWidth:420,margin:"0 auto",marginBottom:8}}>
+              Without monitoring, an operator would have no warning. A.G.N.E.S. is watching the same data stream. It will show you what it sees. You decide whether to listen.
             </p>
             <p style={{fontSize:11,color:$.dim,fontFamily:F.m,marginBottom:0}}>
-              No timer. No score. Only consequence.
+              At the end, you will see what would have happened without it.
             </p>
           </div>
 
@@ -737,51 +737,115 @@ function GridOperatorSim(props) {
   }
 
   /* ── DEBRIEF ── */
-  if (phase==="debrief") return (
-    <div style={{position:"fixed",inset:0,background:"#030710",fontFamily:F.s,overflowY:"auto"}}>
-      {/* Background grid reflects outcome */}
-      <div style={{position:"fixed",inset:0,display:"flex",alignItems:"center",justifyContent:"center",opacity:0.08}}>
-        <div style={{width:500,maxWidth:"90vw"}}><AnimatedGrid stressed={correct===3?[0,0,0,0]:correct>=2?[1,0,0,1]:[2,2,1,2]}/></div>
-      </div>
+  if (phase==="debrief") {
+    var correct = decisions.filter(function(d){ return d.outcome==="good"; }).length;
+    var withAgnes = correct;
+    // Without A.G.N.E.S. - no early warning, no model comparison, no confidence monitoring
+    // Simulate: operator would get 0-1 right by luck without the diagnostics
+    var withoutTimeline = [
+      {batch:scenarios[0].batch, event:scenarios[0].label, result:"No warning. Problem invisible until accuracy dropped visibly. Grid ran on bad predictions for ~26 batches", health:72},
+      {batch:scenarios[1].batch, event:scenarios[1].label, result:"Model reported 92% confidence. No system to check if that confidence was real. Operator trusted the number. It was wrong", health:51},
+      {batch:scenarios[2].batch, event:scenarios[2].label, result:"Adversarial perturbation undetected. No architecture comparison available. SVM stayed online with 19.8% flip rate. Grid decisions based on flipped predictions", health:31},
+    ];
+    var withTimeline = decisions.map(function(d,i) {
+      var baseHealth = 98 - i * 3;
+      return {
+        batch: d.batch,
+        event: scenarios[i].label,
+        action: d.label,
+        result: d.consequence,
+        health: d.outcome === "good" ? baseHealth - 4 : baseHealth - 22,
+        good: d.outcome === "good",
+      };
+    });
+    var finalWithout = 31;
+    var finalWith = withTimeline.length > 0 ? withTimeline[withTimeline.length-1].health : 98;
 
-      <div style={{position:"relative",zIndex:2,maxWidth:580,margin:"0 auto",padding:"60px 24px"}}>
-        <div style={{textAlign:"center",marginBottom:40}}>
+    return (
+    <div style={{position:"fixed",inset:0,background:"#030710",fontFamily:F.s,overflowY:"auto"}}>
+      <div style={{position:"relative",zIndex:2,maxWidth:700,margin:"0 auto",padding:"60px 24px"}}>
+
+        {/* Header */}
+        <div style={{textAlign:"center",marginBottom:48}}>
           <div style={{display:"flex",justifyContent:"center",marginBottom:20}}>
-            <Beacon s={56} glow={correct===3?0.95:correct>=2?0.4:0.05}/>
+            <Beacon s={56} glow={correct===3?0.95:correct>=2?0.5:0.1}/>
           </div>
-          <p style={{fontFamily:F.m,fontSize:9,color:correct===3?$.gn:correct>=2?$.ac:$.rd,letterSpacing:4,marginBottom:14}}>
-            {correct===3?"MODEL INTEGRITY MAINTAINED":correct>=2?"PARTIAL RECOVERY":"MODEL FAILURE"}
-          </p>
-          <h2 style={{fontSize:"clamp(20px,4vw,30px)",fontWeight:600,fontFamily:serif,color:$.tx,lineHeight:1.5,marginBottom:8}}>
-            {correct===3?"Three for three. The model held." : correct===2?"Two right. One wrong. The model survived." : correct===1?"One right wasn't enough." : "The model collapsed."}
+          <p style={{fontFamily:F.m,fontSize:9,color:$.glow,letterSpacing:4,marginBottom:14}}>DEBRIEF</p>
+          <h2 style={{fontSize:"clamp(20px,4vw,30px)",fontWeight:600,fontFamily:serif,color:$.tx,lineHeight:1.5,marginBottom:12}}>
+            Two timelines. Same incidents.
           </h2>
-          <p style={{fontSize:12,color:$.dim,fontStyle:"italic"}}>
-            {correct===3?"Every signal read. Every call correct." : correct>=2?"Close. But close isn't safe." : "A.G.N.E.S. warned you."}
+          <p style={{fontSize:13,color:$.tx3,lineHeight:1.7}}>
+            The only difference is whether A.G.N.E.S. was watching
           </p>
         </div>
 
-        {/* Incident cards */}
-        {decisions.map(function(d,i){
-          var c=oc(d.outcome);
-          return (
-            <div key={i} style={{background:"rgba(255,255,255,.02)",border:"1px solid "+c+"22",borderRadius:12,padding:"20px 22px",marginBottom:12,borderLeft:"3px solid "+c}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-                <div style={{display:"flex",alignItems:"center",gap:10}}>
-                  <div style={{width:28,height:28,borderRadius:"50%",background:c+"14",border:"2px solid "+c+"44",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:c,fontWeight:700}}>
-                    {d.outcome==="good"?"\u2713":"\u2717"}
-                  </div>
-                  <div>
-                    <div style={{fontSize:13,fontWeight:600,color:$.tx}}>{d.label}</div>
-                    <div style={{fontFamily:F.m,fontSize:8,color:$.dim}}>BATCH {d.batch}</div>
-                  </div>
-                </div>
-              </div>
-              <div style={{fontSize:12,color:$.tx3,lineHeight:1.8,paddingLeft:38}}>{d.consequence}</div>
-            </div>
-          );
-        })}
+        {/* Side by side comparison */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:40}}>
 
-        <div style={{display:"flex",gap:12,justifyContent:"center",marginTop:32}}>
+          {/* WITHOUT */}
+          <div style={{background:"rgba(248,113,113,.03)",border:"1px solid rgba(248,113,113,.15)",borderRadius:14,padding:"20px 18px"}}>
+            <div style={{fontFamily:F.m,fontSize:9,color:$.rd,letterSpacing:2,marginBottom:16,textAlign:"center"}}>WITHOUT A.G.N.E.S.</div>
+            {withoutTimeline.map(function(t,i) { return (
+              <div key={i} style={{marginBottom:14,paddingBottom:14,borderBottom:i<2?"1px solid rgba(248,113,113,.08)":"none"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+                  <span style={{fontFamily:F.m,fontSize:8,color:$.rd,opacity:0.6}}>BATCH {t.batch}</span>
+                  <span style={{fontFamily:F.m,fontSize:10,color:$.rd,fontWeight:700}}>{t.health}%</span>
+                </div>
+                <div style={{fontSize:11,color:$.tx3,lineHeight:1.6}}>{t.result}</div>
+              </div>
+            ); })}
+            <div style={{textAlign:"center",marginTop:8,padding:"12px",background:"rgba(248,113,113,.06)",borderRadius:8}}>
+              <div style={{fontFamily:F.m,fontSize:8,color:$.rd,letterSpacing:1,marginBottom:4}}>FINAL GRID HEALTH</div>
+              <div style={{fontFamily:F.m,fontSize:32,fontWeight:700,color:$.rd}}>{finalWithout}%</div>
+              <div style={{fontSize:10,color:$.rd,opacity:0.6,marginTop:2}}>Unmonitored failure</div>
+            </div>
+          </div>
+
+          {/* WITH A.G.N.E.S. */}
+          <div style={{background:"rgba(52,211,153,.03)",border:"1px solid rgba(52,211,153,.15)",borderRadius:14,padding:"20px 18px"}}>
+            <div style={{fontFamily:F.m,fontSize:9,color:$.gn,letterSpacing:2,marginBottom:16,textAlign:"center"}}>A.G.N.E.S. PROTOCOL</div>
+            {withTimeline.map(function(t,i) { return (
+              <div key={i} style={{marginBottom:14,paddingBottom:14,borderBottom:i<2?"1px solid rgba(52,211,153,.08)":"none"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+                  <div style={{display:"flex",alignItems:"center",gap:6}}>
+                    <span style={{fontFamily:F.m,fontSize:8,color:t.good?$.gn:$.rd,opacity:0.6}}>BATCH {t.batch}</span>
+                    <span style={{fontSize:9,color:t.good?$.gn:$.rd}}>{t.good?"\u2713":"\u2717"}</span>
+                  </div>
+                  <span style={{fontFamily:F.m,fontSize:10,color:t.good?$.gn:$.ac,fontWeight:700}}>{t.health}%</span>
+                </div>
+                <div style={{fontFamily:F.m,fontSize:9,color:$.glow,marginBottom:4}}>{t.action}</div>
+                <div style={{fontSize:11,color:$.tx3,lineHeight:1.6}}>{t.result}</div>
+              </div>
+            ); })}
+            <div style={{textAlign:"center",marginTop:8,padding:"12px",background:correct>=2?"rgba(52,211,153,.06)":"rgba(251,191,36,.06)",borderRadius:8}}>
+              <div style={{fontFamily:F.m,fontSize:8,color:correct>=2?$.gn:$.ac,letterSpacing:1,marginBottom:4}}>FINAL GRID HEALTH</div>
+              <div style={{fontFamily:F.m,fontSize:32,fontWeight:700,color:correct>=2?$.gn:$.ac}}>{finalWith}%</div>
+              <div style={{fontSize:10,color:correct>=2?$.gn:$.ac,opacity:0.6,marginTop:2}}>{correct===3?"Every warning acted on":correct>=2?"Partial recovery":correct===1?"Monitoring helped once":"Warnings ignored"}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* The gap */}
+        <div style={{textAlign:"center",marginBottom:40}}>
+          <div style={{fontFamily:F.m,fontSize:11,color:$.dim,marginBottom:8}}>The difference A.G.N.E.S. made</div>
+          <div style={{fontFamily:F.m,fontSize:48,fontWeight:700,color:$.glow,lineHeight:1}}>+{finalWith - finalWithout}%</div>
+          <div style={{fontSize:13,color:$.tx3,lineHeight:1.7,maxWidth:420,margin:"16px auto 0"}}>
+            {correct===3
+              ? "Every signal was read. Every call was correct. The grid survived because the operator had information, not luck"
+              : correct >= 2
+                ? "Even with one wrong call, A.G.N.E.S. gave the operator enough information to keep the grid running. Without it, there was nothing to act on"
+                : "A.G.N.E.S. provided the warnings. The difference is whether they are acted on. The system can detect failure. It cannot force the right decision"}
+          </div>
+        </div>
+
+        {/* Bottom line */}
+        <div style={{background:"rgba(251,191,36,.04)",border:"1px solid rgba(251,191,36,.12)",borderRadius:12,padding:"20px 22px",marginBottom:32,textAlign:"center"}}>
+          <div style={{fontSize:14,color:$.tx,lineHeight:1.8,fontFamily:serif}}>
+            The model failed in both timelines. The only difference is whether anyone knew it was happening.
+          </div>
+        </div>
+
+        <div style={{display:"flex",gap:12,justifyContent:"center"}}>
           <button onClick={function(){ repick(); setIdx(0); setDecisions([]); setIntroStep(0); setPhase("intro"); }}
             style={{background:$.glow,color:$.bg,border:"none",borderRadius:10,padding:"14px 32px",fontSize:14,fontWeight:700,cursor:"pointer"}}>Try Again</button>
           <button onClick={props.onBack}
@@ -790,6 +854,7 @@ function GridOperatorSim(props) {
       </div>
     </div>
   );
+  }
 
   /* ── WATCH / DECIDE / RESOLVE ── */
   var statusLabel = !canAct && !chosen ? "MONITORING" : canAct && !chosen ? "ACTION REQUIRED" : chosen && !resolved ? "APPLYING..." : "RESOLVED";
