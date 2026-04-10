@@ -189,7 +189,7 @@ function useStyles() {
     l.href = "https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap";
     document.head.appendChild(l);
     var s = document.createElement("style"); s.id = "wrn";
-    s.textContent = "@keyframes wup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}@keyframes wpulse{0%,100%{opacity:1}50%{opacity:.3}}@keyframes wblink{0%,100%{opacity:.5}50%{opacity:1}}@keyframes wsweep{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes wshake{0%,100%{transform:translateX(0)}15%,45%,75%{transform:translateX(-3px)}30%,60%,90%{transform:translateX(3px)}}@keyframes lhSweep{0%,100%{transform:rotate(-35deg)}50%{transform:rotate(35deg)}}@keyframes bIdlePulse{0%,100%{opacity:.55}50%{opacity:.95}}*{box-sizing:border-box;margin:0;padding:0}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(251,191,36,.1);border-radius:2px}";
+    s.textContent = "@keyframes wup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}@keyframes wpulse{0%,100%{opacity:1}50%{opacity:.3}}@keyframes wblink{0%,100%{opacity:.5}50%{opacity:1}}@keyframes wsweep{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes wshake{0%,100%{transform:translateX(0)}15%,45%,75%{transform:translateX(-3px)}30%,60%,90%{transform:translateX(3px)}}@keyframes lhSweep{0%,100%{transform:rotate(-35deg)}50%{transform:rotate(35deg)}}@keyframes wLoad{0%{width:0%}100%{width:100%}}@keyframes wTransSweep{0%{transform:rotate(-40deg)}50%{transform:rotate(40deg)}100%{transform:rotate(-40deg)}}@keyframes bIdlePulse{0%,100%{opacity:.55}50%{opacity:.95}}*{box-sizing:border-box;margin:0;padding:0}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(251,191,36,.1);border-radius:2px}";
     document.head.appendChild(s);
   }, []);
 }
@@ -1851,7 +1851,7 @@ function HeroSection(props) {
 
         <p style={{ fontSize: "clamp(12px, 2.5vw, 16px)", color: $.tx3, lineHeight: 1.6, maxWidth: 440, margin: "0 auto clamp(6px, 1.5vw, 14px)", textShadow: "0 2px 20px #030608",
           opacity: stage >= 4 ? 1 : 0, transform: stage >= 4 ? "none" : "translateY(14px)", transition: "all 0.8s ease" }}>
-          Real-time monitoring for deployed AI<br/>under drift, noise, and attack
+          When an AI runs a power grid,<br/>how do you know it is still getting it right
         </p>
 
         <p style={{ fontFamily: F.m, fontSize: "clamp(7px, 1.2vw, 9px)", color: $.dim, letterSpacing: 1.2, marginBottom: "clamp(14px, 3vw, 28px)",
@@ -2166,16 +2166,54 @@ function StressTestWidget() {
 /* ═══ APP ═══ */
 export default function App() {
   useStyles();
-  var _p = useState("landing"); var page = _p[0]; var setPage = _p[1];
+  var _p = useState("landing"); var page = _p[0]; var rawSetPage = _p[1];
   var _s = useState(0); var scrollY = _s[0]; var setScrollY = _s[1];
+  var _loading = useState(true); var loading = _loading[0]; var setLoading = _loading[1];
+  var _fade = useState("visible"); var fade = _fade[0]; var setFade = _fade[1];
+
+  useEffect(function() {
+    var t = setTimeout(function() { setLoading(false); }, 2200);
+    return function() { clearTimeout(t); };
+  }, []);
+
+  function setPage(p) {
+    setFade("clear");
+    setTimeout(function() { setFade("beacon"); }, 500);
+    setTimeout(function() { setFade("sweep"); }, 1000);
+    setTimeout(function() { setFade("flash"); }, 4000);
+    setTimeout(function() {
+      rawSetPage(p);
+      window.scrollTo(0, 0);
+      setFade("reveal");
+    }, 4800);
+    setTimeout(function() { setFade("visible"); }, 5200);
+  }
+
   useEffect(function() { var h = function() { setScrollY(window.scrollY); }; window.addEventListener("scroll", h, { passive: true }); return function() { window.removeEventListener("scroll", h); }; }, []);
 
-  if (page === "command") return <CommandCentre onBack={function() { setPage("landing"); window.scrollTo(0, 0); }} />;
-  if (page === "operator") return <GridOperatorSim onBack={function() { setPage("landing"); window.scrollTo(0, 0); }} />;
+  // Loading screen
+  if (loading) return (
+    <div style={{ background: $.bg, height: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: F.s }}>
+      <div style={{ marginBottom: 24, animation: "wpulse 1.5s ease-in-out infinite" }}>
+        <Beacon s={48} glow={0.7} />
+      </div>
+      <div style={{ fontFamily: F.m, fontSize: 11, letterSpacing: 4, color: $.glow, opacity: 0.6, marginBottom: 8 }}>W.R.E.N.</div>
+      <div style={{ fontSize: 11, color: $.dim }}>Initialising deployment monitor</div>
+      <div style={{ width: 120, height: 2, background: "rgba(255,255,255,.04)", borderRadius: 1, marginTop: 20, overflow: "hidden" }}>
+        <div style={{ height: "100%", background: $.glow, borderRadius: 1, animation: "wLoad 2s ease-in-out forwards" }} />
+      </div>
+    </div>
+  );
+
+  var pageContent;
+
+  if (page === "command") pageContent = <CommandCentre onBack={function() { setPage("landing"); }} />;
+  else if (page === "operator") pageContent = <GridOperatorSim onBack={function() { setPage("landing"); }} />;
+  else {
 
   var go = function(id) { var el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
 
-  return (
+  pageContent = (
     <div style={{ background: $.bg, color: $.tx, fontFamily: F.s, overflowX: "hidden" }}>
 
       {/* NAV */}
@@ -2267,17 +2305,84 @@ export default function App() {
       <section id="honour" style={{ padding: "60px 24px 80px", textAlign: "center" }}>
         <div style={{ maxWidth: 420, margin: "0 auto" }}>
           <Rv><div style={{ width: 24, height: 1, background: $.glow, margin: "0 auto 28px", opacity: 0.15 }} /></Rv>
-          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939-1945.</p></Rv>
+          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939–1945.</p></Rv>
           <Rv d={0.2}><p style={{ fontSize: 13, lineHeight: 1.9, color: $.dim }}>They sat in signals rooms, detecting anomalies in the noise and warning of danger before it arrived.</p></Rv>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer style={{ padding: "20px 36px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
-        <div style={{ fontSize: 9, letterSpacing: 2, color: $.dim, fontFamily: F.m }}>W.R.E.N.</div>
-        <div style={{ fontSize: 9, color: $.dim }}>University of Portsmouth | 2025-2026</div>
-        <div style={{ fontSize: 9, color: $.dim, opacity: 0.6 }}>Powered by A.G.N.E.S. v4.2</div>
+      <footer style={{ padding: "32px 36px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, borderTop: "1px solid rgba(255,255,255,.03)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <BeaconSmall s={12} />
+          <span style={{ fontSize: 9, letterSpacing: 2, color: $.dim, fontFamily: F.m }}>W.R.E.N.</span>
+        </div>
+        <div style={{ fontSize: 9, color: $.dim }}>University of Portsmouth | 2025–2026</div>
+        <div style={{ fontSize: 9, color: $.dim, opacity: 0.5 }}>Powered by A.G.N.E.S. v4.2</div>
       </footer>
+    </div>
+  );
+  }
+
+  var transitioning = fade !== "visible";
+
+  return (
+    <div style={{ position: "relative", minHeight: "100vh" }}>
+      {/* Page content */}
+      <div style={{
+        opacity: fade === "clear" || fade === "beacon" || fade === "flash" ? 0 : 1,
+        transition: fade === "clear" ? "opacity 0.4s ease-out" : fade === "reveal" ? "opacity 0.3s ease-in" : "none",
+        pointerEvents: transitioning ? "none" : "auto",
+      }}>
+        {pageContent}
+      </div>
+
+      {/* Transition overlay */}
+      {transitioning && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 9999,
+          background: $.bg,
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+          opacity: fade === "clear" ? 0 : fade === "reveal" ? 0 : 1,
+          transition: fade === "reveal" ? "opacity 0.35s ease-out" : "opacity 0.4s ease-in",
+        }}>
+          {/* Beacon + sweep */}
+          <div style={{ position: "relative" }}>
+            <div style={{
+              opacity: (fade === "beacon" || fade === "sweep" || fade === "flash") ? 1 : 0,
+              transform: fade === "flash" ? "scale(1.15)" : "scale(1)",
+              transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)",
+            }}>
+              <Beacon s={64} glow={fade === "flash" ? 1 : fade === "sweep" ? 0.7 : 0.4} />
+            </div>
+
+            {/* Sweeping beam */}
+            {(fade === "sweep") && (
+              <div style={{ position: "absolute", top: -280, left: "50%", marginLeft: -400, width: 800, height: 300, pointerEvents: "none", overflow: "visible" }}>
+                <svg viewBox="0 0 800 300" style={{ width: "100%", height: "100%", overflow: "visible" }}>
+                  <defs>
+                    <radialGradient id="tBeam" cx="50%" cy="100%" r="80%">
+                      <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.3"/>
+                      <stop offset="100%" stopColor="#fbbf24" stopOpacity="0"/>
+                    </radialGradient>
+                  </defs>
+                  <g style={{ transformOrigin: "400px 290px", animation: "wTransSweep 3s ease-in-out infinite" }}>
+                    <polygon points="400,290 150,0 650,0" fill="url(#tBeam)" opacity="0.45"/>
+                  </g>
+                </svg>
+              </div>
+            )}
+          </div>
+
+          {/* Flash glow */}
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "radial-gradient(circle at 50% 50%, rgba(251,191,36,0.4), rgba(251,191,36,0.1) 35%, transparent 65%)",
+            opacity: fade === "flash" ? 1 : 0,
+            transition: "opacity 0.5s ease-in",
+            pointerEvents: "none",
+          }} />
+        </div>
+      )}
     </div>
   );
 }
