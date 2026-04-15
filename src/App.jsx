@@ -244,6 +244,28 @@ function Topo(props) {
 }
 
 /* ═══ ENTRANCE ═══ */
+function EvidenceCard(props) {
+  var d = props.d; var last = props.last;
+  var _open = useState(false); var open = _open[0]; var setOpen = _open[1];
+  return (
+    <div style={{ marginBottom: 28, paddingBottom: 28, borderBottom: last ? "none" : "1px solid rgba(255,255,255,.04)" }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 12, flexWrap: "wrap" }}>
+        <span style={{ fontFamily: F.m, fontSize: "clamp(20px, 4vw, 26px)", fontWeight: 700, color: d.color, lineHeight: 1 }}>{d.before}</span>
+        <span style={{ fontSize: 14, color: $.dim }}>→</span>
+        <span style={{ fontFamily: F.m, fontSize: "clamp(20px, 4vw, 26px)", fontWeight: 700, color: d.color, lineHeight: 1 }}>{d.after}</span>
+        <span style={{ fontFamily: F.m, fontSize: 8, color: $.dim, letterSpacing: 1, marginLeft: 4 }}>{d.tag.toUpperCase()}</span>
+      </div>
+      <div style={{ fontSize: 14, color: $.tx2, lineHeight: 1.8, marginBottom: 6 }}>{d.plain}</div>
+      <div onClick={function(){setOpen(!open);}} style={{ cursor: "pointer", display: "inline-block" }}>
+        <span style={{ fontFamily: F.m, fontSize: 9, color: $.dim, borderBottom: "1px dotted " + $.dim }}>{open ? "Hide technical detail" : "Technical detail"}</span>
+      </div>
+      {open && (
+        <div style={{ marginTop: 8, fontSize: 11, color: $.dim, lineHeight: 1.6, fontFamily: F.m, animation: "wup .2s ease both" }}>{d.technical}</div>
+      )}
+    </div>
+  );
+}
+
 function Entrance(props) {
   var _s = useState(0); var stage = _s[0]; var setStage = _s[1];
   useEffect(function() {
@@ -267,109 +289,128 @@ function Entrance(props) {
 var SCENE_ORDER = ["nominal", "noise", "gradual", "adversarial", "collapse"];
 var SCENE_TIMING = [3000, 4000, 4000, 4500, 4500];
 
+var SLIDES = [
+  { key: "nominal", num: "01", title: "Stable Operation", serif: "The AI scores 99.99%. Every prediction is correct. Everything looks perfect.", detail: "This is what a static benchmark shows. If evaluation stopped here, every model would look production ready.", batch: 20, health: 98 },
+  { key: "noise", num: "02", title: "Sensor Corruption", serif: "A sensor starts feeding bad data. The AI cannot tell the difference between a broken sensor and a real threat.", detail: "SCADA environments have noisy, imperfect measurements. A model that has only seen clean data does not know how to handle this.", batch: 45, health: 92 },
+  { key: "gradual", num: "03", title: "The World Drifts", serif: "Consumer behaviour changes slowly. The AI was trained on old patterns. It does not know the world has moved.", detail: "Accuracy drops a little. Confidence becomes a lie. The model says 90% sure while being wrong more and more often.", batch: 55, health: 87 },
+  { key: "adversarial", num: "04", title: "Fake Data Attack", serif: "Carefully crafted false readings are injected into the sensor stream. One model is tricked a third of the time. Another holds at 0.04%.", detail: "The vulnerability depends entirely on what type of AI is used. The choice of model is a security decision, not just a performance decision.", batch: 65, health: 74 },
+  { key: "collapse", num: "05", title: "Everything Changes", serif: "A generator trips offline. The grid operates in a way the AI has never seen. Its safety guarantees expire immediately.", detail: "One in six predictions now has no valid safety bound. The AI is still confident. That confidence is meaningless.", batch: 95, health: 52 },
+];
+
 function SignatureDemo() {
-  var _sc = useState("nominal"); var scenario = _sc[0]; var setScenario = _sc[1];
-  var _playing = useState(false); var playing = _playing[0]; var setPlaying = _playing[1];
-  var _si = useState(0); var sceneIdx = _si[0]; var setSceneIdx = _si[1];
-  var _health = useState(98); var dispHealth = _health[0]; var setDispHealth = _health[1];
-  var _alerts = useState([]); var alerts = _alerts[0]; var setAlerts = _alerts[1];
-  var _done = useState(false); var done = _done[0]; var setDone = _done[1];
-  var _started = useState(false); var started = _started[0]; var setStarted = _started[1];
-  var timerRef = useRef(null); var healthRef = useRef(null); var wrapRef = useRef(null);
-  var sc = SCENARIOS[scenario]; var b = sc.batch;
+  var _si = useState(0); var slideIdx = _si[0]; var setSlideIdx = _si[1];
+  var _animDir = useState(0); var animDir = _animDir[0]; var setAnimDir = _animDir[1];
+  var _auto = useState(false); var auto = _auto[0]; var setAuto = _auto[1];
+  var autoRef = useRef(null);
+  var wrapRef = useRef(null);
   var aucData = useMemo(function() { return SH.map(function(v, i) { return { b: i, H: v, S: SV[i] }; }); }, []);
 
-  /* Start playing only when scrolled into view */
-  useEffect(function() {
-    if (started) return;
-    var el = wrapRef.current; if (!el) return;
-    var o = new IntersectionObserver(function(entries) {
-      if (entries[0].isIntersecting) { setPlaying(true); setStarted(true); o.disconnect(); }
-    }, { threshold: 0.3 });
-    o.observe(el);
-    return function() { o.disconnect(); };
-  }, [started]);
+  var slide = SLIDES[slideIdx];
+  var sc = SCENARIOS[slide.key];
+  var healthColor = slide.health > 90 ? $.gn : slide.health > 75 ? $.ac : $.rd;
 
-  useEffect(function() {
-    if (!playing) return;
-    var idx = sceneIdx; var key = SCENE_ORDER[idx]; var target = SCENARIOS[key];
-    setScenario(key);
-    setAlerts(function(prev) { if (idx === 0) return []; return prev.concat([{ time: Date.now(), text: target.alert, color: target.color }]); });
-    var startHealth = dispHealth; var endHealth = target.health; var steps = 30; var step = 0;
-    clearInterval(healthRef.current);
-    healthRef.current = setInterval(function() {
-      step++; var t = step / steps; var ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-      setDispHealth(Math.round(startHealth + (endHealth - startHealth) * ease));
-      if (step >= steps) clearInterval(healthRef.current);
-    }, 30);
-    timerRef.current = setTimeout(function() {
-      if (idx < SCENE_ORDER.length - 1) { setSceneIdx(idx + 1); } else { setPlaying(false); setDone(true); }
-    }, SCENE_TIMING[idx]);
-    return function() { clearTimeout(timerRef.current); clearInterval(healthRef.current); };
-  }, [playing, sceneIdx]);
+  function go(dir) {
+    var next = slideIdx + dir;
+    if (next < 0 || next >= SLIDES.length) return;
+    setAnimDir(dir);
+    setSlideIdx(next);
+  }
 
-  function manualSelect(key) { setPlaying(false); setDone(true); setScenario(key); setDispHealth(SCENARIOS[key].health); setAlerts([{ time: Date.now(), text: SCENARIOS[key].alert, color: SCENARIOS[key].color }]); }
-  function replay() { setSceneIdx(0); setDispHealth(98); setAlerts([]); setDone(false); setPlaying(true); }
-  var healthColor = dispHealth > 90 ? $.gn : dispHealth > 75 ? $.ac : $.rd;
+  // Autoplay
+  useEffect(function() {
+    if (!auto) { clearInterval(autoRef.current); return; }
+    autoRef.current = setInterval(function() {
+      setSlideIdx(function(prev) {
+        if (prev >= SLIDES.length - 1) { setAuto(false); return prev; }
+        setAnimDir(1);
+        return prev + 1;
+      });
+    }, 5000);
+    return function() { clearInterval(autoRef.current); };
+  }, [auto]);
 
   return (
-    <div ref={wrapRef} style={{ maxWidth: 900, margin: "0 auto" }}>
-      {/* Scenario strip - minimal */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 12 }}>
-        {SCENE_ORDER.map(function(key, i) {
-          var s = SCENARIOS[key]; var isCurrent = scenario === key; var isPast = SCENE_ORDER.indexOf(scenario) > i;
-          return (<div key={key} style={{ flex: 1, textAlign: "center" }}><div style={{ height: 2, borderRadius: 1, background: isCurrent ? s.color : isPast ? s.color + "55" : "rgba(255,255,255,.04)", transition: "background .5s", marginBottom: 5 }} /><div style={{ fontFamily: F.m, fontSize: 8, color: isCurrent ? s.color : $.dim, transition: "color .3s", fontWeight: isCurrent ? 600 : 400 }}>{s.label}</div></div>);
-        })}
-      </div>
-      {/* Narration - subtle, not a card */}
-      <div style={{ marginBottom: 16, transition: "all .5s" }}>
-        <div style={{ fontSize: 12, color: $.tx3, lineHeight: 1.6, fontStyle: "italic", opacity: 0.8 }}>{sc.plain}</div>
-      </div>
-      {/* Main row: health dominant + status + chart */}
-      <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: 16, marginBottom: 16 }}>
-        {/* Health - dominant */}
-        <div style={{ background: "rgba(255,255,255,.025)", borderRadius: 12, padding: "20px 16px", textAlign: "center" }}>
-          <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, letterSpacing: 1, marginBottom: 10 }}>HEALTH</div>
-          <div style={{ fontSize: 52, fontWeight: 800, color: healthColor, fontFamily: F.m, lineHeight: 1, transition: "color .3s" }}>{dispHealth}</div>
-          <div style={{ width: "100%", height: 3, background: "rgba(255,255,255,.04)", borderRadius: 2, marginTop: 12, overflow: "hidden" }}><div style={{ width: dispHealth + "%", height: "100%", background: healthColor, borderRadius: 2, transition: "width .8s, background .5s" }} /></div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 12 }}>
-            <div style={{ width: 6, height: 6, borderRadius: "50%", background: sc.color, animation: sc.color !== $.gn ? "wpulse 1.5s ease-in-out infinite" : "none" }} />
-            <span style={{ fontFamily: F.m, fontSize: 9, color: sc.color, fontWeight: 600 }}>{sc.status}</span>
+    <div ref={wrapRef} style={{ maxWidth: 900, margin: "0 auto", position: "relative" }}>
+
+      {/* Slide content */}
+      <div key={slideIdx} style={{ animation: "wup 0.5s cubic-bezier(0.16,1,0.3,1) both" }}>
+
+        {/* Header row */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+              <span style={{ fontFamily: F.m, fontSize: 11, color: $.dim, opacity: 0.4 }}>{slide.num}</span>
+              <span style={{ fontFamily: F.m, fontSize: 10, color: sc.color, letterSpacing: 1, fontWeight: 600 }}>{slide.title.toUpperCase()}</span>
+            </div>
+            <div style={{ fontSize: "clamp(18px, 3vw, 24px)", fontFamily: serif, color: $.tx, lineHeight: 1.6, maxWidth: 520, fontWeight: 400, fontStyle: "italic" }}>
+              {slide.serif}
+            </div>
+          </div>
+          {/* Health */}
+          <div style={{ textAlign: "center", flexShrink: 0, paddingLeft: 24 }}>
+            <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, letterSpacing: 1, marginBottom: 6 }}>HEALTH</div>
+            <div style={{ fontFamily: F.m, fontSize: 44, fontWeight: 800, color: healthColor, lineHeight: 1, transition: "color .3s" }}>{slide.health}</div>
+            <div style={{ width: 48, height: 2, background: "rgba(255,255,255,.04)", borderRadius: 1, marginTop: 8, margin: "8px auto 0" }}>
+              <div style={{ width: slide.health + "%", height: "100%", background: healthColor, borderRadius: 1, transition: "width .8s" }} />
+            </div>
           </div>
         </div>
-        {/* Chart */}
-        <div style={{ background: "rgba(255,255,255,.025)", borderRadius: 12, padding: "14px 14px 6px" }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: $.tx, marginBottom: 6 }}>Model confidence</div>
-          <ResponsiveContainer width="100%" height={160}>
-            <LineChart data={aucData} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
+
+        {/* Chart - cinematic */}
+        <div style={{ background: "rgba(255,255,255,.02)", borderRadius: 14, padding: "20px 20px 12px", marginBottom: 16, border: "1px solid rgba(255,255,255,.03)" }}>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={aucData} margin={{ top: 8, right: 12, bottom: 4, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(251,191,36,.03)" />
               <XAxis dataKey="b" tick={TK} tickLine={false} />
               <YAxis domain={["auto", "auto"]} tick={TK} tickLine={false} width={32} />
               <Tooltip contentStyle={TT} />
-              <ReferenceLine x={b} stroke={$.glow} strokeWidth={1.5} strokeOpacity={0.7} />
-              {sc.showDrift && <ReferenceLine x={40} stroke={$.ac} strokeDasharray="4 4" strokeOpacity={0.25} />}
-              {sc.showRegime && <ReferenceLine x={80} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={0.25} />}
-              <Line type="monotone" dataKey="H" stroke={$.glow} strokeWidth={2} dot={false} name="Hybrid" />
-              <Line type="monotone" dataKey="S" stroke="#a78bfa" strokeWidth={1} dot={false} opacity={0.2} name="SVM" />
+              <ReferenceLine x={slide.batch} stroke={sc.color} strokeWidth={2} strokeOpacity={0.8} />
+              {sc.showDrift && <ReferenceLine x={40} stroke={$.ac} strokeDasharray="4 4" strokeOpacity={0.2} label={{value:"Drift",position:"insideTopLeft",fill:$.ac,fontSize:7,opacity:0.5}} />}
+              {sc.showRegime && <ReferenceLine x={80} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={0.2} label={{value:"Regime",position:"insideTopLeft",fill:$.rd,fontSize:7,opacity:0.5}} />}
+              <Line type="monotone" dataKey="H" stroke={$.glow} strokeWidth={2.5} dot={false} name="Hybrid" isAnimationActive={false} />
+              <Line type="monotone" dataKey="S" stroke="#a78bfa" strokeWidth={1} dot={false} opacity={0.15} name="SVM" isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </div>
-      {/* Action row - compact */}
-      <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-        <div style={{ flex: 1, fontSize: 11, color: $.tx3, lineHeight: 1.6 }}>
-          {alerts.length === 0 && <span style={{ color: $.dim }}>All systems nominal.</span>}
-          {alerts.slice(-2).map(function(a, i) { return (<div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 4, animation: "wup .3s ease both" }}><div style={{ width: 4, height: 4, borderRadius: "50%", background: a.color, marginTop: 5, flexShrink: 0 }} /><span style={{ color: $.tx2, fontSize: 11 }}>{a.text}</span></div>); })}
+
+        {/* Detail + status */}
+        <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+          <div style={{ flex: 1, fontSize: 13, color: $.tx3, lineHeight: 1.7 }}>{slide.detail}</div>
+          <div style={{ background: sc.color + "08", borderRadius: 8, padding: "10px 14px", maxWidth: 240, flexShrink: 0, border: "1px solid " + sc.color + "15" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+              <div style={{ width: 5, height: 5, borderRadius: "50%", background: sc.color, animation: sc.color !== $.gn ? "wpulse 1.5s ease-in-out infinite" : "none" }} />
+              <span style={{ fontFamily: F.m, fontSize: 9, color: sc.color, fontWeight: 600 }}>{sc.status}</span>
+            </div>
+            <div style={{ fontSize: 10, color: $.tx2, lineHeight: 1.5 }}>{sc.action}</div>
+          </div>
         </div>
-        <div style={{ background: sc.color + "08", borderRadius: 8, padding: "10px 14px", maxWidth: 280, flexShrink: 0 }}>
-          <div style={{ fontFamily: F.m, fontSize: 7, color: sc.color, letterSpacing: 1, marginBottom: 3 }}>ACTION</div>
-          <div style={{ fontSize: 11, color: $.tx, lineHeight: 1.5 }}>{sc.action}</div>
-        </div>
       </div>
-      {/* Replay - minimal */}
-      <div style={{ textAlign: "center" }}>
-        {playing && (<button onClick={function() { setPlaying(false); setDone(true); }} style={{ padding: "6px 16px", borderRadius: 6, background: "rgba(255,255,255,.03)", color: $.dim, fontFamily: F.m, fontSize: 10, cursor: "pointer", border: "none", transition: "color .2s" }} onMouseEnter={function(e){e.target.style.color=$.tx2;}} onMouseLeave={function(e){e.target.style.color=$.dim;}}>Skip →</button>)}
-        {done && (<div style={{ animation: "wup .4s ease both" }}><div style={{ display: "flex", gap: 4, justifyContent: "center", flexWrap: "wrap" }}>{SCENE_ORDER.map(function(key) { var s = SCENARIOS[key]; var active = scenario === key; return (<button key={key} onClick={function() { manualSelect(key); }} style={{ padding: "6px 14px", borderRadius: 6, fontFamily: F.m, fontSize: 10, fontWeight: active ? 700 : 400, cursor: "pointer", color: active ? $.bg : $.dim, background: active ? s.color : "rgba(255,255,255,.025)", border: "none", transition: "all .2s" }} onMouseEnter={function(e){if(!active)e.target.style.background="rgba(255,255,255,.05)";e.target.style.color=active?$.bg:$.tx2;}} onMouseLeave={function(e){if(!active)e.target.style.background="rgba(255,255,255,.025)";e.target.style.color=active?$.bg:$.dim;}}>{s.label}</button>); })}<button onClick={replay} style={{ padding: "6px 14px", borderRadius: 6, fontFamily: F.m, fontSize: 10, cursor: "pointer", color: $.glow, background: "rgba(251,191,36,.06)", border: "none", transition: "all .2s" }} onMouseEnter={function(e){e.target.style.background="rgba(251,191,36,.12)";}} onMouseLeave={function(e){e.target.style.background="rgba(251,191,36,.06)";}}>Replay</button></div></div>)}
+
+      {/* Navigation */}
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 20, marginTop: 32 }}>
+        <button onClick={function() { go(-1); }} disabled={slideIdx === 0}
+          style={{ background: "none", border: "none", color: slideIdx === 0 ? "rgba(255,255,255,.08)" : $.tx3, fontSize: 18, cursor: slideIdx === 0 ? "default" : "pointer", padding: "8px 12px", transition: "color .2s" }}>
+          {"\u2190"}
+        </button>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {SLIDES.map(function(_, i) {
+            var active = i === slideIdx;
+            return (
+              <button key={i} onClick={function() { setAnimDir(i > slideIdx ? 1 : -1); setSlideIdx(i); setAuto(false); }}
+                style={{ width: active ? 24 : 8, height: 3, borderRadius: 2, background: active ? SCENARIOS[SLIDES[i].key].color : "rgba(255,255,255,.1)", border: "none", cursor: "pointer", transition: "all .3s", padding: 0 }} />
+            );
+          })}
+        </div>
+        <button onClick={function() { go(1); }} disabled={slideIdx === SLIDES.length - 1}
+          style={{ background: "none", border: "none", color: slideIdx === SLIDES.length - 1 ? "rgba(255,255,255,.08)" : $.tx3, fontSize: 18, cursor: slideIdx === SLIDES.length - 1 ? "default" : "pointer", padding: "8px 12px", transition: "color .2s" }}>
+          {"\u2192"}
+        </button>
+      </div>
+      <div style={{ textAlign: "center", marginTop: 10 }}>
+        <button onClick={function() { if (auto) { setAuto(false); } else { setSlideIdx(0); setAuto(true); } }}
+          style={{ background: "none", border: "none", fontFamily: F.m, fontSize: 9, color: auto ? $.glow : $.dim, cursor: "pointer", letterSpacing: 0.5, transition: "color .2s" }}>
+          {auto ? "Pause" : "Autoplay"}
+        </button>
       </div>
     </div>
   );
@@ -483,6 +524,7 @@ function CommandCentre(props) {
   var _pipeOpen = useState(null); var pipeOpen = _pipeOpen[0]; var setPipeOpen = _pipeOpen[1];
   var _pipeRunning = useState(false); var pipeRunning = _pipeRunning[0]; var setPipeRunning = _pipeRunning[1];
   var pipeTimers = useRef([]);
+  var _findOpen = useState(null); var findOpen = _findOpen[0]; var setFindOpen = _findOpen[1];
   var demoRef = useRef(null);
   var aucData = useMemo(function(){ return SH.map(function(v,i){ return {b:i,H:v,S:SV[i],R:SR[i],L:SL[i]}; }); },[]);
   var psiData = useMemo(function(){ return SP.map(function(v,i){ return {b:i,P:v}; }); },[]);
@@ -555,6 +597,22 @@ function CommandCentre(props) {
     },
   };
 
+  /* Findings data consequence format */
+  var FINDINGS = [
+    {metric:"AUC fell from 0.9999 to 0.8834",   color:$.rd, 
+     consequence:"The model was near perfect in the lab. Under real deployment drift, 1 in 9 predictions deteriorated. A model that looks production ready on a static benchmark can still fail silently once deployed. This is the gap W.R.E.N. exists to close."},
+    {metric:"ECE increased 214×",                color:$.rd, 
+     consequence:"Calibration error is how wrong the model's confidence is. 214× baseline means when it said '90% stable', it was right far less often. Decisions made on uncalibrated confidence are decisions made on false certainty. LaSCal recalibration brought this back under control."},
+    {metric:"PSI crossed 0.25 at batch 55",      color:$.glow,icon:"",
+     consequence:"26 batches before accuracy dropped, the data started looking different. PSI caught it first. That 26-batch head start is the difference between a controlled recalibration and an emergency shutdown. Early warning is the economic value of deployment monitoring."},
+    {metric:"RF adversarial flip rate: 0.04%",   color:$.gn, 
+     consequence:"Under FGSM adversarial testing, the SVM was flipped 19.8% of the time. The Random Forest: 0.04%. Tree models don't use gradients there's no slope to attack. When adversarial conditions are possible, the fallback model is the RF, not the SVM."},
+    {metric:"Conformal coverage dropped to 83%", color:$.ac, 
+     consequence:"1 in 6 predictions during regime collapse had no valid uncertainty bound. The conformal guarantee expired. This isn't a model failure it's the model honestly admitting it is out of its depth. A model that tells you when to stop trusting it is more valuable than one that doesn't."},
+    {metric:"F_gain_mean dominated all phases",  color:$.glow,icon:"",
+     consequence:"SHAP showed that the physics formula F_gain = τ·g remained the top feature across every drift phase, every attack, every regime. The physics didn't break even when the statistics did. The model's core reasoning was sound only its calibration drifted."},
+  ];
+
   var nav = (
     <div style={{position:"sticky",top:0,zIndex:100,background:"rgba(6,11,20,.98)",backdropFilter:"blur(20px)",borderBottom:"1px solid rgba(255,255,255,.06)"}}>
       <div style={{padding:"10px 24px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
@@ -566,7 +624,7 @@ function CommandCentre(props) {
         <button onClick={props.onBack} style={{background:"transparent",border:"1px solid rgba(255,255,255,.08)",borderRadius:6,color:$.dim,padding:"5px 14px",fontSize:11,fontFamily:F.s,cursor:"pointer"}}>Exit</button>
       </div>
       <div style={{display:"flex",borderTop:"1px solid rgba(255,255,255,.04)"}}>
-        {[{id:"sim",label:"Simulation"},{id:"pipe",label:"Pipeline · 22 Stages"}].map(function(t){
+        {[{id:"sim",label:"Simulation"},{id:"pipe",label:"Pipeline · 22 Stages"},{id:"finds",label:"Findings"}].map(function(t){
           var a=tab===t.id;
           return (<button key={t.id} onClick={function(){setTab(t.id);setCard(null);}} style={{flex:1,padding:"10px 0",fontFamily:F.m,fontSize:10,fontWeight:a?600:400,color:a?$.glow:$.dim,background:"transparent",border:"none",cursor:"pointer",borderBottom:"2px solid "+(a?$.glow:"transparent"),letterSpacing:".04em",transition:"all .2s"}}>{t.label}</button>);
         })}
@@ -830,7 +888,217 @@ function CommandCentre(props) {
     </div>
   );
 
+  /* ── TAB: FINDINGS ── */
+
+  return (
+    <div style={{minHeight:"100vh",background:$.bg,fontFamily:F.s,color:$.tx2}}>
+      {nav}
+      <div style={{maxWidth:820,margin:"0 auto",padding:"28px 20px 56px"}}>
+        <div style={{marginBottom:28}}>
+          <p style={{fontFamily:F.m,fontSize:10,color:$.glow,letterSpacing:4,marginBottom:8}}>RESEARCH FINDINGS</p>
+          <h2 style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:8}}>The data behind every claim</h2>
+          <p style={{fontSize:13,color:$.tx3,lineHeight:1.75}}>Click any finding to see the actual evidence</p>
+        </div>
+
+        {/* Finding 1: AUC degradation */}
+        <div style={{marginBottom:14}}>
+          <div onClick={function(){setFindOpen(findOpen===1?null:1);}} style={{background:$.bg2,border:"1px solid "+(findOpen===1?$.rd+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===1?14:0}}>
+              <div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.rd}}>0.9999 → 0.8834</div>
+                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The model was near-perfect in the lab. Deployment told a different story</div>
+              </div>
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===1?"Close":"See proof"}</span>
+            </div>
+            {findOpen===1 && (
+              <div style={{animation:"wup .2s ease both"}}>
+                <ResponsiveContainer width="100%" height={180}>
+                  <LineChart data={aucData} margin={{top:8,right:8,bottom:4,left:0}}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(251,191,36,.04)"/>
+                    <XAxis dataKey="b" tick={TK} tickLine={false}/>
+                    <YAxis domain={[0.84,1]} tick={TK} tickLine={false} width={36}/>
+                    <ReferenceLine x={40} stroke={$.ac} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Drift",fill:$.ac,fontSize:8}}/>
+                    <ReferenceLine x={65} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Attack",fill:$.rd,fontSize:8}}/>
+                    <ReferenceLine x={80} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Regime",fill:$.rd,fontSize:8}}/>
+                    <Line type="monotone" dataKey="H" stroke={$.glow} strokeWidth={2} dot={false} name="Hybrid" isAnimationActive={false}/>
+                    <Line type="monotone" dataKey="S" stroke="#a78bfa" strokeWidth={1} dot={false} opacity={.4} name="SVM" isAnimationActive={false}/>
+                    <Line type="monotone" dataKey="R" stroke={$.gn} strokeWidth={1} dot={false} opacity={.4} name="RF" isAnimationActive={false}/>
+                  </LineChart>
+                </ResponsiveContainer>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7,marginTop:8}}>Every line is a different model watching the same data stream. The vertical dashed lines mark when conditions changed. Between batch 40 and batch 120, 1 in 9 Hybrid predictions degraded. The model had no idea it was getting worse</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Finding 2: ECE / Confidence */}
+        <div style={{marginBottom:14}}>
+          <div onClick={function(){setFindOpen(findOpen===2?null:2);}} style={{background:$.bg2,border:"1px solid "+(findOpen===2?$.rd+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===2?14:0}}>
+              <div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.rd}}>Confidence error increased 214×</div>
+                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The model was still saying "90% sure" while being wrong</div>
+              </div>
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===2?"Close":"See proof"}</span>
+            </div>
+            {findOpen===2 && (
+              <div style={{animation:"wup .2s ease both"}}>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:12}}>
+                  <div style={{background:"rgba(52,211,153,.04)",borderRadius:8,padding:"16px",textAlign:"center"}}>
+                    <div style={{fontFamily:F.m,fontSize:8,color:$.gn,letterSpacing:1,marginBottom:6}}>LAB (CLEAN DATA)</div>
+                    <div style={{fontFamily:F.m,fontSize:28,fontWeight:700,color:$.gn}}>1×</div>
+                    <div style={{fontSize:11,color:$.tx3,marginTop:4}}>Model says 90%, is right 90% of the time</div>
+                  </div>
+                  <div style={{background:"rgba(248,113,113,.04)",borderRadius:8,padding:"16px",textAlign:"center"}}>
+                    <div style={{fontFamily:F.m,fontSize:8,color:$.rd,letterSpacing:1,marginBottom:6}}>DEPLOYED (DRIFT)</div>
+                    <div style={{fontFamily:F.m,fontSize:28,fontWeight:700,color:$.rd}}>214×</div>
+                    <div style={{fontSize:11,color:$.tx3,marginTop:4}}>Model says 90%, is right far less often</div>
+                  </div>
+                </div>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>This is the most dangerous failure mode in ML deployment. The model does not know it is wrong. It keeps outputting high-confidence predictions that no longer match reality. LaSCal recalibration brought this back under control</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Finding 3: PSI Early Warning */}
+        <div style={{marginBottom:14}}>
+          <div onClick={function(){setFindOpen(findOpen===3?null:3);}} style={{background:$.bg2,border:"1px solid "+(findOpen===3?$.glow+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===3?14:0}}>
+              <div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.glow}}>PSI fired 26 batches early</div>
+                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The system spotted trouble before accuracy dropped</div>
+              </div>
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===3?"Close":"See proof"}</span>
+            </div>
+            {findOpen===3 && (
+              <div style={{animation:"wup .2s ease both"}}>
+                <ResponsiveContainer width="100%" height={140}>
+                  <AreaChart data={psiData} margin={{top:8,right:8,bottom:4,left:0}}>
+                    <XAxis dataKey="b" tick={TK} tickLine={false}/>
+                    <YAxis tick={false} axisLine={false} width={0} domain={[0,function(mx){return Math.max(0.4,mx*1.1);}]}/>
+                    <ReferenceLine y={0.25} stroke={$.rd} strokeDasharray="3 3" strokeOpacity={.5} label={{value:"Alert threshold",fill:$.rd,fontSize:8}}/>
+                    <ReferenceLine x={55} stroke={$.glow} strokeWidth={2} strokeOpacity={.5} label={{value:"PSI fires",fill:$.glow,fontSize:8,position:"top"}}/>
+                    <ReferenceLine x={81} stroke={$.rd} strokeWidth={1} strokeOpacity={.3} label={{value:"AUC drops",fill:$.rd,fontSize:8,position:"top"}}/>
+                    <Area type="monotone" dataKey="P" stroke={$.ac} fill={$.acD} strokeWidth={2} isAnimationActive={false}/>
+                  </AreaChart>
+                </ResponsiveContainer>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,marginBottom:8}}>
+                  <div style={{flex:1,height:1,background:$.glow+"33"}}/>
+                  <span style={{fontFamily:F.m,fontSize:11,color:$.glow,fontWeight:700}}>26 batch gap</span>
+                  <div style={{flex:1,height:1,background:$.glow+"33"}}/>
+                </div>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>The amber line is PSI, which measures how different incoming data looks from training data. It crossed the alert threshold at batch 55. Accuracy did not visibly drop until batch 81. That 26-batch window is the time you have to recalibrate, switch models, or alert an operator before the failure becomes visible</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Finding 4: Adversarial Robustness */}
+        <div style={{marginBottom:14}}>
+          <div onClick={function(){setFindOpen(findOpen===4?null:4);}} style={{background:$.bg2,border:"1px solid "+(findOpen===4?$.gn+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===4?14:0}}>
+              <div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.gn}}>SVM 19.8% flipped vs RF 0.04%</div>
+                <div style={{fontSize:13,color:$.tx,marginTop:4}}>Same test, completely different resilience</div>
+              </div>
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===4?"Close":"See proof"}</span>
+            </div>
+            {findOpen===4 && (
+              <div style={{animation:"wup .2s ease both"}}>
+                <div style={{display:"flex",gap:12,marginBottom:12}}>
+                  {[
+                    {name:"SVM",val:19.8,color:"#a78bfa"},
+                    {name:"Hybrid",val:3.3,color:$.glow},
+                    {name:"LGBM",val:1.2,color:"#67e8f9"},
+                    {name:"RF",val:0.04,color:$.gn},
+                  ].map(function(m){return (
+                    <div key={m.name} style={{flex:1,textAlign:"center"}}>
+                      <div style={{height:100,display:"flex",alignItems:"flex-end",justifyContent:"center",marginBottom:6}}>
+                        <div style={{width:"100%",maxWidth:40,height:Math.max(2,m.val/19.8*90),background:m.color,opacity:0.5,borderRadius:"3px 3px 0 0",transition:"height .5s ease"}}/>
+                      </div>
+                      <div style={{fontFamily:F.m,fontSize:12,fontWeight:700,color:m.color}}>{m.val}%</div>
+                      <div style={{fontFamily:F.m,fontSize:8,color:$.dim,marginTop:2}}>{m.name}</div>
+                    </div>
+                  );})}
+                </div>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>Under FGSM adversarial perturbation testing at ε=0.1, the SVM had its predictions flipped almost 20% of the time. The Random Forest held at 0.04%. Tree-based models have no gradient to exploit. This is why the system keeps RF as the automatic fallback when adversarial conditions are detected</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Finding 5: Coverage */}
+        <div style={{marginBottom:14}}>
+          <div onClick={function(){setFindOpen(findOpen===5?null:5);}} style={{background:$.bg2,border:"1px solid "+(findOpen===5?$.ac+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===5?14:0}}>
+              <div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.ac}}>Coverage dropped from 96% to 83%</div>
+                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The safety guarantee expired. 1 in 6 predictions had no bound</div>
+              </div>
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===5?"Close":"See proof"}</span>
+            </div>
+            {findOpen===5 && (
+              <div style={{animation:"wup .2s ease both"}}>
+                <ResponsiveContainer width="100%" height={130}>
+                  <AreaChart data={covData} margin={{top:8,right:8,bottom:4,left:0}}>
+                    <XAxis dataKey="b" tick={TK} tickLine={false}/>
+                    <YAxis domain={[0.78,1]} tick={TK} tickLine={false} width={36}/>
+                    <ReferenceLine y={0.95} stroke={$.gn} strokeDasharray="3 3" strokeOpacity={.5} label={{value:"95% guarantee",fill:$.gn,fontSize:8}}/>
+                    <Area type="monotone" dataKey="C" stroke={$.glow} fill={$.glowD} strokeWidth={2} isAnimationActive={false}/>
+                  </AreaChart>
+                </ResponsiveContainer>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7,marginTop:8}}>Conformal prediction guarantees that at least 95% of predictions have a reliable confidence bound. When the data shifts far enough, that guarantee breaks. At batch 95, coverage was 83%, meaning 1 in 6 predictions had no valid safety net. A model that can tell you when its own guarantee has expired is more valuable than one that cannot</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Finding 6: F_gain */}
+        <div style={{marginBottom:14}}>
+          <div onClick={function(){setFindOpen(findOpen===6?null:6);}} style={{background:$.bg2,border:"1px solid "+(findOpen===6?$.glow+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===6?14:0}}>
+              <div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.glow}}>F_gain dominated every phase</div>
+                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The physics held even when the statistics broke down</div>
+              </div>
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===6?"Close":"See proof"}</span>
+            </div>
+            {findOpen===6 && (
+              <div style={{animation:"wup .2s ease both"}}>
+                <div style={{marginBottom:12}}>
+                  {[
+                    {name:"F_gain_mean",val:100,phase:"All phases"},
+                    {name:"tau_std",val:72,phase:"Drift + Regime"},
+                    {name:"g_mean",val:58,phase:"Stable + Drift"},
+                    {name:"H_net",val:41,phase:"Regime only"},
+                    {name:"V_weak",val:33,phase:"Attack only"},
+                  ].map(function(f){return (
+                    <div key={f.name} style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+                      <div style={{fontFamily:F.m,fontSize:9,color:$.tx2,width:90,textAlign:"right"}}>{f.name}</div>
+                      <div style={{flex:1,height:6,background:"rgba(255,255,255,.04)",borderRadius:3,overflow:"hidden"}}>
+                        <div style={{width:f.val+"%",height:"100%",background:f.name==="F_gain_mean"?$.glow:$.dim,opacity:f.name==="F_gain_mean"?0.6:0.25,borderRadius:3}}/>
+                      </div>
+                      <div style={{fontFamily:F.m,fontSize:8,color:$.dim,width:80}}>{f.phase}</div>
+                    </div>
+                  );})}
+                </div>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>SHAP analysis across every drift phase, every attack, every regime shift. The physics formula F_gain = τ·g was the most important feature in every single condition. When the statistics broke down, the physics still held. The model learned real electrical behaviour, not statistical artifacts</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div style={{marginTop:28,background:"rgba(248,113,113,.04)",border:"1px solid rgba(248,113,113,.16)",borderRadius:12,padding:"20px 22px"}}>
+          <div style={{fontFamily:F.m,fontSize:9,color:$.rd,letterSpacing:".06em",marginBottom:10}}>THE BOTTOM LINE</div>
+          <p style={{fontSize:14,color:$.tx,lineHeight:1.85,fontFamily:serif}}>A model that scores <strong style={{color:$.glow}}>0.9999</strong> in the lab can still fail silently in the field. The only difference between knowing and not knowing is whether you built the monitoring to detect it</p>
+        </div>
+      </div>
+    </div>
+  );
 }
+
+
 
 
 /* ═══ HERO SECTION ═══ */
@@ -1389,10 +1657,11 @@ const INCIDENTS = [
       { label: "Reset the AI's confidence", desc: "Tell the AI to recalculate how sure it should be, using the new data it is actually seeing right now",
         why: "The AI's predictions are still okay. The problem is that it thinks it is more certain than it actually is. Resetting its confidence makes it honest again. It will say '70% sure' instead of '90% sure,' and that 70% will be real.",
         outcome: "good", consequence: "The AI becomes honest about what it knows and what it does not. Its safety guarantees start working again. Operators can trust the numbers on screen." },
-      { label: "Do nothing and keep watching", desc: "No action. Wait and gather more data before intervening",
-        why: "Acting too early risks disrupting a system that might stabilise on its own. If this is just normal variation, intervention wastes resources and creates unnecessary downtime. Waiting gives you more data to confirm whether the change is real before committing to action.",
+      { label: "Do nothing and keep watching", desc: "No action. Wait and see if the problem fixes itself",
+        why: "This feels safe, but every minute that passes makes the gap between what the AI believes and what is true wider. There is a window to fix this easily. That window is closing.",
         outcome: "bad", consequence: "Wrong call. But because A.G.N.E.S. caught the drift early, the damage is contained. The AI's confidence is unreliable, but the system flags every prediction it is not sure about. Operators know which readings to double check. Without A.G.N.E.S., this would have gone unnoticed until something broke." },
     ],
+    research: "Measured result: Expected Calibration Error increased 214\u00d7 from baseline across 120 streaming batches (Chapter 4, Section 4.3). AUC degraded from 0.9999 to 0.8834 (Table 6).",
     lesson: "The AI kept saying 'I am 90% sure this grid is safe.' But it was wrong more and more often. The accuracy dropped a little. The confidence became a lie. That is the most dangerous kind of failure: a system that looks certain while quietly falling apart."
   },
   {
@@ -1416,10 +1685,11 @@ const INCIDENTS = [
       { label: "Switch to the backup AI", desc: "Stop using the main AI and switch to a different type called Random Forest that works in a completely different way",
         why: "The attack works by finding a smooth surface in the AI's logic and pushing predictions along it, like sliding a ball down a hill. The backup AI does not have a smooth surface. It makes decisions using simple yes/no questions, like a flowchart. There is no hill to push the ball down. The attack simply does not work on it.",
         outcome: "good", consequence: "The backup AI is immune to this type of attack. The fake data has no effect. The attack fails completely and the grid goes back to normal." },
-      { label: "Reset the AI's confidence", desc: "Recalibrate the main AI so it adapts to the new data pattern",
-        why: "If the data has genuinely changed, the AI needs to learn the new pattern. Recalibration teaches the AI what normal looks like now, so it can give accurate answers based on current reality instead of outdated training data.",
+      { label: "Reset the AI's confidence", desc: "Recalibrate the main AI against the new data coming in",
+        why: "Resetting confidence fixes a different problem. It fixes the gap between how sure the AI is and how right it is. But this attack is not about confidence. It is tricking the AI into giving the wrong actual answer. Resetting confidence does not help if the answers themselves are wrong.",
         outcome: "bad", consequence: "Wrong call. The attack continues and predictions are unreliable. But A.G.N.E.S. detected the attack pattern and is flagging every suspicious prediction. Operators can see which answers are likely corrupted instead of trusting them blindly. Without A.G.N.E.S., nobody would even know an attack was happening." },
     ],
+    research: "Measured result: SVM flip rate 32.4% vs Random Forest 0.04% under FGSM at \u03b5=0.10, an 800\u00d7 vulnerability difference (Chapter 4, Section 4.5, Table 5).",
     lesson: "Two different AIs looked at the exact same attack. One was tricked a third of the time. The other was tricked 0.04% of the time, basically never. Same attack, completely different result. The type of AI you choose is not just about accuracy. It is about security."
   },
   {
@@ -1444,10 +1714,11 @@ const INCIDENTS = [
       { label: "Call a human operator", desc: "Hand control to a real person. Reduce power load on the weakest parts of the grid to create a safety margin",
         why: "When the AI has never seen anything like the current situation, its predictions are guesses. A human operator can use judgment, experience, and common sense that the AI does not have. Reducing load on weak points buys time to figure out what happened.",
         outcome: "good", consequence: "A human takes over while the AI is out of its depth. The power reduction creates a safety cushion. The grid stays running. No blackout." },
-      { label: "Keep the AI running", desc: "The AI has more data and faster reactions than any human. Let it handle the situation",
-        why: "The AI processes thousands of readings per second. A human operator works on instinct and experience, which is slower and less consistent. The AI may be operating outside its training data, but it still has more information than a person looking at a dashboard. Keeping it running preserves response speed.",
+      { label: "Keep the AI running", desc: "Let the AI continue making decisions. Wait for more information before doing anything",
+        why: "The AI is still producing answers. But those answers are based on a world that no longer exists. It is like following GPS directions in a city that has been completely rebuilt. The directions look confident. They are meaningless.",
         outcome: "bad", consequence: "Wrong call. The AI's predictions are meaningless in this new regime. But A.G.N.E.S. has already triggered all three warning systems and is showing exactly how far outside normal the grid has moved. The situation is serious, but visible. Without A.G.N.E.S., this would have looked like normal operation right up until the blackout." },
     ],
+    research: "Measured result: Page Hinkley triggered at batch 9, CUSUM at batch 34, PSI at batch 55. Conformal coverage fell from 99.97% to 85.05% (Chapter 4, Sections 4.6\u20134.7, Tables 6\u20138).",
     lesson: "Three different warning systems spotted trouble at three different times. The earliest caught it 71 steps before the worst damage. The warnings were there the whole time. Everything came down to whether someone was listening and whether someone acted."
   },
 ];
@@ -1619,11 +1890,11 @@ function MetricChip({ label, abbr, value, color, explain }) {
   return (
     <div style={{ background: "rgba(255,255,255,.03)", border: `1px solid ${color}22`, borderRadius: 8, padding: "8px 14px", flex: 1, minWidth: 80 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-        <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, letterSpacing: 1 }}>{label}</div>
+        <div style={{ fontFamily: F.m, fontSize: 7, color: $.tx3, letterSpacing: 1 }}>{label}</div>
         <div style={{ fontFamily: F.m, fontSize: 6, color: $.dim, opacity: 0.5 }}>{abbr}</div>
       </div>
-      <div style={{ fontSize: 13, fontWeight: 600, color, transition: "color 0.3s", marginBottom: 3, lineHeight: 1.3 }}>{explain}</div>
-      <div style={{ fontFamily: F.m, fontSize: 10, color: $.dim }}>{value}</div>
+      <div style={{ fontFamily: F.m, fontSize: 18, fontWeight: 700, color, transition: "color 0.3s" }}>{value}</div>
+      <div style={{ fontSize: 8, color: $.tx3, marginTop: 2, lineHeight: 1.4 }}>{explain}</div>
     </div>
   );
 }
@@ -2137,7 +2408,13 @@ function OpsCenter(props) {
             {/* The lesson */}
             <div style={{ background: `${$.glow}06`, border: `1px solid ${$.glow}18`, borderRadius: 12, padding: "16px 18px", marginBottom: 12 }}>
               <div style={{ fontFamily: F.m, fontSize: 8, color: $.glow, letterSpacing: 1, marginBottom: 8 }}>WHY THIS MATTERS</div>
-              <div style={{ fontSize: 13, color: $.tx2, lineHeight: 1.8 }}>{incident.lesson}</div>
+              <div style={{ fontSize: 13, color: $.tx2, lineHeight: 1.8, marginBottom: incident.research ? 10 : 0 }}>{incident.lesson}</div>
+              {incident.research && (
+                <div style={{ borderTop: `1px solid ${$.glow}15`, paddingTop: 8 }}>
+                  <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, letterSpacing: 1, marginBottom: 4 }}>FROM THE RESEARCH</div>
+                  <div style={{ fontFamily: F.m, fontSize: 10, color: $.tx3, lineHeight: 1.6 }}>{incident.research}</div>
+                </div>
+              )}
             </div>
             <button onClick={advance} style={{ width: "100%", background: $.glow, color: $.bg, border: "none", borderRadius: 10, padding: "14px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {incidentIdx >= INCIDENTS.length - 1 ? "See the debrief" : "Next incident"}
@@ -2155,7 +2432,7 @@ export default function App() {
   var _p = useState("landing"); var page = _p[0]; var rawSetPage = _p[1];
   var _s = useState(0); var scrollY = _s[0]; var setScrollY = _s[1];
   var _loading = useState(true); var loading = _loading[0]; var setLoading = _loading[1];
-  var _fade = useState(false); var fade = _fade[0]; var setFade = _fade[1];
+  var _fade = useState("visible"); var fade = _fade[0]; var setFade = _fade[1];
 
   useEffect(function() {
     var t = setTimeout(function() { setLoading(false); }, 2200);
@@ -2163,12 +2440,16 @@ export default function App() {
   }, []);
 
   function setPage(p) {
-    setFade(true);
+    setFade("clear");
+    setTimeout(function() { setFade("beacon"); }, 500);
+    setTimeout(function() { setFade("sweep"); }, 1000);
+    setTimeout(function() { setFade("flash"); }, 4000);
     setTimeout(function() {
       rawSetPage(p);
       window.scrollTo(0, 0);
-    }, 800);
-    setTimeout(function() { setFade(false); }, 1200);
+      setFade("reveal");
+    }, 4800);
+    setTimeout(function() { setFade("visible"); }, 5200);
   }
 
   useEffect(function() { var h = function() { setScrollY(window.scrollY); }; window.addEventListener("scroll", h, { passive: true }); return function() { window.removeEventListener("scroll", h); }; }, []);
@@ -2215,8 +2496,8 @@ export default function App() {
       {/* ═══ FULL DEMO ═══ */}
       <section id="demo" style={{ padding: "80px 24px 80px", background: $.bg2 }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <Rv><h2 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 700, fontFamily: F.s, marginBottom: 16 }}>Five ways a model fails</h2></Rv>
-          <Rv d={0.08}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 380, margin: "0 auto" }}>Real data from a 120-batch deployment simulation</p></Rv>
+          <Rv><h2 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 700, fontFamily: F.s, marginBottom: 16 }}>What deployment actually looks like</h2></Rv>
+          <Rv d={0.08}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 420, margin: "0 auto" }}>Five stages of a model encountering the real world. Navigate with the arrows or let it play.</p></Rv>
         </div>
         <Rv d={0.16}><div style={{ maxWidth: 900, margin: "0 auto" }}><SignatureDemo /></div></Rv>
       </section>
@@ -2251,25 +2532,26 @@ export default function App() {
       </section>
 
       {/* ═══ EVIDENCE ═══ */}
-      <section id="proof" style={{ padding: "60px 24px 60px", background: $.bg2 }}>
-        <div style={{ maxWidth: 640, margin: "0 auto" }}>
-          <Rv><h2 style={{ fontSize: "clamp(22px, 3.5vw, 30px)", fontWeight: 700, fontFamily: F.s, textAlign: "center", marginBottom: 32 }}>What the data showed</h2></Rv>
-          <Rv d={0.08}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", background: "rgba(248,113,113,.04)", borderRadius: 10, border: "1px solid rgba(248,113,113,.12)" }}>
-              <div style={{ fontFamily: F.m, fontSize: 22, fontWeight: 700, color: $.rd, flexShrink: 0 }}>11.7%</div>
-              <div style={{ fontSize: 13, color: $.tx2, lineHeight: 1.6 }}>A near perfect AI lost 1 in 9 predictions once deployed into real conditions. Static lab testing never showed this.</div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", background: "rgba(251,191,36,.04)", borderRadius: 10, border: "1px solid rgba(251,191,36,.12)" }}>
-              <div style={{ fontFamily: F.m, fontSize: 22, fontWeight: 700, color: $.glow, flexShrink: 0 }}>26</div>
-              <div style={{ fontSize: 13, color: $.tx2, lineHeight: 1.6 }}>The monitoring system spotted trouble 26 steps before accuracy visibly dropped. That early warning is the difference between a fix and a failure.</div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", background: "rgba(52,211,153,.04)", borderRadius: 10, border: "1px solid rgba(52,211,153,.12)" }}>
-              <div style={{ fontFamily: F.m, fontSize: 22, fontWeight: 700, color: $.gn, flexShrink: 0 }}>800×</div>
-              <div style={{ fontSize: 13, color: $.tx2, lineHeight: 1.6 }}>Under the same attack, one AI type was tricked 800 times more often than another. The type of AI you choose is a security decision.</div>
-            </div>
-          </div>
-          </Rv>
+      <section id="proof" style={{ padding: "80px 24px 80px", background: $.bg2 }}>
+        <div style={{ maxWidth: 600, margin: "0 auto" }}>
+          <Rv><h2 style={{ fontSize: "clamp(24px, 3.5vw, 34px)", fontWeight: 700, fontFamily: F.s, marginBottom: 40 }}>What the data showed</h2></Rv>
+
+          {[
+            { before: "99.99%", after: "88.34%", tag: "Accuracy", color: $.rd,
+              plain: "In the lab, the model got almost every prediction right. Once deployed into the real world, 1 in 9 predictions went wrong. The model did not know it was getting worse",
+              technical: "AUC dropped from 0.9999 to 0.8834 across 120 streaming batches under distribution drift, adversarial perturbation, and regime shift" },
+            { before: "Accurate", after: "214× wrong", tag: "Confidence", color: $.rd,
+              plain: "When the model said \"I am 90% sure this is safe,\" it used to be right. After deployment, that confidence became 214 times less reliable. It was still saying 90% while being wrong",
+              technical: "Expected Calibration Error (ECE) increased 214× from baseline. Post-hoc LaSCal recalibration recovered alignment" },
+            { before: "Problem visible", after: "26 batches earlier", tag: "Early warning", color: $.glow,
+              plain: "The accuracy only visibly dropped at batch 81. But the system spotted something was wrong at batch 55, twenty-six steps earlier. That early warning is the whole point",
+              technical: "PSI crossed the 0.25 alert threshold 26 batches before AUC degradation became statistically significant" },
+            { before: "19.8% flipped", after: "0.04% flipped", tag: "Attack resistance", color: $.gn,
+              plain: "Under standard adversarial robustness testing, one model's predictions flipped almost 20% of the time. A different model held at 0.04%. Same test, different architecture, completely different resilience",
+              technical: "SVM RBF flip rate 19.8% under FGSM at ε=0.1. Random Forest flip rate 0.04%, immune due to discrete leaf structure" },
+          ].map(function(d, i) { return (
+            <Rv key={i} d={0.06 * i}><EvidenceCard d={d} last={i===3} /></Rv>
+          ); })}
         </div>
       </section>
 
@@ -2295,31 +2577,64 @@ export default function App() {
   );
   }
 
+  var transitioning = fade !== "visible";
+
   return (
     <div style={{ position: "relative", minHeight: "100vh" }}>
+      {/* Page content */}
       <div style={{
-        opacity: fade ? 0 : 1,
-        transition: "opacity 0.35s ease",
-        pointerEvents: fade ? "none" : "auto",
+        opacity: fade === "clear" || fade === "beacon" || fade === "flash" ? 0 : 1,
+        transition: fade === "clear" ? "opacity 0.4s ease-out" : fade === "reveal" ? "opacity 0.3s ease-in" : "none",
+        pointerEvents: transitioning ? "none" : "auto",
       }}>
         {pageContent}
       </div>
 
-      {fade && (
+      {/* Transition overlay */}
+      {transitioning && (
         <div style={{
           position: "fixed", inset: 0, zIndex: 9999,
           background: $.bg,
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          animation: "wup 0.3s ease both",
+          opacity: fade === "clear" ? 0 : fade === "reveal" ? 0 : 1,
+          transition: fade === "reveal" ? "opacity 0.35s ease-out" : "opacity 0.4s ease-in",
         }}>
-          <div style={{ marginBottom: 24, animation: "wpulse 1.5s ease-in-out infinite" }}>
-            <Beacon s={48} glow={0.7} />
+          {/* Beacon + sweep */}
+          <div style={{ position: "relative" }}>
+            <div style={{
+              opacity: (fade === "beacon" || fade === "sweep" || fade === "flash") ? 1 : 0,
+              transform: fade === "flash" ? "scale(1.15)" : "scale(1)",
+              transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)",
+            }}>
+              <Beacon s={64} glow={fade === "flash" ? 1 : fade === "sweep" ? 0.7 : 0.4} />
+            </div>
+
+            {/* Sweeping beam */}
+            {(fade === "sweep") && (
+              <div style={{ position: "absolute", top: -280, left: "50%", marginLeft: -400, width: 800, height: 300, pointerEvents: "none", overflow: "visible" }}>
+                <svg viewBox="0 0 800 300" style={{ width: "100%", height: "100%", overflow: "visible" }}>
+                  <defs>
+                    <radialGradient id="tBeam" cx="50%" cy="100%" r="80%">
+                      <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.3"/>
+                      <stop offset="100%" stopColor="#fbbf24" stopOpacity="0"/>
+                    </radialGradient>
+                  </defs>
+                  <g style={{ transformOrigin: "400px 290px", animation: "wTransSweep 3s ease-in-out infinite" }}>
+                    <polygon points="400,290 150,0 650,0" fill="url(#tBeam)" opacity="0.45"/>
+                  </g>
+                </svg>
+              </div>
+            )}
           </div>
-          <div style={{ fontFamily: F.m, fontSize: 11, letterSpacing: 4, color: $.glow, opacity: 0.6, marginBottom: 8 }}>W.R.E.N.</div>
-          <div style={{ fontSize: 11, color: $.dim }}>Initialising deployment monitor</div>
-          <div style={{ width: 120, height: 2, background: "rgba(255,255,255,.04)", borderRadius: 1, marginTop: 20, overflow: "hidden" }}>
-            <div style={{ height: "100%", background: $.glow, borderRadius: 1, animation: "wLoad 0.8s ease-in-out forwards" }} />
-          </div>
+
+          {/* Flash glow */}
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "radial-gradient(circle at 50% 50%, rgba(251,191,36,0.4), rgba(251,191,36,0.1) 35%, transparent 65%)",
+            opacity: fade === "flash" ? 1 : 0,
+            transition: "opacity 0.5s ease-in",
+            pointerEvents: "none",
+          }} />
         </div>
       )}
     </div>
