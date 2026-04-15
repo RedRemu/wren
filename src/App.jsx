@@ -2559,7 +2559,7 @@ export default function App() {
       <section id="honour" style={{ padding: "60px 24px 80px", textAlign: "center" }}>
         <div style={{ maxWidth: 420, margin: "0 auto" }}>
           <Rv><div style={{ width: 24, height: 1, background: $.glow, margin: "0 auto 28px", opacity: 0.15 }} /></Rv>
-          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939–1945.</p></Rv>
+          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939-1945.</p></Rv>
           <Rv d={0.2}><p style={{ fontSize: 13, lineHeight: 1.9, color: $.dim }}>They sat in signals rooms, detecting anomalies in the noise and warning of danger before it arrived.</p></Rv>
         </div>
       </section>
@@ -2570,7 +2570,7 @@ export default function App() {
           <BeaconSmall s={12} />
           <span style={{ fontSize: 9, letterSpacing: 2, color: $.dim, fontFamily: F.m }}>W.R.E.N.</span>
         </div>
-        <div style={{ fontSize: 9, color: $.dim }}>University of Portsmouth | 2025–2026</div>
+        <div style={{ fontSize: 9, color: $.dim }}>University of Portsmouth | 2025-2026</div>
         <div style={{ fontSize: 9, color: $.dim, opacity: 0.5 }}>Powered by A.G.N.E.S. v4.2</div>
       </footer>
     </div>
