@@ -244,28 +244,6 @@ function Topo(props) {
 }
 
 /* ═══ ENTRANCE ═══ */
-function EvidenceCard(props) {
-  var d = props.d; var last = props.last;
-  var _open = useState(false); var open = _open[0]; var setOpen = _open[1];
-  return (
-    <div style={{ marginBottom: 28, paddingBottom: 28, borderBottom: last ? "none" : "1px solid rgba(255,255,255,.04)" }}>
-      <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 12, flexWrap: "wrap" }}>
-        <span style={{ fontFamily: F.m, fontSize: "clamp(20px, 4vw, 26px)", fontWeight: 700, color: d.color, lineHeight: 1 }}>{d.before}</span>
-        <span style={{ fontSize: 14, color: $.dim }}>→</span>
-        <span style={{ fontFamily: F.m, fontSize: "clamp(20px, 4vw, 26px)", fontWeight: 700, color: d.color, lineHeight: 1 }}>{d.after}</span>
-        <span style={{ fontFamily: F.m, fontSize: 8, color: $.dim, letterSpacing: 1, marginLeft: 4 }}>{d.tag.toUpperCase()}</span>
-      </div>
-      <div style={{ fontSize: 14, color: $.tx2, lineHeight: 1.8, marginBottom: 6 }}>{d.plain}</div>
-      <div onClick={function(){setOpen(!open);}} style={{ cursor: "pointer", display: "inline-block" }}>
-        <span style={{ fontFamily: F.m, fontSize: 9, color: $.dim, borderBottom: "1px dotted " + $.dim }}>{open ? "Hide technical detail" : "Technical detail"}</span>
-      </div>
-      {open && (
-        <div style={{ marginTop: 8, fontSize: 11, color: $.dim, lineHeight: 1.6, fontFamily: F.m, animation: "wup .2s ease both" }}>{d.technical}</div>
-      )}
-    </div>
-  );
-}
-
 function Entrance(props) {
   var _s = useState(0); var stage = _s[0]; var setStage = _s[1];
   useEffect(function() {
@@ -505,7 +483,6 @@ function CommandCentre(props) {
   var _pipeOpen = useState(null); var pipeOpen = _pipeOpen[0]; var setPipeOpen = _pipeOpen[1];
   var _pipeRunning = useState(false); var pipeRunning = _pipeRunning[0]; var setPipeRunning = _pipeRunning[1];
   var pipeTimers = useRef([]);
-  var _findOpen = useState(null); var findOpen = _findOpen[0]; var setFindOpen = _findOpen[1];
   var demoRef = useRef(null);
   var aucData = useMemo(function(){ return SH.map(function(v,i){ return {b:i,H:v,S:SV[i],R:SR[i],L:SL[i]}; }); },[]);
   var psiData = useMemo(function(){ return SP.map(function(v,i){ return {b:i,P:v}; }); },[]);
@@ -578,22 +555,6 @@ function CommandCentre(props) {
     },
   };
 
-  /* Findings data consequence format */
-  var FINDINGS = [
-    {metric:"AUC fell from 0.9999 to 0.8834",   color:$.rd, 
-     consequence:"The model was near perfect in the lab. Under real deployment drift, 1 in 9 predictions deteriorated. A model that looks production ready on a static benchmark can still fail silently once deployed. This is the gap W.R.E.N. exists to close."},
-    {metric:"ECE increased 214×",                color:$.rd, 
-     consequence:"Calibration error is how wrong the model's confidence is. 214× baseline means when it said '90% stable', it was right far less often. Decisions made on uncalibrated confidence are decisions made on false certainty. LaSCal recalibration brought this back under control."},
-    {metric:"PSI crossed 0.25 at batch 55",      color:$.glow,icon:"",
-     consequence:"26 batches before accuracy dropped, the data started looking different. PSI caught it first. That 26-batch head start is the difference between a controlled recalibration and an emergency shutdown. Early warning is the economic value of deployment monitoring."},
-    {metric:"RF adversarial flip rate: 0.04%",   color:$.gn, 
-     consequence:"Under FGSM adversarial testing, the SVM was flipped 19.8% of the time. The Random Forest: 0.04%. Tree models don't use gradients there's no slope to attack. When adversarial conditions are possible, the fallback model is the RF, not the SVM."},
-    {metric:"Conformal coverage dropped to 83%", color:$.ac, 
-     consequence:"1 in 6 predictions during regime collapse had no valid uncertainty bound. The conformal guarantee expired. This isn't a model failure it's the model honestly admitting it is out of its depth. A model that tells you when to stop trusting it is more valuable than one that doesn't."},
-    {metric:"F_gain_mean dominated all phases",  color:$.glow,icon:"",
-     consequence:"SHAP showed that the physics formula F_gain = τ·g remained the top feature across every drift phase, every attack, every regime. The physics didn't break even when the statistics did. The model's core reasoning was sound only its calibration drifted."},
-  ];
-
   var nav = (
     <div style={{position:"sticky",top:0,zIndex:100,background:"rgba(6,11,20,.98)",backdropFilter:"blur(20px)",borderBottom:"1px solid rgba(255,255,255,.06)"}}>
       <div style={{padding:"10px 24px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
@@ -605,7 +566,7 @@ function CommandCentre(props) {
         <button onClick={props.onBack} style={{background:"transparent",border:"1px solid rgba(255,255,255,.08)",borderRadius:6,color:$.dim,padding:"5px 14px",fontSize:11,fontFamily:F.s,cursor:"pointer"}}>Exit</button>
       </div>
       <div style={{display:"flex",borderTop:"1px solid rgba(255,255,255,.04)"}}>
-        {[{id:"sim",label:"Simulation"},{id:"pipe",label:"Pipeline · 22 Stages"},{id:"finds",label:"Findings"}].map(function(t){
+        {[{id:"sim",label:"Simulation"},{id:"pipe",label:"Pipeline · 22 Stages"}].map(function(t){
           var a=tab===t.id;
           return (<button key={t.id} onClick={function(){setTab(t.id);setCard(null);}} style={{flex:1,padding:"10px 0",fontFamily:F.m,fontSize:10,fontWeight:a?600:400,color:a?$.glow:$.dim,background:"transparent",border:"none",cursor:"pointer",borderBottom:"2px solid "+(a?$.glow:"transparent"),letterSpacing:".04em",transition:"all .2s"}}>{t.label}</button>);
         })}
@@ -728,6 +689,14 @@ function CommandCentre(props) {
                 </AreaChart>
               </ResponsiveContainer>
             }/>
+        </div>
+
+        {/* Stress Test */}
+        <div style={{marginTop:24,marginBottom:24}}>
+          <div style={{fontFamily:F.m,fontSize:9,color:$.glow,letterSpacing:".06em",marginBottom:8}}>INTERACTIVE</div>
+          <h3 style={{fontSize:16,fontWeight:600,color:$.tx,marginBottom:6}}>Break it yourself</h3>
+          <p style={{fontSize:12,color:$.tx3,marginBottom:16}}>Drag the slider. Watch four models respond differently to the same threat</p>
+          <StressTestWidget />
         </div>
       </div>
       <div style={{textAlign:"center",padding:"12px",borderTop:"1px solid "+$.brd}}>
@@ -861,217 +830,7 @@ function CommandCentre(props) {
     </div>
   );
 
-  /* ── TAB: FINDINGS ── */
-
-  return (
-    <div style={{minHeight:"100vh",background:$.bg,fontFamily:F.s,color:$.tx2}}>
-      {nav}
-      <div style={{maxWidth:820,margin:"0 auto",padding:"28px 20px 56px"}}>
-        <div style={{marginBottom:28}}>
-          <p style={{fontFamily:F.m,fontSize:10,color:$.glow,letterSpacing:4,marginBottom:8}}>RESEARCH FINDINGS</p>
-          <h2 style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:8}}>The data behind every claim</h2>
-          <p style={{fontSize:13,color:$.tx3,lineHeight:1.75}}>Click any finding to see the actual evidence</p>
-        </div>
-
-        {/* Finding 1: AUC degradation */}
-        <div style={{marginBottom:14}}>
-          <div onClick={function(){setFindOpen(findOpen===1?null:1);}} style={{background:$.bg2,border:"1px solid "+(findOpen===1?$.rd+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===1?14:0}}>
-              <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.rd}}>0.9999 → 0.8834</div>
-                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The model was near-perfect in the lab. Deployment told a different story</div>
-              </div>
-              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===1?"Close":"See proof"}</span>
-            </div>
-            {findOpen===1 && (
-              <div style={{animation:"wup .2s ease both"}}>
-                <ResponsiveContainer width="100%" height={180}>
-                  <LineChart data={aucData} margin={{top:8,right:8,bottom:4,left:0}}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(251,191,36,.04)"/>
-                    <XAxis dataKey="b" tick={TK} tickLine={false}/>
-                    <YAxis domain={[0.84,1]} tick={TK} tickLine={false} width={36}/>
-                    <ReferenceLine x={40} stroke={$.ac} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Drift",fill:$.ac,fontSize:8}}/>
-                    <ReferenceLine x={65} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Attack",fill:$.rd,fontSize:8}}/>
-                    <ReferenceLine x={80} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Regime",fill:$.rd,fontSize:8}}/>
-                    <Line type="monotone" dataKey="H" stroke={$.glow} strokeWidth={2} dot={false} name="Hybrid" isAnimationActive={false}/>
-                    <Line type="monotone" dataKey="S" stroke="#a78bfa" strokeWidth={1} dot={false} opacity={.4} name="SVM" isAnimationActive={false}/>
-                    <Line type="monotone" dataKey="R" stroke={$.gn} strokeWidth={1} dot={false} opacity={.4} name="RF" isAnimationActive={false}/>
-                  </LineChart>
-                </ResponsiveContainer>
-                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7,marginTop:8}}>Every line is a different model watching the same data stream. The vertical dashed lines mark when conditions changed. Between batch 40 and batch 120, 1 in 9 Hybrid predictions degraded. The model had no idea it was getting worse</div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Finding 2: ECE / Confidence */}
-        <div style={{marginBottom:14}}>
-          <div onClick={function(){setFindOpen(findOpen===2?null:2);}} style={{background:$.bg2,border:"1px solid "+(findOpen===2?$.rd+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===2?14:0}}>
-              <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.rd}}>Confidence error increased 214×</div>
-                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The model was still saying "90% sure" while being wrong</div>
-              </div>
-              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===2?"Close":"See proof"}</span>
-            </div>
-            {findOpen===2 && (
-              <div style={{animation:"wup .2s ease both"}}>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:12}}>
-                  <div style={{background:"rgba(52,211,153,.04)",borderRadius:8,padding:"16px",textAlign:"center"}}>
-                    <div style={{fontFamily:F.m,fontSize:8,color:$.gn,letterSpacing:1,marginBottom:6}}>LAB (CLEAN DATA)</div>
-                    <div style={{fontFamily:F.m,fontSize:28,fontWeight:700,color:$.gn}}>1×</div>
-                    <div style={{fontSize:11,color:$.tx3,marginTop:4}}>Model says 90%, is right 90% of the time</div>
-                  </div>
-                  <div style={{background:"rgba(248,113,113,.04)",borderRadius:8,padding:"16px",textAlign:"center"}}>
-                    <div style={{fontFamily:F.m,fontSize:8,color:$.rd,letterSpacing:1,marginBottom:6}}>DEPLOYED (DRIFT)</div>
-                    <div style={{fontFamily:F.m,fontSize:28,fontWeight:700,color:$.rd}}>214×</div>
-                    <div style={{fontSize:11,color:$.tx3,marginTop:4}}>Model says 90%, is right far less often</div>
-                  </div>
-                </div>
-                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>This is the most dangerous failure mode in ML deployment. The model does not know it is wrong. It keeps outputting high-confidence predictions that no longer match reality. LaSCal recalibration brought this back under control</div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Finding 3: PSI Early Warning */}
-        <div style={{marginBottom:14}}>
-          <div onClick={function(){setFindOpen(findOpen===3?null:3);}} style={{background:$.bg2,border:"1px solid "+(findOpen===3?$.glow+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===3?14:0}}>
-              <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.glow}}>PSI fired 26 batches early</div>
-                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The system spotted trouble before accuracy dropped</div>
-              </div>
-              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===3?"Close":"See proof"}</span>
-            </div>
-            {findOpen===3 && (
-              <div style={{animation:"wup .2s ease both"}}>
-                <ResponsiveContainer width="100%" height={140}>
-                  <AreaChart data={psiData} margin={{top:8,right:8,bottom:4,left:0}}>
-                    <XAxis dataKey="b" tick={TK} tickLine={false}/>
-                    <YAxis tick={false} axisLine={false} width={0} domain={[0,function(mx){return Math.max(0.4,mx*1.1);}]}/>
-                    <ReferenceLine y={0.25} stroke={$.rd} strokeDasharray="3 3" strokeOpacity={.5} label={{value:"Alert threshold",fill:$.rd,fontSize:8}}/>
-                    <ReferenceLine x={55} stroke={$.glow} strokeWidth={2} strokeOpacity={.5} label={{value:"PSI fires",fill:$.glow,fontSize:8,position:"top"}}/>
-                    <ReferenceLine x={81} stroke={$.rd} strokeWidth={1} strokeOpacity={.3} label={{value:"AUC drops",fill:$.rd,fontSize:8,position:"top"}}/>
-                    <Area type="monotone" dataKey="P" stroke={$.ac} fill={$.acD} strokeWidth={2} isAnimationActive={false}/>
-                  </AreaChart>
-                </ResponsiveContainer>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,marginBottom:8}}>
-                  <div style={{flex:1,height:1,background:$.glow+"33"}}/>
-                  <span style={{fontFamily:F.m,fontSize:11,color:$.glow,fontWeight:700}}>26 batch gap</span>
-                  <div style={{flex:1,height:1,background:$.glow+"33"}}/>
-                </div>
-                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>The amber line is PSI, which measures how different incoming data looks from training data. It crossed the alert threshold at batch 55. Accuracy did not visibly drop until batch 81. That 26-batch window is the time you have to recalibrate, switch models, or alert an operator before the failure becomes visible</div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Finding 4: Adversarial Robustness */}
-        <div style={{marginBottom:14}}>
-          <div onClick={function(){setFindOpen(findOpen===4?null:4);}} style={{background:$.bg2,border:"1px solid "+(findOpen===4?$.gn+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===4?14:0}}>
-              <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.gn}}>SVM 19.8% flipped vs RF 0.04%</div>
-                <div style={{fontSize:13,color:$.tx,marginTop:4}}>Same test, completely different resilience</div>
-              </div>
-              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===4?"Close":"See proof"}</span>
-            </div>
-            {findOpen===4 && (
-              <div style={{animation:"wup .2s ease both"}}>
-                <div style={{display:"flex",gap:12,marginBottom:12}}>
-                  {[
-                    {name:"SVM",val:19.8,color:"#a78bfa"},
-                    {name:"Hybrid",val:3.3,color:$.glow},
-                    {name:"LGBM",val:1.2,color:"#67e8f9"},
-                    {name:"RF",val:0.04,color:$.gn},
-                  ].map(function(m){return (
-                    <div key={m.name} style={{flex:1,textAlign:"center"}}>
-                      <div style={{height:100,display:"flex",alignItems:"flex-end",justifyContent:"center",marginBottom:6}}>
-                        <div style={{width:"100%",maxWidth:40,height:Math.max(2,m.val/19.8*90),background:m.color,opacity:0.5,borderRadius:"3px 3px 0 0",transition:"height .5s ease"}}/>
-                      </div>
-                      <div style={{fontFamily:F.m,fontSize:12,fontWeight:700,color:m.color}}>{m.val}%</div>
-                      <div style={{fontFamily:F.m,fontSize:8,color:$.dim,marginTop:2}}>{m.name}</div>
-                    </div>
-                  );})}
-                </div>
-                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>Under FGSM adversarial perturbation testing at ε=0.1, the SVM had its predictions flipped almost 20% of the time. The Random Forest held at 0.04%. Tree-based models have no gradient to exploit. This is why the system keeps RF as the automatic fallback when adversarial conditions are detected</div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Finding 5: Coverage */}
-        <div style={{marginBottom:14}}>
-          <div onClick={function(){setFindOpen(findOpen===5?null:5);}} style={{background:$.bg2,border:"1px solid "+(findOpen===5?$.ac+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===5?14:0}}>
-              <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.ac}}>Coverage dropped from 96% to 83%</div>
-                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The safety guarantee expired. 1 in 6 predictions had no bound</div>
-              </div>
-              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===5?"Close":"See proof"}</span>
-            </div>
-            {findOpen===5 && (
-              <div style={{animation:"wup .2s ease both"}}>
-                <ResponsiveContainer width="100%" height={130}>
-                  <AreaChart data={covData} margin={{top:8,right:8,bottom:4,left:0}}>
-                    <XAxis dataKey="b" tick={TK} tickLine={false}/>
-                    <YAxis domain={[0.78,1]} tick={TK} tickLine={false} width={36}/>
-                    <ReferenceLine y={0.95} stroke={$.gn} strokeDasharray="3 3" strokeOpacity={.5} label={{value:"95% guarantee",fill:$.gn,fontSize:8}}/>
-                    <Area type="monotone" dataKey="C" stroke={$.glow} fill={$.glowD} strokeWidth={2} isAnimationActive={false}/>
-                  </AreaChart>
-                </ResponsiveContainer>
-                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7,marginTop:8}}>Conformal prediction guarantees that at least 95% of predictions have a reliable confidence bound. When the data shifts far enough, that guarantee breaks. At batch 95, coverage was 83%, meaning 1 in 6 predictions had no valid safety net. A model that can tell you when its own guarantee has expired is more valuable than one that cannot</div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Finding 6: F_gain */}
-        <div style={{marginBottom:14}}>
-          <div onClick={function(){setFindOpen(findOpen===6?null:6);}} style={{background:$.bg2,border:"1px solid "+(findOpen===6?$.glow+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===6?14:0}}>
-              <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.glow}}>F_gain dominated every phase</div>
-                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The physics held even when the statistics broke down</div>
-              </div>
-              <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===6?"Close":"See proof"}</span>
-            </div>
-            {findOpen===6 && (
-              <div style={{animation:"wup .2s ease both"}}>
-                <div style={{marginBottom:12}}>
-                  {[
-                    {name:"F_gain_mean",val:100,phase:"All phases"},
-                    {name:"tau_std",val:72,phase:"Drift + Regime"},
-                    {name:"g_mean",val:58,phase:"Stable + Drift"},
-                    {name:"H_net",val:41,phase:"Regime only"},
-                    {name:"V_weak",val:33,phase:"Attack only"},
-                  ].map(function(f){return (
-                    <div key={f.name} style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
-                      <div style={{fontFamily:F.m,fontSize:9,color:$.tx2,width:90,textAlign:"right"}}>{f.name}</div>
-                      <div style={{flex:1,height:6,background:"rgba(255,255,255,.04)",borderRadius:3,overflow:"hidden"}}>
-                        <div style={{width:f.val+"%",height:"100%",background:f.name==="F_gain_mean"?$.glow:$.dim,opacity:f.name==="F_gain_mean"?0.6:0.25,borderRadius:3}}/>
-                      </div>
-                      <div style={{fontFamily:F.m,fontSize:8,color:$.dim,width:80}}>{f.phase}</div>
-                    </div>
-                  );})}
-                </div>
-                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>SHAP analysis across every drift phase, every attack, every regime shift. The physics formula F_gain = τ·g was the most important feature in every single condition. When the statistics broke down, the physics still held. The model learned real electrical behaviour, not statistical artifacts</div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div style={{marginTop:28,background:"rgba(248,113,113,.04)",border:"1px solid rgba(248,113,113,.16)",borderRadius:12,padding:"20px 22px"}}>
-          <div style={{fontFamily:F.m,fontSize:9,color:$.rd,letterSpacing:".06em",marginBottom:10}}>THE BOTTOM LINE</div>
-          <p style={{fontSize:14,color:$.tx,lineHeight:1.85,fontFamily:serif}}>A model that scores <strong style={{color:$.glow}}>0.9999</strong> in the lab can still fail silently in the field. The only difference between knowing and not knowing is whether you built the monitoring to detect it</p>
-        </div>
-      </div>
-    </div>
-  );
 }
-
-
 
 
 /* ═══ HERO SECTION ═══ */
@@ -1611,79 +1370,85 @@ function StressTestWidget() {
 const INCIDENTS = [
   {
     id: "drift",
-    label: "DISTRIBUTION DRIFT",
+    label: "SLOW CHANGE",
     batch: 55,
     color: $.ac,
     briefing: {
-      title: "The world is changing",
-      body: "Consumers on this grid are slowly changing how they respond to electricity prices. They are reacting more slowly than they used to. The model was trained on the old behaviour. It does not know the world has moved.",
-      teaches: "This is called concept drift. The data the model sees today no longer matches what it learned from."
+      title: "The world is changing but the AI does not know",
+      body: "Think of a weather forecast built on last year's climate. The seasons are shifting, but the forecast still uses old patterns. It keeps predicting, and it still gets some things right, but it is slowly becoming less reliable. It does not know this is happening. That is what is about to happen to this grid's AI.",
+      teaches: "This is called 'drift.' The AI was trained on old data. The real world has moved on. The AI has not."
     },
     taskCorruption: { sensorDriftSpeed: 2.5, noiseChance: 0.4, calFail: 0.35 },
     alerts: [
-      { t: 2000, msg: "Incoming readings diverging from expected patterns", plain: "The sensor readings look different from what the model expects" },
-      { t: 4000, msg: "Data shift index crossing alert threshold", plain: "The data has changed enough to trigger a warning" },
-      { t: 6500, msg: "Model confidence drifting away from actual accuracy", plain: "The model still gets most answers right, but its confidence scores are becoming meaningless" },
+      { t: 2000, msg: "Incoming readings diverging from expected patterns", plain: "The numbers coming in are starting to look different from what the AI learned from" },
+      { t: 4000, msg: "Data shift index crossing alert threshold", plain: "The difference between old data and new data is now big enough to trigger a warning" },
+      { t: 6500, msg: "Model confidence drifting from actual accuracy", plain: "Here is the dangerous part: the AI still says it is 90% sure, but it is actually getting more things wrong. Its confidence no longer matches reality" },
     ],
     metrics: { auc: [0.98, 0.96, 0.94, 0.927], psi: [0.08, 0.15, 0.28, 0.35], cov: [0.96, 0.93, 0.90, 0.886] },
     options: [
-      { label: "Trigger Recalibration", desc: "Reset the model so its confidence scores match reality again", why: "Recalibration fixes the gap between what the model says and what is true. The model's predictions stay the same but its confidence becomes honest again.",
-        outcome: "good", consequence: "Calibration error stabilises. Coverage recovers toward 94%. The model remains operationally trustworthy through the drift phase." },
-      { label: "Hold and Continue Monitoring", desc: "No intervention yet. Keep watching the numbers.", why: "This feels safe but the window to fix the problem is closing. Every new batch of changed data makes the correction harder.",
-        outcome: "bad", consequence: "The gap between what the model says and what is true triples over the next 10 batches. The window to fix it closes. Emergency action will be needed to recover." },
+      { label: "Reset the AI's confidence", desc: "Tell the AI to recalculate how sure it should be, using the new data it is actually seeing right now",
+        why: "The AI's predictions are still okay. The problem is that it thinks it is more certain than it actually is. Resetting its confidence makes it honest again. It will say '70% sure' instead of '90% sure,' and that 70% will be real.",
+        outcome: "good", consequence: "The AI becomes honest about what it knows and what it does not. Its safety guarantees start working again. Operators can trust the numbers on screen." },
+      { label: "Do nothing and keep watching", desc: "No action. Wait and gather more data before intervening",
+        why: "Acting too early risks disrupting a system that might stabilise on its own. If this is just normal variation, intervention wastes resources and creates unnecessary downtime. Waiting gives you more data to confirm whether the change is real before committing to action.",
+        outcome: "bad", consequence: "Wrong call. But because A.G.N.E.S. caught the drift early, the damage is contained. The AI's confidence is unreliable, but the system flags every prediction it is not sure about. Operators know which readings to double check. Without A.G.N.E.S., this would have gone unnoticed until something broke." },
     ],
-    lesson: "The model kept saying it was 90% confident. But it was getting things wrong more and more often. Accuracy dropped a little. Confidence became a lie. That is the dangerous part: a model that looks sure of itself while quietly falling apart."
+    lesson: "The AI kept saying 'I am 90% sure this grid is safe.' But it was wrong more and more often. The accuracy dropped a little. The confidence became a lie. That is the most dangerous kind of failure: a system that looks certain while quietly falling apart."
   },
   {
     id: "adversarial",
-    label: "ADVERSARIAL ATTACK",
+    label: "FAKE DATA ATTACK",
     batch: 65,
     color: $.rd,
     briefing: {
-      title: "Someone is lying to the sensors",
-      body: "Mathematically crafted fake readings are being fed into the sensor stream. They are small enough to look plausible but designed to flip the model's predictions from 'stable' to 'unstable' or the other way around.",
-      teaches: "This is called an adversarial attack. Different model architectures are vulnerable in completely different ways."
+      title: "Someone is feeding the AI fake data",
+      body: "Imagine a security camera system. Someone has figured out how to hold up a carefully crafted picture in front of the camera. The camera thinks it is seeing reality, but it is seeing a fake. That is what is happening here. Tiny, carefully designed changes in the sensor readings are tricking the AI into giving wrong answers.",
+      teaches: "This is called an 'adversarial attack.' The key discovery: different types of AI are vulnerable in completely different ways. One type can be tricked easily. Another is almost immune."
     },
     taskCorruption: { sensorDriftSpeed: 1.5, noiseChance: 0.6, calFail: 0.5 },
     alerts: [
-      { t: 2000, msg: "Suspicious pattern detected in generator sensor feed", plain: "The sensor readings at the generator have a suspicious mathematical pattern" },
-      { t: 4000, msg: "Primary model flip rate rising above 6%", plain: "The smooth boundary model is being fooled. One in sixteen predictions just flipped." },
-      { t: 6000, msg: "Deliberate sensor manipulation confirmed across all channels", plain: "This is not sensor noise. Someone is deliberately corrupting the inputs." },
+      { t: 2000, msg: "Suspicious pattern detected in generator feed", plain: "The readings from the generator look strange. They seem normal at first glance, but there is a hidden mathematical pattern that should not be there" },
+      { t: 4000, msg: "Primary model flip rate rising above 6%", plain: "The main AI is starting to change its answers. Predictions that used to say 'safe' are now flipping to 'unsafe' for no real reason" },
+      { t: 6000, msg: "Deliberate manipulation confirmed", plain: "This is not a glitch. Someone is deliberately feeding fake data into the system to make the AI give wrong answers" },
     ],
     metrics: { auc: [0.97, 0.94, 0.92, 0.916], psi: [0.12, 0.28, 0.45, 0.57], cov: [0.94, 0.91, 0.88, 0.865] },
     options: [
-      { label: "Switch to Random Forest", desc: "Route all predictions through the tree based model only", why: "The Random Forest makes decisions using simple yes or no rules at each step. The attack works by finding a smooth slope to push predictions along. There is no smooth slope in a tree. Nothing to push.",
-        outcome: "good", consequence: "Flip rate drops to 0.05%. The Random Forest makes decisions using simple yes or no splits, not smooth curves. There is nothing for the attack to exploit. Grid confidence fully restored." },
-      { label: "Trigger Recalibration", desc: "Recalibrate the primary model against recent data", why: "Recalibration fixes the model's confidence, not its vulnerability. The attack is fooling the model's actual decisions, not just its confidence scores. Recalibrating does not help.",
-        outcome: "bad", consequence: "The attack continues. The primary model's flip rate reaches 32.4%. One in three predictions is now corrupted. Grid assessments are unreliable." },
+      { label: "Switch to the backup AI", desc: "Stop using the main AI and switch to a different type called Random Forest that works in a completely different way",
+        why: "The attack works by finding a smooth surface in the AI's logic and pushing predictions along it, like sliding a ball down a hill. The backup AI does not have a smooth surface. It makes decisions using simple yes/no questions, like a flowchart. There is no hill to push the ball down. The attack simply does not work on it.",
+        outcome: "good", consequence: "The backup AI is immune to this type of attack. The fake data has no effect. The attack fails completely and the grid goes back to normal." },
+      { label: "Reset the AI's confidence", desc: "Recalibrate the main AI so it adapts to the new data pattern",
+        why: "If the data has genuinely changed, the AI needs to learn the new pattern. Recalibration teaches the AI what normal looks like now, so it can give accurate answers based on current reality instead of outdated training data.",
+        outcome: "bad", consequence: "Wrong call. The attack continues and predictions are unreliable. But A.G.N.E.S. detected the attack pattern and is flagging every suspicious prediction. Operators can see which answers are likely corrupted instead of trusting them blindly. Without A.G.N.E.S., nobody would even know an attack was happening." },
     ],
-    lesson: "Two models looked at the same attack. One was fooled a third of the time. The other held at near zero. Same data, same attack, completely different resilience. The model you choose is not just a performance decision. It is a security decision."
+    lesson: "Two different AIs looked at the exact same attack. One was tricked a third of the time. The other was tricked 0.04% of the time, basically never. Same attack, completely different result. The type of AI you choose is not just about accuracy. It is about security."
   },
   {
     id: "collapse",
-    label: "REGIME COLLAPSE",
+    label: "TOTAL SYSTEM CHANGE",
     batch: 85,
     color: $.rd,
     briefing: {
-      title: "The grid just changed completely",
-      body: "A major generator has tripped offline. How consumers respond to prices has shifted overnight. The grid is now operating in a way that is completely different from anything the model was trained on. The world it learned no longer exists.",
-      teaches: "This is called regime change. Unlike gradual drift, this is sudden and severe. The model's guarantees expire immediately."
+      title: "Everything the AI learned is now wrong",
+      body: "A major power source just went offline. The way people use electricity has changed overnight. Think of a GPS that was trained on city roads suddenly being used in the countryside. Every rule it learned, every pattern it memorised, no longer applies. The AI is still giving answers, but those answers are based on a world that no longer exists.",
+      teaches: "This is called 'regime change.' Unlike slow drift, this is sudden. The AI's safety guarantees expire immediately because the data is completely outside what it was trained on."
     },
     taskCorruption: { sensorDriftSpeed: 4, noiseChance: 0.7, calFail: 0.65 },
     alerts: [
-      { t: 1500, msg: "First early warning detector triggered", plain: "The earliest warning system just fired. Something fundamental has shifted." },
-      { t: 3000, msg: "Second warning detector confirms sustained shift", plain: "The second detector confirms: this is not noise. The shift is real and sustained." },
-      { t: 5000, msg: "All sensor readings now outside the model's training range", plain: "Every single input the model is seeing has moved outside what it was trained on." },
-      { t: 6500, msg: "Safety coverage at 83%. One in six predictions unprotected", plain: "The model can no longer guarantee that its safety bounds are reliable." },
+      { t: 1500, msg: "Page Hinkley detector triggered", plain: "The earliest warning system just fired. Something fundamental about the grid has changed" },
+      { t: 3000, msg: "CUSUM threshold breached", plain: "A second, independent warning system confirms it. This is not a false alarm. The change is real and getting worse" },
+      { t: 5000, msg: "All readings outside training range", plain: "Every single number the AI is seeing right now is outside anything it was trained on. It has never seen data like this before" },
+      { t: 6500, msg: "Safety coverage at 83%", plain: "The AI can no longer guarantee that its safety checks are reliable. One in six predictions has no safety net at all" },
     ],
     metrics: { auc: [0.95, 0.91, 0.88, 0.877], psi: [0.25, 0.68, 1.2, 1.65], cov: [0.91, 0.86, 0.84, 0.83] },
     options: [
-      { label: "Escalate to Human Operator", desc: "Transfer decision authority to human oversight. Shed load at vulnerable nodes.", why: "When the model's guarantees expire, the correct response is to admit uncertainty and involve humans. Load reduction creates a stability margin while the situation is assessed.",
-        outcome: "good", consequence: "Human oversight takes control during model uncertainty. Load reduction creates a stability margin. The grid holds. No cascade." },
-      { label: "Continue Automated Monitoring", desc: "Keep the model running. Observe further before committing.", why: "The model is still producing predictions. But those predictions have no valid uncertainty bounds. You are flying blind.",
-        outcome: "bad", consequence: "The situation worsens rapidly. Grid health drops beyond the point of recovery. Emergency shutdown becomes unavoidable." },
+      { label: "Call a human operator", desc: "Hand control to a real person. Reduce power load on the weakest parts of the grid to create a safety margin",
+        why: "When the AI has never seen anything like the current situation, its predictions are guesses. A human operator can use judgment, experience, and common sense that the AI does not have. Reducing load on weak points buys time to figure out what happened.",
+        outcome: "good", consequence: "A human takes over while the AI is out of its depth. The power reduction creates a safety cushion. The grid stays running. No blackout." },
+      { label: "Keep the AI running", desc: "The AI has more data and faster reactions than any human. Let it handle the situation",
+        why: "The AI processes thousands of readings per second. A human operator works on instinct and experience, which is slower and less consistent. The AI may be operating outside its training data, but it still has more information than a person looking at a dashboard. Keeping it running preserves response speed.",
+        outcome: "bad", consequence: "Wrong call. The AI's predictions are meaningless in this new regime. But A.G.N.E.S. has already triggered all three warning systems and is showing exactly how far outside normal the grid has moved. The situation is serious, but visible. Without A.G.N.E.S., this would have looked like normal operation right up until the blackout." },
     ],
-    lesson: "Three different warning systems spotted trouble at three different times. The earliest caught it 71 steps before the worst damage hit. The warnings were there. Everything depends on whether someone listens and acts."
+    lesson: "Three different warning systems spotted trouble at three different times. The earliest caught it 71 steps before the worst damage. The warnings were there the whole time. Everything came down to whether someone was listening and whether someone acted."
   },
 ];
 
@@ -1720,7 +1485,7 @@ function SensorCalibration({ corruption, onComplete, onFail }) {
   return (
     <div style={{ background: "rgba(255,255,255,.03)", border: `1px solid ${$.brd}`, borderRadius: 12, padding: "16px 20px", cursor: done ? "default" : "pointer" }} onClick={handleClick}>
       <div style={{ fontFamily: F.m, fontSize: 8, color: $.tx3, letterSpacing: 2, marginBottom: 8 }}>SENSOR CALIBRATION</div>
-      <div style={{ fontSize: 11, color: $.tx2, marginBottom: 12, lineHeight: 1.6 }}>Tap when the needle is in the green zone</div>
+      <div style={{ fontSize: 11, color: $.tx2, marginBottom: 12, lineHeight: 1.6 }}>The needle is drifting. Tap when it hits the green zone</div>
       <div style={{ position: "relative", height: 32, background: "rgba(255,255,255,.03)", borderRadius: 6, overflow: "hidden" }}>
         <div style={{ position: "absolute", left: "35%", width: "30%", height: "100%", background: "rgba(52,211,153,.1)", borderLeft: `1px solid ${$.gn}33`, borderRight: `1px solid ${$.gn}33` }} />
         <div style={{ position: "absolute", left: `${pos}%`, top: "50%", transform: "translate(-50%,-50%)", width: 12, height: 24, background: col, borderRadius: 3, transition: "left 0.08s linear, background 0.2s", boxShadow: `0 0 8px ${col}44` }} />
@@ -1759,7 +1524,7 @@ function SignalFilter({ corruption, onComplete, onFail }) {
   return (
     <div style={{ background: "rgba(255,255,255,.03)", border: `1px solid ${$.brd}`, borderRadius: 12, padding: "16px 20px" }}>
       <div style={{ fontFamily: F.m, fontSize: 8, color: $.tx3, letterSpacing: 2, marginBottom: 8 }}>SIGNAL FILTER</div>
-      <div style={{ fontSize: 11, color: $.tx2, marginBottom: 12, lineHeight: 1.6 }}>Tap readings that look corrupted, then submit</div>
+      <div style={{ fontSize: 11, color: $.tx2, marginBottom: 12, lineHeight: 1.6 }}>Some numbers are glitching. Tap the ones that look wrong, then submit</div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 12 }}>
         {signals.map(s => (
           <button key={s.id} onClick={() => handleTap(s.id)} disabled={done}
@@ -1797,7 +1562,7 @@ function ConfidenceCheck({ corruption, onComplete, onFail }) {
   return (
     <div style={{ background: "rgba(255,255,255,.03)", border: `1px solid ${$.brd}`, borderRadius: 12, padding: "16px 20px" }}>
       <div style={{ fontFamily: F.m, fontSize: 8, color: $.tx3, letterSpacing: 2, marginBottom: 8 }}>CONFIDENCE CHECK</div>
-      <div style={{ fontSize: 11, color: $.tx2, marginBottom: 12, lineHeight: 1.6 }}>The model says it is {prediction.confidence}% sure. Should you trust it?</div>
+      <div style={{ fontSize: 11, color: $.tx2, marginBottom: 12, lineHeight: 1.6 }}>The AI says it is {prediction.confidence}% sure about this one. Is it right, or is it bluffing?</div>
       <div style={{ textAlign: "center", marginBottom: 14 }}>
         <div style={{ fontFamily: F.m, fontSize: 22, fontWeight: 700, color: prediction.label === "STABLE" ? $.gn : $.rd }}>{prediction.label}</div>
         <div style={{ fontFamily: F.m, fontSize: 12, color: $.tx3 }}>{prediction.confidence}% confident</div>
@@ -1810,7 +1575,7 @@ function ConfidenceCheck({ corruption, onComplete, onFail }) {
       ) : (
         <div style={{ textAlign: "center" }}>
           <div style={{ fontFamily: F.m, fontSize: 11, color: correct ? $.gn : $.rd, marginBottom: 4 }}>{correct ? "Good call." : "Wrong call."}</div>
-          <div style={{ fontSize: 10, color: $.tx3, lineHeight: 1.6 }}>{prediction.isWrong ? "The model was overconfident. High confidence did not mean correct." : "The model was right this time. Its confidence matched reality."}</div>
+          <div style={{ fontSize: 10, color: $.tx3, lineHeight: 1.6 }}>{prediction.isWrong ? "The AI was bluffing. It sounded sure, but it was wrong. High confidence does not always mean correct." : "The AI was telling the truth this time. Its confidence matched what actually happened."}</div>
         </div>
       )}
     </div>
@@ -1850,12 +1615,15 @@ function Grid({ stress }) {
 }
 
 /* ═══ METRICS BAR ═══ */
-function MetricChip({ label, value, color, explain }) {
+function MetricChip({ label, abbr, value, color, explain }) {
   return (
     <div style={{ background: "rgba(255,255,255,.03)", border: `1px solid ${color}22`, borderRadius: 8, padding: "8px 14px", flex: 1, minWidth: 80 }}>
-      <div style={{ fontFamily: F.m, fontSize: 7, color: $.tx3, letterSpacing: 1, marginBottom: 4 }}>{label}</div>
-      <div style={{ fontFamily: F.m, fontSize: 18, fontWeight: 700, color, transition: "color 0.3s" }}>{value}</div>
-      <div style={{ fontSize: 8, color: $.tx3, marginTop: 2, lineHeight: 1.4 }}>{explain}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+        <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, letterSpacing: 1 }}>{label}</div>
+        <div style={{ fontFamily: F.m, fontSize: 6, color: $.dim, opacity: 0.5 }}>{abbr}</div>
+      </div>
+      <div style={{ fontSize: 13, fontWeight: 600, color, transition: "color 0.3s", marginBottom: 3, lineHeight: 1.3 }}>{explain}</div>
+      <div style={{ fontFamily: F.m, fontSize: 10, color: $.dim }}>{value}</div>
     </div>
   );
 }
@@ -1872,13 +1640,15 @@ function OpsCenter(props) {
   const [metricStep, setMetricStep] = useState(0);
   const [stress, setStress] = useState([0,0,0,0]);
   const [chosen, setChosen] = useState(null);
-  const [showWhy, setShowWhy] = useState(null);
   const [decisions, setDecisions] = useState([]);
   const [taskBarPct, setTaskBarPct] = useState(0);
   const [countdown, setCountdown] = useState(null);
+  const [gridHealth, setGridHealth] = useState(100);
+  const [optionOrder, setOptionOrder] = useState([0, 1]);
   const timers = useRef([]);
   const alertRef = useRef(null);
   const countdownRef = useRef(null);
+  const tasksDoneRef = useRef(0);
 
   const incident = INCIDENTS[incidentIdx];
 
@@ -1893,14 +1663,16 @@ function OpsCenter(props) {
   }, []);
 
   const onTaskComplete = useCallback(() => {
-    setTasksDone(prev => prev + 1);
+    setTasksDone(prev => { tasksDoneRef.current = prev + 1; return prev + 1; });
     setTaskBarPct(prev => Math.min(100, prev + 8));
+    setGridHealth(prev => Math.min(100, prev + 2));
     setTimeout(() => spawnTask(), 600);
   }, [spawnTask]);
 
   const onTaskFail = useCallback(() => {
     setTasksFailed(prev => prev + 1);
     setTaskBarPct(prev => Math.max(0, prev - 3));
+    setGridHealth(prev => Math.max(10, prev - 4));
   }, []);
 
   const startTasks = () => {
@@ -1909,32 +1681,35 @@ function OpsCenter(props) {
     setMetricStep(0);
     setStress([0,0,0,0]);
     setChosen(null);
-    setShowWhy(null);
     setCountdown(null);
     setTasksDone(0);
     setTasksFailed(0);
     setTaskTotal(0);
+    tasksDoneRef.current = 0;
+    setOptionOrder(Math.random() > 0.5 ? [1, 0] : [0, 1]);
     spawnTask();
 
     const inc = incident;
     const t = [];
 
-    // Schedule alerts and metric degradation
+    // Schedule alerts and metric degradation — health drops with each alert
     inc.alerts.forEach((a, i) => {
       t.push(setTimeout(() => {
         setAlerts(prev => [...prev, a]);
         setMetricStep(i + 1);
         const stressPatterns = [[0,0,0,0],[1,0,0,0],[1,1,0,1],[2,1,1,1]];
         setStress(stressPatterns[Math.min(i + 1, 3)]);
+        setGridHealth(prev => Math.max(10, prev - 2));
       }, a.t));
     });
 
-    // Trigger crisis
+    // Trigger crisis — flat 30 seconds
     t.push(setTimeout(() => {
       setPhase("crisis");
       setMetricStep(3);
       setStress(inc.id === "collapse" ? [2,2,1,1] : [2,1,1,0]);
-      setCountdown(25);
+      setGridHealth(prev => Math.max(10, prev - 3));
+      setCountdown(30);
     }, inc.alerts[inc.alerts.length - 1].t + 2000));
 
     timers.current = t;
@@ -1944,23 +1719,31 @@ function OpsCenter(props) {
   useEffect(() => {
     if (phase !== "crisis" || chosen !== null || countdown === null) return;
     if (countdown <= 0) {
-      // Auto pick wrong answer
-      handleDecision(1);
+      // Time's up — pick the wrong answer (real index 1 is always bad)
+      const badDisplayIdx = optionOrder.indexOf(1);
+      handleDecision(badDisplayIdx);
       return;
     }
     countdownRef.current = setTimeout(() => setCountdown(prev => prev - 1), 1000);
     return () => clearTimeout(countdownRef.current);
   }, [countdown, phase, chosen]);
 
-  const handleDecision = (i) => {
+  const handleDecision = (displayIdx) => {
     if (chosen !== null) return;
     clr();
-    setChosen(i);
-    const opt = incident.options[i];
+    const realIdx = optionOrder[displayIdx];
+    setChosen(realIdx);
+    const opt = incident.options[realIdx];
     setDecisions(prev => [...prev, { label: opt.label, outcome: opt.outcome, consequence: opt.consequence, batch: incident.batch, incident: incident.label }]);
-    setStress(opt.outcome === "good" ? [0,0,0,0] : [2,2,2,2]);
-    if (opt.outcome === "good") setTaskBarPct(prev => Math.min(100, prev + 15));
-    else setTaskBarPct(prev => Math.max(0, prev - 20));
+    if (opt.outcome === "good") {
+      setStress([0,0,0,0]);
+      setTaskBarPct(prev => Math.min(100, prev + 15));
+      setGridHealth(prev => Math.min(100, prev + 8));
+    } else {
+      setStress([2,1,1,0]);
+      setTaskBarPct(prev => Math.max(0, prev - 10));
+      setGridHealth(prev => Math.max(30, prev - 10));
+    }
   };
 
   const advance = () => {
@@ -1981,6 +1764,8 @@ function OpsCenter(props) {
     setTasksDone(0);
     setTasksFailed(0);
     setTaskTotal(0);
+    setGridHealth(100);
+    tasksDoneRef.current = 0;
   };
 
   const ms = incident.metrics;
@@ -1995,24 +1780,25 @@ function OpsCenter(props) {
         <div style={{ width: 200, opacity: 0.15, marginBottom: 32 }}><Grid stress={[0,0,0,0]} /></div>
         <div style={{ fontFamily: F.m, fontSize: 9, color: $.glow, letterSpacing: 5, marginBottom: 20 }}>OPERATIONS CENTRE</div>
         <h1 style={{ fontSize: "clamp(22px, 5vw, 34px)", fontWeight: 600, color: $.tx, textAlign: "center", lineHeight: 1.5, marginBottom: 12, maxWidth: 480 }}>
-          You are the grid operator.<br />Three incidents are coming.
+          You are the grid operator.<br />Three things are about to go wrong.
         </h1>
         <p style={{ fontSize: 13, color: $.tx3, textAlign: "center", lineHeight: 1.8, maxWidth: 440, marginBottom: 8 }}>
-          Between incidents, you will monitor the grid by performing small tasks: calibrating sensors, filtering corrupt signals, checking model confidence. These tasks are what keeps the system running.
+          Before each incident, you will get a briefing explaining what is about to happen. Between incidents, you will do small monitoring tasks that keep the grid healthy. When the crisis hits, you will get two options with full explanations of what each one does.
         </p>
         <p style={{ fontSize: 11, color: $.dim, textAlign: "center", lineHeight: 1.7, maxWidth: 400, marginBottom: 32 }}>
-          When something goes wrong, the tasks will tell you before the alerts do. Pay attention to what feels different.
+          You have 30 seconds to decide each time. There is no trick. The reasoning is right there on the screen. Read it and choose.
         </p>
 
         {/* Legend */}
         <div style={{ display: "flex", gap: 12, marginBottom: 32, flexWrap: "wrap", justifyContent: "center" }}>
           {[
-            { label: "AUC", explain: "How often the model is right" },
-            { label: "PSI", explain: "How much the data has changed" },
-            { label: "COV", explain: "Whether safety bounds still hold" },
+            { label: "ACCURACY", sub: "AUC", explain: "How often the model is right" },
+            { label: "DATA SHIFT", sub: "PSI", explain: "How much the incoming data has changed" },
+            { label: "SAFETY", sub: "COV", explain: "Whether predictions have safety bounds" },
           ].map(m => (
             <div key={m.label} style={{ background: "rgba(255,255,255,.03)", borderRadius: 8, padding: "8px 14px", textAlign: "center" }}>
               <div style={{ fontFamily: F.m, fontSize: 10, color: $.glow, fontWeight: 700 }}>{m.label}</div>
+              <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, marginTop: 1 }}>{m.sub}</div>
               <div style={{ fontSize: 9, color: $.tx3, marginTop: 2 }}>{m.explain}</div>
             </div>
           ))}
@@ -2031,11 +1817,24 @@ function OpsCenter(props) {
         <div style={{ fontFamily: F.m, fontSize: 9, color: incident.color, letterSpacing: 4, marginBottom: 8 }}>INCIDENT {incidentIdx + 1} OF 3</div>
         <div style={{ fontFamily: F.m, fontSize: 10, color: incident.color, letterSpacing: 2, marginBottom: 24, opacity: 0.6 }}>BATCH {incident.batch}</div>
         <h2 style={{ fontSize: "clamp(20px, 4vw, 30px)", fontWeight: 600, color: $.tx, textAlign: "center", lineHeight: 1.5, marginBottom: 16, maxWidth: 480 }}>{incident.briefing.title}</h2>
-        <p style={{ fontSize: 14, color: $.tx2, textAlign: "center", lineHeight: 1.8, maxWidth: 440, marginBottom: 16 }}>{incident.briefing.body}</p>
-        <div style={{ background: `${incident.color}08`, border: `1px solid ${incident.color}22`, borderRadius: 10, padding: "14px 20px", maxWidth: 440, marginBottom: 32 }}>
-          <div style={{ fontSize: 12, color: incident.color, lineHeight: 1.7, textAlign: "center" }}>{incident.briefing.teaches}</div>
+        <p style={{ fontSize: 14, color: $.tx2, textAlign: "center", lineHeight: 1.8, maxWidth: 440, marginBottom: 20 }}>{incident.briefing.body}</p>
+        <div style={{ background: `${incident.color}08`, border: `1px solid ${incident.color}22`, borderRadius: 10, padding: "16px 20px", maxWidth: 440, marginBottom: 16 }}>
+          <div style={{ fontFamily: F.m, fontSize: 8, color: incident.color, letterSpacing: 1, marginBottom: 6 }}>WHAT THIS TEACHES YOU</div>
+          <div style={{ fontSize: 13, color: $.tx2, lineHeight: 1.7, textAlign: "center" }}>{incident.briefing.teaches}</div>
         </div>
-        <p style={{ fontSize: 11, color: $.tx2, textAlign: "center", marginBottom: 24 }}>Complete your monitoring tasks. When the crisis hits, you will have to decide.</p>
+        <div style={{ background: "rgba(255,255,255,.03)", borderRadius: 8, padding: "10px 16px", maxWidth: 440, marginBottom: 28 }}>
+          <div style={{ fontFamily: F.m, fontSize: 8, color: $.dim, letterSpacing: 1, marginBottom: 4 }}>WHAT TO WATCH FOR</div>
+          <div style={{ fontSize: 11, color: $.tx3, lineHeight: 1.6, textAlign: "center" }}>
+            {incident.id === "drift" && "Watch the Accuracy number at the top. It will start high. The scary part: the Data Shift number will rise first, before Accuracy falls. The AI is getting worse but does not realise it yet."}
+            {incident.id === "adversarial" && "Watch the Data Shift number jump suddenly. The AI is being tricked with fake data, but only one of the two options can actually stop it. The explanations on each option will tell you which one and why."}
+            {incident.id === "collapse" && "Watch the Safety number. When it drops below 95%, the AI can no longer promise its answers are reliable. That is when a human needs to take over."}
+          </div>
+        </div>
+        <div style={{ fontSize: 11, color: $.tx3, textAlign: "center", marginBottom: 20 }}>
+          Grid health: <span style={{ fontFamily: F.m, fontWeight: 700, color: gridHealth > 75 ? $.gn : gridHealth > 50 ? $.ac : $.rd }}>{gridHealth}</span>
+          <span style={{ color: $.dim }}> | </span>
+          Complete tasks to earn more decision time
+        </div>
         <button onClick={startTasks} style={{ background: incident.color, color: $.bg, border: "none", borderRadius: 10, padding: "14px 44px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Start Monitoring</button>
       </div>
     );
@@ -2047,13 +1846,13 @@ function OpsCenter(props) {
 
     const withoutTimeline = [
       { batch: INCIDENTS[0].batch, event: INCIDENTS[0].label,
-        result: "No warning. Calibration error tripled silently. The model kept saying 90% confident while getting worse. Operator trusted the number. It was wrong",
+        result: "No warning system was watching. The AI kept saying it was confident while slowly getting things wrong. Nobody knew until it was too late to fix easily",
         health: 72 },
       { batch: INCIDENTS[1].batch, event: INCIDENTS[1].label,
-        result: "Adversarial perturbation undetected. No architecture comparison available. SVM stayed online with 32.4% flip rate. One in three grid assessments based on corrupted predictions",
+        result: "Fake data was fed into the system. Without monitoring, nobody noticed. The AI gave wrong answers a third of the time. Every grid decision based on those answers was unreliable",
         health: 48 },
       { batch: INCIDENTS[2].batch, event: INCIDENTS[2].label,
-        result: "All three detectors would have fired. None were deployed. Regime change invisible until grid health collapsed. Emergency shutdown unavoidable",
+        result: "The grid changed completely. The AI kept running on rules from a world that no longer existed. No warning. No human called. The grid failed",
         health: 23 },
     ];
 
@@ -2062,12 +1861,12 @@ function OpsCenter(props) {
       event: d.incident,
       action: d.label,
       result: d.consequence,
-      health: d.outcome === "good" ? 95 - i * 3 : 72 - i * 18,
+      health: Math.max(10, Math.round(gridHealth + (2 - i) * (d.outcome === "good" ? 3 : -5))),
       good: d.outcome === "good",
     }));
 
     const finalWithout = 23;
-    const finalWith = withTimeline.length > 0 ? withTimeline[withTimeline.length - 1].health : 95;
+    const finalWith = gridHealth;
     const gap = finalWith - finalWithout;
 
     return (
@@ -2083,7 +1882,7 @@ function OpsCenter(props) {
             <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.7 }}>
               The only difference is whether A.G.N.E.S. was watching
             </p>
-            <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 20 }}>
+            <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 20, marginBottom: 16 }}>
               <div>
                 <div style={{ fontFamily: F.m, fontSize: 36, fontWeight: 700, color: correct === 3 ? $.gn : correct >= 2 ? $.ac : $.rd }}>{correct}/3</div>
                 <div style={{ fontSize: 10, color: $.tx3 }}>correct decisions</div>
@@ -2091,6 +1890,17 @@ function OpsCenter(props) {
               <div>
                 <div style={{ fontFamily: F.m, fontSize: 36, fontWeight: 700, color: $.glow }}>{tasksDone}</div>
                 <div style={{ fontSize: 10, color: $.tx3 }}>tasks completed</div>
+              </div>
+              <div>
+                <div style={{ fontFamily: F.m, fontSize: 36, fontWeight: 700, color: gridHealth > 75 ? $.gn : gridHealth > 50 ? $.ac : $.rd }}>{gridHealth}</div>
+                <div style={{ fontSize: 10, color: $.tx3 }}>grid health</div>
+              </div>
+            </div>
+            {/* Operator rating */}
+            <div style={{ display: "inline-block", background: correct === 3 && tasksDone >= 6 ? `${$.gn}12` : correct >= 2 ? `${$.ac}12` : `${$.rd}12`, border: `1px solid ${correct === 3 && tasksDone >= 6 ? $.gn : correct >= 2 ? $.ac : $.rd}33`, borderRadius: 8, padding: "8px 20px" }}>
+              <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, letterSpacing: 1, marginBottom: 4 }}>OPERATOR RATING</div>
+              <div style={{ fontFamily: F.m, fontSize: 14, fontWeight: 700, color: correct === 3 && tasksDone >= 6 ? $.gn : correct >= 2 ? $.ac : $.ac }}>
+                {correct === 3 && tasksDone >= 6 ? "EXEMPLARY" : correct === 3 ? "EXCELLENT" : correct >= 2 ? "COMPETENT" : correct === 1 ? "LEARNING" : "ROUGH SHIFT"}
               </div>
             </div>
           </div>
@@ -2100,7 +1910,7 @@ function OpsCenter(props) {
 
             {/* WITHOUT */}
             <div style={{ background: "rgba(248,113,113,.03)", border: "1px solid rgba(248,113,113,.15)", borderRadius: 14, padding: "20px 18px" }}>
-              <div style={{ fontFamily: F.m, fontSize: 9, color: $.rd, letterSpacing: 2, marginBottom: 16, textAlign: "center" }}>WITHOUT A.G.N.E.S.</div>
+              <div style={{ fontFamily: F.m, fontSize: 9, color: $.rd, letterSpacing: 2, marginBottom: 16, textAlign: "center" }}>WITHOUT ANY MONITORING</div>
               {withoutTimeline.map((t, i) => (
                 <div key={i} style={{ marginBottom: 14, paddingBottom: 14, borderBottom: i < 2 ? "1px solid rgba(248,113,113,.08)" : "none" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
@@ -2114,7 +1924,7 @@ function OpsCenter(props) {
               <div style={{ textAlign: "center", marginTop: 8, padding: "12px", background: "rgba(248,113,113,.06)", borderRadius: 8 }}>
                 <div style={{ fontFamily: F.m, fontSize: 8, color: $.rd, letterSpacing: 1, marginBottom: 4 }}>FINAL GRID HEALTH</div>
                 <div style={{ fontFamily: F.m, fontSize: 32, fontWeight: 700, color: $.rd }}>{finalWithout}%</div>
-                <div style={{ fontSize: 10, color: $.rd, opacity: 0.6, marginTop: 2 }}>Unmonitored failure</div>
+                <div style={{ fontSize: 10, color: $.rd, opacity: 0.6, marginTop: 2 }}>No warnings. No visibility. No chance.</div>
               </div>
             </div>
 
@@ -2138,7 +1948,7 @@ function OpsCenter(props) {
                 <div style={{ fontFamily: F.m, fontSize: 8, color: correct >= 2 ? $.gn : $.ac, letterSpacing: 1, marginBottom: 4 }}>FINAL GRID HEALTH</div>
                 <div style={{ fontFamily: F.m, fontSize: 32, fontWeight: 700, color: correct >= 2 ? $.gn : $.ac }}>{finalWith}%</div>
                 <div style={{ fontSize: 10, color: correct >= 2 ? $.gn : $.ac, opacity: 0.6, marginTop: 2 }}>
-                  {correct === 3 ? "Every warning acted on" : correct >= 2 ? "Partial recovery" : correct === 1 ? "One warning heeded" : "Warnings ignored"}
+                  {correct === 3 ? "Every warning acted on" : correct >= 2 ? "Mostly right. Monitoring made the difference" : correct === 1 ? "One right call. A.G.N.E.S. caught the rest" : "Every call wrong. A.G.N.E.S. still prevented collapse"}
                 </div>
               </div>
             </div>
@@ -2150,17 +1960,20 @@ function OpsCenter(props) {
             <div style={{ fontFamily: F.m, fontSize: 48, fontWeight: 700, color: $.glow, lineHeight: 1 }}>+{gap}%</div>
             <div style={{ fontSize: 13, color: $.tx3, lineHeight: 1.7, maxWidth: 420, margin: "16px auto 0" }}>
               {correct === 3
-                ? "Every signal was read. Every call was correct. The grid survived because the operator had information, not luck"
+                ? "Every warning was read. Every decision was right. The grid survived because the operator had the right information at the right time"
                 : correct >= 2
-                  ? "Even with one wrong call, A.G.N.E.S. gave the operator enough information to keep the grid running. Without it, there was nothing to act on"
-                  : "A.G.N.E.S. provided the warnings. The difference is whether they are acted on. The system can detect failure. It cannot force the right decision"}
+                  ? "Even with one wrong call, having a monitoring system meant the operator could see what was happening and respond. Without it, there was nothing to act on at all"
+                  : "The monitoring system gave the warnings. The information was there on screen. The difference is always whether someone reads it and acts on it"}
             </div>
           </div>
 
           {/* Bottom line */}
           <div style={{ background: `${$.glow}08`, border: `1px solid ${$.glow}22`, borderRadius: 12, padding: "20px 22px", textAlign: "center", marginBottom: 32 }}>
-            <div style={{ fontSize: 14, color: $.tx, lineHeight: 1.8 }}>
-              The model failed in both timelines. The only difference is whether anyone knew it was happening.
+            <div style={{ fontSize: 15, color: $.tx, lineHeight: 1.8 }}>
+              The AI failed in both timelines. The only difference is whether anyone could see it happening.
+            </div>
+            <div style={{ fontSize: 12, color: $.tx3, lineHeight: 1.6, marginTop: 10 }}>
+              That is what this project is about. Not building a better AI. Building the system that tells you when to stop trusting it.
             </div>
           </div>
 
@@ -2191,8 +2004,24 @@ function OpsCenter(props) {
           <span style={{ fontFamily: F.m, fontSize: 10, color: isCrisis ? $.rd : $.glow, fontWeight: 700 }}>{isCrisis ? "ACTION REQUIRED" : "MONITORING"}</span>
           <span style={{ fontFamily: F.m, fontSize: 9, color: incident.color, opacity: 0.6 }}>{incident.label}</span>
         </div>
-        <div style={{ display: "flex", gap: 4 }}>
-          {INCIDENTS.map((_, i) => <div key={i} style={{ width: 24, height: 3, borderRadius: 2, background: i < incidentIdx ? $.gn : i === incidentIdx ? incident.color : $.brd }} />)}
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          {/* Grid Health */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontFamily: F.m, fontSize: 7, color: $.dim, letterSpacing: 1 }}>GRID</span>
+            <span style={{ fontFamily: F.m, fontSize: 16, fontWeight: 700, color: gridHealth > 75 ? $.gn : gridHealth > 50 ? $.ac : $.rd, transition: "color 0.3s" }}>{gridHealth}</span>
+            <div style={{ width: 40, height: 3, background: "rgba(255,255,255,.06)", borderRadius: 2, overflow: "hidden" }}>
+              <div style={{ width: gridHealth + "%", height: "100%", background: gridHealth > 75 ? $.gn : gridHealth > 50 ? $.ac : $.rd, borderRadius: 2, transition: "width 0.5s, background 0.3s" }} />
+            </div>
+          </div>
+          {/* Task score */}
+          <div style={{ fontFamily: F.m, fontSize: 9, color: $.dim }}>
+            <span style={{ color: $.gn }}>{tasksDone}</span>
+            {tasksFailed > 0 && <span style={{ color: $.rd, marginLeft: 4 }}>/{tasksFailed}</span>}
+          </div>
+          {/* Progress pips */}
+          <div style={{ display: "flex", gap: 4 }}>
+            {INCIDENTS.map((_, i) => <div key={i} style={{ width: 24, height: 3, borderRadius: 2, background: i < incidentIdx ? $.gn : i === incidentIdx ? incident.color : $.brd }} />)}
+          </div>
         </div>
       </div>
 
@@ -2204,11 +2033,24 @@ function OpsCenter(props) {
       {/* Main area */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "12px 20px", gap: 12, overflowY: "auto" }}>
 
+        {/* Situation bar */}
+        <div style={{ background: `${isCrisis ? $.rd : incident.color}08`, borderRadius: 8, padding: "8px 14px", border: `1px solid ${isCrisis ? $.rd : incident.color}22` }}>
+          <div style={{ fontSize: 12, color: isCrisis ? $.rd : $.tx2, lineHeight: 1.5 }}>
+            {!isCrisis && !isResolved && metricStep === 0 && "Everything looks good so far. While you wait, try the task on the right. It is the kind of work that keeps a grid running."}
+            {!isCrisis && !isResolved && metricStep === 1 && "The numbers are starting to shift. Something might be changing out there. Keep going with your tasks."}
+            {!isCrisis && !isResolved && metricStep === 2 && "This is getting worse. The model is starting to lose touch with what is actually happening on the grid."}
+            {!isCrisis && !isResolved && metricStep >= 3 && "Multiple warnings now. A decision is coming. Get ready."}
+            {isCrisis && !isResolved && "A.G.N.E.S. has spotted a problem. Read both options carefully. The explanation under each one will help you decide."}
+            {isResolved && opt && opt.outcome === "good" && "Nice work. That was the right call. The grid is recovering."}
+            {isResolved && opt && opt.outcome !== "good" && "That was not the right call. But A.G.N.E.S. caught the problem and limited the damage. Read below to see what happened."}
+          </div>
+        </div>
+
         {/* Metrics */}
         <div style={{ display: "flex", gap: 8 }}>
-          <MetricChip label="AUC" value={aucVal.toFixed(3)} color={aucVal > 0.95 ? $.gn : aucVal > 0.92 ? $.ac : $.rd} explain="Model accuracy" />
-          <MetricChip label="PSI" value={psiVal.toFixed(2)} color={psiVal < 0.1 ? $.gn : psiVal < 0.25 ? $.ac : $.rd} explain="Data shift" />
-          <MetricChip label="COV" value={`${(covVal * 100).toFixed(0)}%`} color={covVal > 0.95 ? $.gn : covVal > 0.90 ? $.ac : $.rd} explain="Safety bounds" />
+          <MetricChip label="ACCURACY" abbr="AUC" value={aucVal.toFixed(3)} color={aucVal > 0.95 ? $.gn : aucVal > 0.92 ? $.ac : $.rd} explain={aucVal > 0.95 ? "Getting it right" : aucVal > 0.92 ? "Starting to slip" : "Getting things wrong"} />
+          <MetricChip label="DATA SHIFT" abbr="PSI" value={psiVal.toFixed(2)} color={psiVal < 0.1 ? $.gn : psiVal < 0.25 ? $.ac : $.rd} explain={psiVal < 0.1 ? "Data looks normal" : psiVal < 0.25 ? "Data is changing" : "Data has changed a lot"} />
+          <MetricChip label="SAFETY" abbr="COV" value={`${(covVal * 100).toFixed(0)}%`} color={covVal > 0.95 ? $.gn : covVal > 0.90 ? $.ac : $.rd} explain={covVal > 0.95 ? "Safety checks holding" : covVal > 0.90 ? "Safety weakening" : "Safety checks failing"} />
         </div>
 
         {/* Grid + Task side by side */}
@@ -2218,18 +2060,27 @@ function OpsCenter(props) {
           </div>
           <div>
             {!isCrisis && !isResolved && (
-              <TaskComponent key={`${incidentIdx}-${taskTotal}`} corruption={incident.taskCorruption} onComplete={onTaskComplete} onFail={onTaskFail} />
+              <div>
+                <div style={{ fontSize: 10, color: $.dim, marginBottom: 6, lineHeight: 1.5 }}>
+                  {currentTask === 0 && "This sensor needle is wobbling. Tap the button when it drifts into the green zone to lock it in."}
+                  {currentTask === 1 && "Some of these numbers are glitching. They flicker and look wrong. Tap the ones that look broken, then hit submit."}
+                  {currentTask === 2 && "The AI just made a call. Look at how confident it says it is. Does that feel right to you, or is it bluffing?"}
+                </div>
+                <TaskComponent key={`${incidentIdx}-${taskTotal}`} corruption={incident.taskCorruption} onComplete={onTaskComplete} onFail={onTaskFail} />
+              </div>
             )}
             {isCrisis && !isResolved && countdown !== null && (
               <div style={{ background: `${$.rd}08`, border: `1px solid ${$.rd}33`, borderRadius: 12, padding: 20, textAlign: "center", animation: "pulseBorder 1.5s ease infinite" }}>
-                <div style={{ fontFamily: F.m, fontSize: 42, fontWeight: 700, color: countdown <= 5 ? $.rd : $.ac }}>{countdown}</div>
+                <div style={{ fontFamily: F.m, fontSize: 42, fontWeight: 700, color: countdown <= 5 ? $.rd : countdown <= 10 ? $.ac : $.glow }}>{countdown}</div>
                 <div style={{ fontFamily: F.m, fontSize: 9, color: $.tx3, letterSpacing: 2, marginTop: 4 }}>SECONDS TO DECIDE</div>
+                <div style={{ fontSize: 9, color: $.dim, marginTop: 6 }}>Take your time. Read both options carefully.</div>
               </div>
             )}
             {isResolved && (
-              <div style={{ background: `${opt.outcome === "good" ? $.gn : $.rd}08`, border: `1px solid ${opt.outcome === "good" ? $.gn : $.rd}33`, borderRadius: 12, padding: 16, textAlign: "center" }}>
-                <div style={{ fontSize: 28, marginBottom: 4 }}>{opt.outcome === "good" ? "\u2713" : "\u2717"}</div>
-                <div style={{ fontFamily: F.m, fontSize: 11, color: opt.outcome === "good" ? $.gn : $.rd, fontWeight: 600 }}>{opt.outcome === "good" ? "Correct." : "Wrong call."}</div>
+              <div style={{ background: `${opt.outcome === "good" ? $.gn : $.ac}08`, border: `1px solid ${opt.outcome === "good" ? $.gn : $.ac}33`, borderRadius: 12, padding: 16, textAlign: "center" }}>
+                <div style={{ fontSize: 28, marginBottom: 4 }}>{opt.outcome === "good" ? "\u2713" : "\u26A0"}</div>
+                <div style={{ fontFamily: F.m, fontSize: 12, color: opt.outcome === "good" ? $.gn : $.ac, fontWeight: 600, marginBottom: 6 }}>{opt.outcome === "good" ? "Grid stabilised" : "Damage limited"}</div>
+                <div style={{ fontSize: 10, color: $.tx3 }}>{opt.outcome === "good" ? "Health: " + gridHealth : "A.G.N.E.S. prevented collapse. Health: " + gridHealth}</div>
               </div>
             )}
           </div>
@@ -2240,11 +2091,11 @@ function OpsCenter(props) {
           {alerts.length === 0 && <div style={{ fontFamily: F.m, fontSize: 10, color: $.dim }}>A.G.N.E.S. scanning sensor feeds...</div>}
           {alerts.map((a, i) => (
             <div key={i} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: i < alerts.length - 1 ? `1px solid ${$.brd}` : "none" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
-                <div style={{ width: 5, height: 5, borderRadius: "50%", background: i === alerts.length - 1 ? $.rd : $.ac, flexShrink: 0 }} />
-                <div style={{ fontFamily: F.m, fontSize: 9, color: $.ac }}>{a.msg}</div>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 2 }}>
+                <div style={{ width: 5, height: 5, borderRadius: "50%", background: i === alerts.length - 1 ? $.rd : $.ac, flexShrink: 0, marginTop: 4 }} />
+                <div style={{ fontSize: 11, color: $.tx2, lineHeight: 1.5 }}>{a.plain}</div>
               </div>
-              <div style={{ fontSize: 10, color: $.tx3, paddingLeft: 11, lineHeight: 1.5 }}>{a.plain}</div>
+              <div style={{ fontFamily: F.m, fontSize: 8, color: $.dim, paddingLeft: 11, lineHeight: 1.4 }}>{a.msg}</div>
             </div>
           ))}
         </div>
@@ -2252,25 +2103,25 @@ function OpsCenter(props) {
         {/* Decision cards */}
         {isCrisis && !isResolved && (
           <div>
-            <div style={{ fontFamily: F.m, fontSize: 9, color: $.rd, letterSpacing: 2, marginBottom: 10, textAlign: "center" }}>YOUR CALL, OPERATOR</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              {incident.options.map((o, i) => (
-                <div key={i}>
-                  <button onClick={() => handleDecision(i)}
-                    style={{ width: "100%", textAlign: "left", background: "rgba(255,255,255,.03)", border: `1px solid ${incident.color}33`, borderRadius: 12, padding: "16px 14px", cursor: "pointer", fontFamily: F.s, transition: "all 0.2s" }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = incident.color; e.currentTarget.style.background = `${incident.color}0a`; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = `${incident.color}33`; e.currentTarget.style.background = "rgba(255,255,255,.03)"; }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: $.tx, marginBottom: 6 }}>{o.label}</div>
-                    <div style={{ fontSize: 10, color: $.tx3, lineHeight: 1.6, marginBottom: 8 }}>{o.desc}</div>
-                  </button>
-                  <button onClick={() => setShowWhy(showWhy === i ? null : i)} style={{ width: "100%", background: "none", border: "none", padding: "6px 0", cursor: "pointer", fontFamily: F.m, fontSize: 9, color: $.dim, textAlign: "center" }}>
-                    {showWhy === i ? "hide reasoning" : "why would this work?"}
-                  </button>
-                  {showWhy === i && (
-                    <div style={{ background: `${$.glow}06`, borderRadius: 8, padding: "10px 12px", marginTop: 4, fontSize: 10, color: $.ac, lineHeight: 1.7 }}>{o.why}</div>
-                  )}
-                </div>
-              ))}
+            <div style={{ fontFamily: F.m, fontSize: 9, color: $.rd, letterSpacing: 2, marginBottom: 6, textAlign: "center" }}>YOUR CALL, OPERATOR</div>
+            <div style={{ fontSize: 12, color: $.tx3, textAlign: "center", marginBottom: 14, lineHeight: 1.5 }}>You have 30 seconds. Read what each option does, then pick the one you think is right.</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {optionOrder.map((realIdx, displayIdx) => {
+                const o = incident.options[realIdx];
+                return (
+                <button key={displayIdx} onClick={() => handleDecision(displayIdx)}
+                  style={{ width: "100%", textAlign: "left", background: "rgba(255,255,255,.03)", border: `1px solid ${incident.color}33`, borderRadius: 14, padding: "18px 16px", cursor: "pointer", fontFamily: F.s, transition: "all 0.2s", display: "flex", flexDirection: "column", gap: 0 }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = incident.color; e.currentTarget.style.background = `${incident.color}0a`; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = `${incident.color}33`; e.currentTarget.style.background = "rgba(255,255,255,.03)"; e.currentTarget.style.transform = "none"; }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: $.tx, marginBottom: 6 }}>{o.label}</div>
+                  <div style={{ fontSize: 11, color: $.tx3, lineHeight: 1.6, marginBottom: 12 }}>{o.desc}</div>
+                  <div style={{ background: `${$.glow}08`, border: `1px solid ${$.glow}15`, borderRadius: 8, padding: "12px 14px", flex: 1 }}>
+                    <div style={{ fontFamily: F.m, fontSize: 8, color: $.glow, letterSpacing: 1, marginBottom: 6 }}>WHAT DOES THIS ACTUALLY DO?</div>
+                    <div style={{ fontSize: 12, color: $.tx2, lineHeight: 1.7 }}>{o.why}</div>
+                  </div>
+                </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -2278,10 +2129,15 @@ function OpsCenter(props) {
         {/* Consequence + lesson */}
         {isResolved && (
           <div>
-            <div style={{ background: "rgba(255,255,255,.03)", border: `1px solid ${$.brd}`, borderRadius: 12, padding: "14px 18px", marginBottom: 10 }}>
-              <div style={{ fontSize: 12, color: $.tx2, lineHeight: 1.7, marginBottom: 10 }}>{opt.consequence}</div>
-              <div style={{ fontFamily: F.m, fontSize: 8, color: $.glow, letterSpacing: 2, marginBottom: 6 }}>THE TAKEAWAY</div>
-              <div style={{ fontSize: 11, color: $.ac, lineHeight: 1.7 }}>{incident.lesson}</div>
+            {/* What happened */}
+            <div style={{ background: `${opt.outcome === "good" ? $.gn : $.rd}06`, border: `1px solid ${opt.outcome === "good" ? $.gn : $.rd}22`, borderRadius: 12, padding: "16px 18px", marginBottom: 12 }}>
+              <div style={{ fontFamily: F.m, fontSize: 8, color: opt.outcome === "good" ? $.gn : $.rd, letterSpacing: 1, marginBottom: 8 }}>WHAT HAPPENED</div>
+              <div style={{ fontSize: 13, color: $.tx, lineHeight: 1.7, marginBottom: 0 }}>{opt.consequence}</div>
+            </div>
+            {/* The lesson */}
+            <div style={{ background: `${$.glow}06`, border: `1px solid ${$.glow}18`, borderRadius: 12, padding: "16px 18px", marginBottom: 12 }}>
+              <div style={{ fontFamily: F.m, fontSize: 8, color: $.glow, letterSpacing: 1, marginBottom: 8 }}>WHY THIS MATTERS</div>
+              <div style={{ fontSize: 13, color: $.tx2, lineHeight: 1.8 }}>{incident.lesson}</div>
             </div>
             <button onClick={advance} style={{ width: "100%", background: $.glow, color: $.bg, border: "none", borderRadius: 10, padding: "14px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
               {incidentIdx >= INCIDENTS.length - 1 ? "See the debrief" : "Next incident"}
@@ -2365,15 +2221,6 @@ export default function App() {
         <Rv d={0.16}><div style={{ maxWidth: 900, margin: "0 auto" }}><SignatureDemo /></div></Rv>
       </section>
 
-      {/* ═══ STRESS TEST ═══ */}
-      <section style={{ padding: "80px 24px 80px" }}>
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <Rv><h2 style={{ fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 700, fontFamily: F.s, marginBottom: 16 }}>Break it yourself</h2></Rv>
-          <Rv d={0.08}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 360, margin: "0 auto" }}>Drag the slider. Watch four models respond differently to the same threat</p></Rv>
-        </div>
-        <Rv d={0.16}><StressTestWidget /></Rv>
-      </section>
-
       {/* ═══ EXPLORE ═══ */}
       <section style={{ padding: "80px 24px" }}>
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
@@ -2404,26 +2251,25 @@ export default function App() {
       </section>
 
       {/* ═══ EVIDENCE ═══ */}
-      <section id="proof" style={{ padding: "80px 24px 80px", background: $.bg2 }}>
-        <div style={{ maxWidth: 600, margin: "0 auto" }}>
-          <Rv><h2 style={{ fontSize: "clamp(24px, 3.5vw, 34px)", fontWeight: 700, fontFamily: F.s, marginBottom: 40 }}>What we found</h2></Rv>
-
-          {[
-            { before: "99.99%", after: "88.34%", tag: "Accuracy", color: $.rd,
-              plain: "In the lab, the model got almost every prediction right. Once deployed into the real world, 1 in 9 predictions went wrong. The model did not know it was getting worse",
-              technical: "AUC dropped from 0.9999 to 0.8834 across 120 streaming batches under distribution drift, adversarial perturbation, and regime shift" },
-            { before: "Accurate", after: "214× wrong", tag: "Confidence", color: $.rd,
-              plain: "When the model said \"I am 90% sure this is safe,\" it used to be right. After deployment, that confidence became 214 times less reliable. It was still saying 90% while being wrong",
-              technical: "Expected Calibration Error (ECE) increased 214× from baseline. Post-hoc LaSCal recalibration recovered alignment" },
-            { before: "Problem visible", after: "26 batches earlier", tag: "Early warning", color: $.glow,
-              plain: "The accuracy only visibly dropped at batch 81. But the system spotted something was wrong at batch 55, twenty-six steps earlier. That early warning is the whole point",
-              technical: "PSI crossed the 0.25 alert threshold 26 batches before AUC degradation became statistically significant" },
-            { before: "19.8% flipped", after: "0.04% flipped", tag: "Attack resistance", color: $.gn,
-              plain: "Under standard adversarial robustness testing, one model's predictions flipped almost 20% of the time. A different model held at 0.04%. Same test, different architecture, completely different resilience",
-              technical: "SVM RBF flip rate 19.8% under FGSM at ε=0.1. Random Forest flip rate 0.04%, immune due to discrete leaf structure" },
-          ].map(function(d, i) { return (
-            <Rv key={i} d={0.06 * i}><EvidenceCard d={d} last={i===3} /></Rv>
-          ); })}
+      <section id="proof" style={{ padding: "60px 24px 60px", background: $.bg2 }}>
+        <div style={{ maxWidth: 640, margin: "0 auto" }}>
+          <Rv><h2 style={{ fontSize: "clamp(22px, 3.5vw, 30px)", fontWeight: 700, fontFamily: F.s, textAlign: "center", marginBottom: 32 }}>What the data showed</h2></Rv>
+          <Rv d={0.08}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", background: "rgba(248,113,113,.04)", borderRadius: 10, border: "1px solid rgba(248,113,113,.12)" }}>
+              <div style={{ fontFamily: F.m, fontSize: 22, fontWeight: 700, color: $.rd, flexShrink: 0 }}>11.7%</div>
+              <div style={{ fontSize: 13, color: $.tx2, lineHeight: 1.6 }}>A near perfect AI lost 1 in 9 predictions once deployed into real conditions. Static lab testing never showed this.</div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", background: "rgba(251,191,36,.04)", borderRadius: 10, border: "1px solid rgba(251,191,36,.12)" }}>
+              <div style={{ fontFamily: F.m, fontSize: 22, fontWeight: 700, color: $.glow, flexShrink: 0 }}>26</div>
+              <div style={{ fontSize: 13, color: $.tx2, lineHeight: 1.6 }}>The monitoring system spotted trouble 26 steps before accuracy visibly dropped. That early warning is the difference between a fix and a failure.</div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", background: "rgba(52,211,153,.04)", borderRadius: 10, border: "1px solid rgba(52,211,153,.12)" }}>
+              <div style={{ fontFamily: F.m, fontSize: 22, fontWeight: 700, color: $.gn, flexShrink: 0 }}>800×</div>
+              <div style={{ fontSize: 13, color: $.tx2, lineHeight: 1.6 }}>Under the same attack, one AI type was tricked 800 times more often than another. The type of AI you choose is a security decision.</div>
+            </div>
+          </div>
+          </Rv>
         </div>
       </section>
 
