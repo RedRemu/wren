@@ -8,7 +8,7 @@ import {
 var $ = {
   bg: "#0a0e1a", bg2: "#0f1525", bg3: "#141c2e",
   brd: "rgba(251,191,36,.08)", brdH: "rgba(251,191,36,.18)",
-  tx: "#fef3c7", tx2: "#e0b88a", tx3: "#b08d5e", dim: "#8a7350",
+  tx: "#fef3c7", tx2: "#ebcb9a", tx3: "#b08d5e", dim: "#8a7350",
   glow: "#fbbf24", glowD: "rgba(251,191,36,.06)",
   ac: "#f59e0b", acB: "#fbbf24", acD: "rgba(245,158,11,.08)",
   gn: "#34d399", gnD: "rgba(52,211,153,.06)",
@@ -639,6 +639,16 @@ function CinematicPipeline(props) {
   var _valid = _pp && _pp.length && _pp.every(function(ph){ return ph && ph.stages && ph.stages.length; });
   var PIPELINE = _valid ? _pp : DEFAULT_PIPELINE;
 
+  // Responsive: detect mobile viewport
+  var _mob = useState(typeof window !== "undefined" && window.innerWidth < 720);
+  var isMobile = _mob[0]; var setMobile = _mob[1];
+  useEffect(function(){
+    if (typeof window === "undefined") return;
+    function onResize(){ setMobile(window.innerWidth < 720); }
+    window.addEventListener("resize", onResize);
+    return function(){ window.removeEventListener("resize", onResize); };
+  },[]);
+
   var _localOpen = useState(null);
   var localOpen = _localOpen[0], setLocalOpen = _localOpen[1];
   var pipeOpen = props.pipeOpen !== undefined ? props.pipeOpen : localOpen;
@@ -698,7 +708,7 @@ function CinematicPipeline(props) {
           background:"radial-gradient(ellipse at center, "+act.color+"22 0%, transparent 60%)",
           pointerEvents:"none",transition:"background 2s ease"}}/>
 
-        <div style={{maxWidth:1200,margin:"0 auto",padding:"26px 24px 0",position:"relative"}}>
+        <div style={{maxWidth:1200,margin:"0 auto",padding:isMobile?"18px 14px 0":"26px 24px 0",position:"relative"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",flexWrap:"wrap",gap:20}}>
             <div>
               <p style={{fontFamily:F.m,fontSize:10,color:$.glow,letterSpacing:4,marginBottom:10,margin:0}}>HOW THE AI LEARNS · 7 STEPS</p>
@@ -736,10 +746,10 @@ function CinematicPipeline(props) {
                 <div key={a.id} onClick={function(){jumpTo(i);}}
                   style={{flex:1,cursor:"pointer",padding:"6px 0"}}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-                    <span style={{fontFamily:F.m,fontSize:8.5,letterSpacing:1.4,
+                    <span style={{fontFamily:F.m,fontSize:isMobile?7:8.5,letterSpacing:isMobile?.5:1.4,
                       color:active?a.color:done?$.tx3:$.dim,fontWeight:active?700:500,
-                      transition:"color .3s"}}>
-                      {String(i+1).padStart(2,"0")} · {a.phase.toUpperCase()}
+                      transition:"color .3s",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+                      {isMobile ? String(i+1).padStart(2,"0") : String(i+1).padStart(2,"0") + " · " + a.phase.toUpperCase()}
                     </span>
                     {active && <span style={{fontFamily:F.m,fontSize:8,color:a.color,
                       animation:"cineBlink 1.2s ease-in-out infinite"}}>●</span>}
@@ -756,27 +766,32 @@ function CinematicPipeline(props) {
           </div>
         </div>
 
-        <div style={{maxWidth:1200,margin:"0 auto",padding:"30px 24px 44px",position:"relative",minHeight:560}}>
+        <div style={{maxWidth:1200,margin:"0 auto",padding:isMobile?"20px 14px 40px":"30px 24px 44px",position:"relative",minHeight:isMobile?"auto":560}}>
           <div key={"cap"+actIdx} style={{
-            position:"absolute",left:24,top:22,maxWidth:320,zIndex:3,
+            position:isMobile?"relative":"absolute",
+            left:isMobile?"auto":24,
+            top:isMobile?"auto":22,
+            maxWidth:isMobile?"100%":320,
+            marginBottom:isMobile?16:0,
+            zIndex:3,
             animation:"cineFade .6s ease both"}}>
             <div style={{fontFamily:F.m,fontSize:9,color:act.color,letterSpacing:2,marginBottom:8}}>
               STEP {actIdx+1} OF 7
             </div>
-            <h3 style={{fontFamily:serif,fontSize:"clamp(22px,2.6vw,30px)",color:$.tx,
+            <h3 style={{fontFamily:serif,fontSize:isMobile?"clamp(20px,5.5vw,26px)":"clamp(22px,2.6vw,30px)",color:$.tx,
               fontWeight:500,margin:"0 0 8px",lineHeight:1.2}}>
               {act.title}
             </h3>
-            <p style={{fontFamily:F.s,fontSize:13,color:$.tx3,lineHeight:1.6,margin:0}}>
+            <p style={{fontFamily:F.s,fontSize:isMobile?12:13,color:$.tx3,lineHeight:1.6,margin:0}}>
               {act.sub}
             </p>
           </div>
 
-          <div style={{marginLeft:"clamp(0px, 28vw, 360px)",minHeight:460,position:"relative"}}>
-            <SceneRenderer act={act} t={t} actIdx={actIdx}/>
+          <div style={{marginLeft:isMobile?0:"clamp(0px, 28vw, 360px)",minHeight:isMobile?380:460,position:"relative"}}>
+            <SceneRenderer act={act} t={t} actIdx={actIdx} isMobile={isMobile}/>
           </div>
 
-          <div style={{position:"absolute",left:24,right:24,bottom:12,display:"flex",alignItems:"center",gap:12}}>
+          <div style={{position:isMobile?"relative":"absolute",left:isMobile?"auto":24,right:isMobile?"auto":24,bottom:isMobile?"auto":12,marginTop:isMobile?16:0,display:"flex",alignItems:"center",gap:12}}>
             <span style={{fontFamily:F.m,fontSize:9,color:$.dim,letterSpacing:1}}>
               {(elapsed/1000).toFixed(1)}s / {(totalDur/1000).toFixed(0)}s
             </span>
@@ -859,23 +874,23 @@ function CinematicPipeline(props) {
 
 /* ═══ SCENE RENDERER ═══ */
 function SceneRenderer(props) {
-  var act = props.act, t = props.t, actIdx = props.actIdx;
+  var act = props.act, t = props.t, actIdx = props.actIdx, isMobile = props.isMobile;
   return (
-    <div key={actIdx} style={{width:"100%",height:460,position:"relative",animation:"cineFade .55s ease both"}}>
-      {act.id==="load"     && <SceneLoad t={t} color={act.color}/>}
-      {act.id==="engineer" && <SceneEngineer t={t} color={act.color}/>}
-      {act.id==="select"   && <SceneSelect t={t} color={act.color}/>}
-      {act.id==="train"    && <SceneTrain t={t} color={act.color}/>}
-      {act.id==="evaluate" && <SceneEvaluate t={t} color={act.color}/>}
-      {act.id==="stress"   && <SceneStress t={t} color={act.color}/>}
-      {act.id==="deploy"   && <SceneDeploy t={t} color={act.color}/>}
+    <div key={actIdx} style={{width:"100%",height:isMobile?380:460,position:"relative",animation:"cineFade .55s ease both"}}>
+      {act.id==="load"     && <SceneLoad t={t} color={act.color} isMobile={isMobile}/>}
+      {act.id==="engineer" && <SceneEngineer t={t} color={act.color} isMobile={isMobile}/>}
+      {act.id==="select"   && <SceneSelect t={t} color={act.color} isMobile={isMobile}/>}
+      {act.id==="train"    && <SceneTrain t={t} color={act.color} isMobile={isMobile}/>}
+      {act.id==="evaluate" && <SceneEvaluate t={t} color={act.color} isMobile={isMobile}/>}
+      {act.id==="stress"   && <SceneStress t={t} color={act.color} isMobile={isMobile}/>}
+      {act.id==="deploy"   && <SceneDeploy t={t} color={act.color} isMobile={isMobile}/>}
     </div>
   );
 }
 
 /* ═══ ACT 1: DATA LOADING ═══ */
 function SceneLoad(props) {
-  var t = props.t, color = props.color;
+  var t = props.t, color = props.color, isMobile = props.isMobile;
   var loaded = Math.floor(Math.min(1, t*1.3) * 60000);
   var nan = t < 0.55 ? Math.floor(t*1800) : Math.max(0, Math.floor((1-t)*200));
   var pct = Math.min(1, t*1.3);
@@ -915,7 +930,7 @@ function SceneLoad(props) {
           <path d="M 185 43 L 445 143" stroke="rgba(255,255,255,.08)" strokeWidth="1" strokeDasharray="3,4"/>
         </svg>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+      <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:8}}>
         <Stat label="READINGS COLLECTED"  value={loaded.toLocaleString()} color={color}/>
         <Stat label="THINGS WE MEASURE"   value="12"                       color={color}/>
         <Stat label="BROKEN READINGS"     value={nan}                      color={nan>0?$.rd:color} pulse={nan>0}/>
@@ -927,7 +942,7 @@ function SceneLoad(props) {
 
 /* ═══ ACT 2: FEATURE ENGINEERING ═══ */
 function SceneEngineer(props) {
-  var t = props.t, color = props.color;
+  var t = props.t, color = props.color, isMobile = props.isMobile;
   var raw = ["Node 1 time","Node 2 time","Node 3 time","Node 4 time","Node 1 power","Node 2 power","Node 3 power","Node 4 power","Node 1 gain","Node 2 gain","Node 3 gain","Node 4 gain"];
   var newFeats = [
     "Node 1 flow","Node 2 flow","Node 3 flow","Node 4 flow",
@@ -1011,7 +1026,7 @@ function SceneEngineer(props) {
         </svg>
       </div>
 
-      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+      <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:8}}>
         <Stat label="WE STARTED WITH"    value="12"        color={$.dim}/>
         <Stat label="CLUES WE BUILT"     value={featCount} color={color} pulse={t<0.7}/>
         <Stat label="MOST POWERFUL"      value={featCount>=5?"5":featCount} color={color}/>
@@ -1023,7 +1038,7 @@ function SceneEngineer(props) {
 
 /* ═══ ACT 3: RFECV SELECTION ═══ */
 function SceneSelect(props) {
-  var t = props.t, color = props.color;
+  var t = props.t, color = props.color, isMobile = props.isMobile;
   var keepIdx = [0,1,2,4,5,7,9,11,13,16,18,22,25,30];
   var drawTo = Math.min(1, t*1.2);
   var kept = Math.round(drawTo * 14);
@@ -1038,7 +1053,7 @@ function SceneSelect(props) {
 
   return (
     <div style={{width:"100%",height:"100%",display:"grid",gridTemplateRows:"1fr auto",gap:16}}>
-      <div style={{display:"grid",gridTemplateColumns:"1.1fr 1fr",gap:14}}>
+      <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1.1fr 1fr",gap:14}}>
 
         <div style={{background:"rgba(255,255,255,.015)",border:"1px solid rgba(255,255,255,.04)",
           borderRadius:12,padding:"16px 18px"}}>
@@ -1116,7 +1131,7 @@ function SceneSelect(props) {
         </div>
       </div>
 
-      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+      <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:8}}>
         <Stat label="CLUES TO START"  value="48"       color={$.dim}/>
         <Stat label="CLUES LEFT"      value={remaining} color={color} pulse={t<0.8}/>
         <Stat label="ACCURACY LOST"   value="Almost none"   color={$.gn}/>
@@ -1128,7 +1143,7 @@ function SceneSelect(props) {
 
 /* ═══ ACT 4: TRAINING ═══ */
 function SceneTrain(props) {
-  var t = props.t;
+  var t = props.t, isMobile = props.isMobile;
   var models = [
     {name:"Helper 1",  color:"#a78bfa", auc:.9999, kind:"boundary"},
     {name:"Helper 2",   color:"#34d399", auc:1.000, kind:"forest"},
@@ -1139,7 +1154,7 @@ function SceneTrain(props) {
 
   return (
     <div style={{width:"100%",height:"100%",display:"grid",gridTemplateRows:"auto 1fr",gap:14}}>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10}}>
+      <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:10}}>
         {models.map(function(m,i){
           var localT = Math.max(0, Math.min(1, (t - i*0.08) * 1.5));
           return (
@@ -1280,7 +1295,7 @@ function TrainMini(props) {
 
 /* ═══ ACT 5: EVALUATION ═══ */
 function SceneEvaluate(props) {
-  var t = props.t, color = props.color;
+  var t = props.t, color = props.color, isMobile = props.isMobile;
   var rocRows = [
     {c:"#fbbf24",auc:1.000, name:"TEAM"},
     {c:"#67e8f9",auc:1.000, name:"H3"},
@@ -1289,7 +1304,7 @@ function SceneEvaluate(props) {
   ];
   return (
     <div style={{width:"100%",height:"100%",display:"grid",
-      gridTemplateColumns:"1fr 1fr",gridTemplateRows:"auto auto",gap:12}}>
+      gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gridTemplateRows:isMobile?"auto":"auto auto",gap:12}}>
 
       <div style={{background:"rgba(255,255,255,.015)",border:"1px solid rgba(255,255,255,.04)",
         borderRadius:12,padding:"14px 16px"}}>
@@ -1399,7 +1414,7 @@ function SceneEvaluate(props) {
 
 /* ═══ ACT 6: STRESS ═══ */
 function SceneStress(props) {
-  var t = props.t, color = props.color;
+  var t = props.t, color = props.color, isMobile = props.isMobile;
   var noise = Math.sin(t * Math.PI * 2) * 0.5 + 0.5;
   var ADV_FRIENDLY = [
     {name:"Helper 1", rate:19.8, color:"#f87171"},
@@ -1443,7 +1458,7 @@ function SceneStress(props) {
         </svg>
       </div>
 
-      <div style={{display:"grid",gridTemplateColumns:"1.4fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1.4fr 1fr",gap:12}}>
         <div style={{background:"rgba(255,255,255,.015)",border:"1px solid rgba(255,255,255,.04)",
           borderRadius:12,padding:"12px 16px"}}>
           <div style={{fontFamily:F.m,fontSize:9,color:$.dim,letterSpacing:1.5,marginBottom:8}}>TOP CLUES THE AI USES</div>
@@ -1492,7 +1507,7 @@ function SceneStress(props) {
 
 /* ═══ ACT 7: DEPLOYMENT ═══ */
 function SceneDeploy(props) {
-  var t = props.t, color = props.color;
+  var t = props.t, color = props.color, isMobile = props.isMobile;
   var nBatches = AUC_STREAM.length;
   var upto = Math.floor(Math.min(1, t) * nBatches);
   var aucSlice = AUC_STREAM.slice(0, upto);
@@ -1574,7 +1589,7 @@ function SceneDeploy(props) {
         </svg>
       </div>
 
-      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+      <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:8}}>
         <Stat label="MINUTES RUNNING"  value={upto + " / " + nBatches}  color={color}/>
         <Stat label="HOW OFTEN RIGHT"  value={upto>0 ? (aucSlice[aucSlice.length-1]*100).toFixed(0)+"%" : "—"} color={color}/>
         <Stat label="TROUBLE LEVEL"    value={upto>0 ? (psiSlice[psiSlice.length-1] < 0.25 ? "Low" : psiSlice[psiSlice.length-1] < 1 ? "Medium" : "High") : "—"} color={alertFired?$.rd:color}/>
@@ -1750,15 +1765,15 @@ function CommandCentre(props) {
   if (tab==="sim") return (
     <div style={{minHeight:"100vh",background:$.bg,fontFamily:F.s,color:$.tx2}}>
       {nav}
-      <div style={{padding:"8px 24px",background:pCol===$.gn?$.gnD:pCol===$.rd?$.rdD:$.acD,borderBottom:"1px solid "+pCol+"22",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-        <div style={{display:"flex",alignItems:"center",gap:8}}>
+      <div style={{padding:"8px 16px",background:pCol===$.gn?$.gnD:pCol===$.rd?$.rdD:$.acD,borderBottom:"1px solid "+pCol+"22",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
           <div style={{width:7,height:7,borderRadius:"50%",background:pCol,animation:phase!=="stable"?"wpulse 1.8s ease-in-out infinite":"none"}}/>
           <span style={{fontFamily:F.m,fontSize:10,fontWeight:600,color:pCol}}>{phase==="stable"?"STABLE":phase==="drift"?"DRIFT DETECTED":"CRITICAL"}</span>
-          <span style={{fontFamily:F.m,fontSize:9,color:pCol,opacity:.6}}>| Batch {batch} | AUC {(SH[batch]||0).toFixed(4)} | PSI {(SP[batch]||0).toFixed(2)}</span>
+          <span style={{fontFamily:F.m,fontSize:9,color:pCol,opacity:.6}}>Batch {batch} · AUC {(SH[batch]||0).toFixed(4)} · PSI {(SP[batch]||0).toFixed(2)}</span>
         </div>
-        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+        <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
           <button onClick={function(){if(demo){setDemo(false);}else{setBatch(0);setDemo(true);}}} style={{padding:"4px 12px",borderRadius:5,border:"1px solid "+(demo?$.rd:$.glow),background:demo?$.rdD:$.acD,color:demo?$.rd:$.glow,fontFamily:F.m,fontSize:9,fontWeight:600,cursor:"pointer"}}>{demo?"Pause":batch>=119?"Replay":"Play"}</button>
-          <input type="range" min={0} max={119} value={batch} onChange={function(e){setDemo(false);setBatch(+e.target.value);}} style={{width:150,accentColor:$.glow}}/>
+          <input type="range" min={0} max={119} value={batch} onChange={function(e){setDemo(false);setBatch(+e.target.value);}} style={{width:"clamp(100px, 25vw, 150px)",accentColor:$.glow}}/>
           <span style={{fontFamily:F.m,fontSize:11,color:$.glow,fontWeight:700,minWidth:20}}>{batch}</span>
         </div>
       </div>
@@ -1767,7 +1782,7 @@ function CommandCentre(props) {
         <p style={{fontFamily:F.m,fontSize:9,color:$.dim,marginBottom:14,textAlign:"right"}}>Click any chart to see a plain-English explanation</p>
 
         {/* KPIs */}
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:1,marginBottom:14,background:$.brd,borderRadius:10,overflow:"hidden",border:"1px solid "+$.brd}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:1,marginBottom:14,background:$.brd,borderRadius:10,overflow:"hidden",border:"1px solid "+$.brd}}>
           {[
             {l:"Hybrid AUC",v:(SH[batch]||0).toFixed(4),c:SH[batch]>.93?$.gn:SH[batch]>.88?$.ac:$.rd,d:SH},
             {l:"SVM AUC",   v:(SV[batch]||0).toFixed(4),c:SV[batch]>.88?$.tx2:$.rd,d:SV},
@@ -1805,7 +1820,7 @@ function CommandCentre(props) {
             }/>
         </div>
 
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:14}}>
           <ChartCard id="psi" title="PSI Drift Index"
             sub="Alert threshold: 0.25. Crossed at batch 55, 26 batches early"
             children={
@@ -3041,33 +3056,15 @@ function OpsCenter(props) {
       <div style={{ minHeight: "100vh", background: $.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: F.s, padding: 24 }}>
         <div style={{ width: 200, opacity: 0.15, marginBottom: 32 }}><Grid stress={[0,0,0,0]} /></div>
         <div style={{ fontFamily: F.m, fontSize: 9, color: $.glow, letterSpacing: 5, marginBottom: 20 }}>OPERATIONS CENTRE</div>
-        <h1 style={{ fontSize: "clamp(22px, 5vw, 34px)", fontWeight: 600, color: $.tx, textAlign: "center", lineHeight: 1.5, marginBottom: 12, maxWidth: 480 }}>
+        <h1 style={{ fontSize: "clamp(22px, 5vw, 34px)", fontWeight: 600, color: $.tx, textAlign: "center", lineHeight: 1.5, marginBottom: 16, maxWidth: 480 }}>
           You are the grid operator.<br />Three things are about to go wrong.
         </h1>
-        <p style={{ fontSize: 13, color: $.tx3, textAlign: "center", lineHeight: 1.8, maxWidth: 440, marginBottom: 8 }}>
-          Before each incident, you will get a briefing explaining what is about to happen. Between incidents, you will do small monitoring tasks that keep the grid healthy. When the crisis hits, you will get two options with full explanations of what each one does.
-        </p>
-        <p style={{ fontSize: 11, color: $.dim, textAlign: "center", lineHeight: 1.7, maxWidth: 400, marginBottom: 32 }}>
-          You have 30 seconds to decide each time. There is no trick. The reasoning is right there on the screen. Read it and choose.
+        <p style={{ fontSize: 13, color: $.tx3, textAlign: "center", lineHeight: 1.8, maxWidth: 420, marginBottom: 36 }}>
+          Each incident comes with a briefing. Every decision is explained. You have 30 seconds to choose.
         </p>
 
-        {/* Legend */}
-        <div style={{ display: "flex", gap: 12, marginBottom: 32, flexWrap: "wrap", justifyContent: "center" }}>
-          {[
-            { label: "ACCURACY", sub: "AUC", explain: "How often the model is right" },
-            { label: "DATA SHIFT", sub: "PSI", explain: "How much the incoming data has changed" },
-            { label: "SAFETY", sub: "COV", explain: "Whether predictions have safety bounds" },
-          ].map(m => (
-            <div key={m.label} style={{ background: "rgba(255,255,255,.03)", borderRadius: 8, padding: "8px 14px", textAlign: "center" }}>
-              <div style={{ fontFamily: F.m, fontSize: 10, color: $.glow, fontWeight: 700 }}>{m.label}</div>
-              <div style={{ fontFamily: F.m, fontSize: 7, color: $.dim, marginTop: 1 }}>{m.sub}</div>
-              <div style={{ fontSize: 9, color: $.tx3, marginTop: 2 }}>{m.explain}</div>
-            </div>
-          ))}
-        </div>
-
-        <button onClick={props.onBack} style={{ background: "transparent", border: "1px solid " + $.brd, borderRadius: 6, color: $.tx2, padding: "8px 16px", fontSize: 11, cursor: "pointer", marginBottom: 16, fontFamily: F.m }}>Back</button>
-        <button onClick={() => setPhase("briefing")} style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 10, padding: "16px 52px", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: F.s }}>Begin Watch</button>
+        <button onClick={() => setPhase("briefing")} style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 10, padding: "16px 52px", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: F.s, marginBottom: 16 }}>Begin Watch</button>
+        <button onClick={props.onBack} style={{ background: "transparent", border: "none", color: $.dim, padding: "6px 12px", fontSize: 11, cursor: "pointer", fontFamily: F.m, letterSpacing: 1 }}>← Back</button>
       </div>
     );
   }
@@ -3168,7 +3165,7 @@ function OpsCenter(props) {
           </div>
 
           {/* Side by side */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 40 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16, marginBottom: 40 }}>
 
             {/* WITHOUT */}
             <div style={{ background: "rgba(248,113,113,.03)", border: "1px solid rgba(248,113,113,.15)", borderRadius: 14, padding: "20px 18px" }}>
@@ -3288,6 +3285,8 @@ function OpsCenter(props) {
           <div style={{ display: "flex", gap: 4 }}>
             {INCIDENTS.map((_, i) => <div key={i} style={{ width: 24, height: 3, borderRadius: 2, background: i < incidentIdx ? $.gn : i === incidentIdx ? incident.color : $.brd }} />)}
           </div>
+          {/* Exit */}
+          <button onClick={props.onBack} style={{ background: "transparent", border: "1px solid rgba(255,255,255,.08)", borderRadius: 5, color: $.dim, padding: "4px 10px", fontSize: 9, fontFamily: F.m, letterSpacing: 1, cursor: "pointer" }}>EXIT</button>
         </div>
       </div>
 
@@ -3320,7 +3319,7 @@ function OpsCenter(props) {
         </div>
 
         {/* Grid + Task side by side */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 12, alignItems: "start" }}>
           <div>
             <Grid stress={stress} />
           </div>
@@ -3371,7 +3370,7 @@ function OpsCenter(props) {
           <div>
             <div style={{ fontFamily: F.m, fontSize: 9, color: $.rd, letterSpacing: 2, marginBottom: 6, textAlign: "center" }}>YOUR CALL, OPERATOR</div>
             <div style={{ fontSize: 12, color: $.tx3, textAlign: "center", marginBottom: 14, lineHeight: 1.5 }}>You have 30 seconds. Read what each option does, then pick the one you think is right.</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 12 }}>
               {optionOrder.map((realIdx, displayIdx) => {
                 const o = incident.options[realIdx];
                 return (
@@ -3430,7 +3429,7 @@ export default function App() {
   var _fade = useState("visible"); var fade = _fade[0]; var setFade = _fade[1];
 
   useEffect(function() {
-    var t = setTimeout(function() { setLoading(false); }, 2200);
+    var t = setTimeout(function() { setLoading(false); }, 1200);
     return function() { clearTimeout(t); };
   }, []);
 
@@ -3458,7 +3457,7 @@ export default function App() {
       <div style={{ fontFamily: F.m, fontSize: 11, letterSpacing: 4, color: $.glow, opacity: 0.6, marginBottom: 8 }}>W.R.E.N.</div>
       <div style={{ fontSize: 11, color: $.dim }}>Initialising deployment monitor</div>
       <div style={{ width: 120, height: 2, background: "rgba(255,255,255,.04)", borderRadius: 1, marginTop: 20, overflow: "hidden" }}>
-        <div style={{ height: "100%", background: $.glow, borderRadius: 1, animation: "wLoad 2s ease-in-out forwards" }} />
+        <div style={{ height: "100%", background: $.glow, borderRadius: 1, animation: "wLoad 1.2s ease-in-out forwards" }} />
       </div>
     </div>
   );
@@ -3476,7 +3475,7 @@ export default function App() {
     <div style={{ background: $.bg, color: $.tx, fontFamily: F.s, overflowX: "hidden" }}>
 
       {/* NAV */}
-      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, padding: "14px 36px", display: "flex", justifyContent: "space-between", alignItems: "center", background: scrollY > 60 ? "rgba(10,14,26,.92)" : "transparent", backdropFilter: scrollY > 60 ? "blur(20px)" : "none", borderBottom: scrollY > 60 ? "1px solid rgba(255,255,255,.04)" : "1px solid transparent", transition: "all .5s ease" }}>
+      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, padding: "14px clamp(16px, 4vw, 36px)", display: "flex", justifyContent: "space-between", alignItems: "center", background: scrollY > 60 ? "rgba(10,14,26,.92)" : "transparent", backdropFilter: scrollY > 60 ? "blur(20px)" : "none", borderBottom: scrollY > 60 ? "1px solid rgba(255,255,255,.04)" : "1px solid transparent", transition: "all .5s ease" }}>
         <div onClick={function() { go("hero"); }} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
           <BeaconSmall s={16} />
           <span style={{ fontSize: 13, letterSpacing: 3, color: $.glow, fontWeight: 700, fontFamily: F.m }}>W.R.E.N.</span>
@@ -3492,8 +3491,9 @@ export default function App() {
       {/* ═══ FULL DEMO ═══ */}
       <section id="demo" style={{ padding: "80px 24px 80px", background: $.bg2 }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <Rv><h2 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 700, fontFamily: F.s, marginBottom: 16 }}>What deployment actually looks like</h2></Rv>
-          <Rv d={0.08}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 420, margin: "0 auto" }}>Five stages of a model encountering the real world. Navigate with the arrows or let it play.</p></Rv>
+          <Rv><div style={{ fontFamily: F.m, fontSize: 10, color: $.rd, letterSpacing: 3, marginBottom: 12 }}>THE PROBLEM</div></Rv>
+          <Rv d={0.05}><h2 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 700, fontFamily: F.s, marginBottom: 16 }}>Why "accurate" AI fails in the real world</h2></Rv>
+          <Rv d={0.08}><p style={{ fontSize: 14, color: $.tx3, maxWidth: 440, margin: "0 auto", lineHeight: 1.7 }}>Five moments that break a model. From a clean lab score of 99.99% to silent failure in deployment.</p></Rv>
         </div>
         <Rv d={0.16}><div style={{ maxWidth: 900, margin: "0 auto" }}><SignatureDemo /></div></Rv>
       </section>
@@ -3501,62 +3501,41 @@ export default function App() {
       {/* ═══ EXPLORE ═══ */}
       <section style={{ padding: "80px 24px" }}>
         <div style={{ maxWidth: 880, margin: "0 auto" }}>
-          <Rv><h2 style={{ fontSize: "clamp(24px, 4vw, 34px)", fontWeight: 700, fontFamily: F.s, textAlign: "center", marginBottom: 48 }}>Go deeper</h2></Rv>
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <Rv><div style={{ fontFamily: F.m, fontSize: 10, color: $.glow, letterSpacing: 3, marginBottom: 12 }}>THE SOLUTION</div></Rv>
+            <Rv d={0.05}><h2 style={{ fontSize: "clamp(24px, 4vw, 34px)", fontWeight: 700, fontFamily: F.s }}>Three ways to see how we solved it</h2></Rv>
+          </div>
           <Rv d={0.1}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 16 }}>
             <div onClick={function() { setPage("story"); }}
               style={{ background: $.bg2, borderRadius: 14, padding: "32px 24px", cursor: "pointer", transition: "all .25s", border: "1px solid " + $.glow + "22" }}
               onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(251,191,36,.1)"; e.currentTarget.style.borderColor = $.glow + "55"; }}
               onMouseLeave={function(e) { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = $.glow + "22"; }}>
-              <div style={{ fontFamily: F.m, fontSize: 9, color: $.glow, letterSpacing: 1.5, marginBottom: 12 }}>For everyone</div>
+              <div style={{ fontFamily: F.m, fontSize: 9, color: $.glow, letterSpacing: 1.5, marginBottom: 12 }}>Watch</div>
               <div style={{ fontSize: 18, fontWeight: 700, color: $.tx, marginBottom: 10 }}>The Story</div>
-              <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.75, marginBottom: 20 }}>Seven steps, no jargon. Watch how the AI learns to keep the power on.</p>
+              <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.75, marginBottom: 20 }}>Seven steps, no jargon. See how we built defences against every failure above.</p>
               <span style={{ fontFamily: F.m, fontSize: 11, color: $.glow, fontWeight: 600 }}>Watch →</span>
             </div>
             <div onClick={function() { setPage("ops"); }}
               style={{ background: $.bg2, borderRadius: 14, padding: "32px 24px", cursor: "pointer", transition: "all .25s" }}
               onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(251,191,36,.06)"; }}
               onMouseLeave={function(e) { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
-              <div style={{ fontFamily: F.m, fontSize: 9, color: $.dim, letterSpacing: 1.5, marginBottom: 12 }}>Interactive</div>
+              <div style={{ fontFamily: F.m, fontSize: 9, color: $.dim, letterSpacing: 1.5, marginBottom: 12 }}>Try</div>
               <div style={{ fontSize: 18, fontWeight: 700, color: $.tx, marginBottom: 10 }}>Operations Centre</div>
-              <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.75, marginBottom: 20 }}>Three incidents. Briefings, mini tasks, timed decisions, a full debrief.</p>
+              <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.75, marginBottom: 20 }}>Take the operator's seat. Three incidents. Thirty seconds to decide. Full debrief.</p>
               <span style={{ fontFamily: F.m, fontSize: 11, color: $.glow, fontWeight: 600 }}>Enter →</span>
             </div>
             <div onClick={function() { setPage("command"); }}
               style={{ background: $.bg2, borderRadius: 14, padding: "32px 24px", cursor: "pointer", transition: "all .25s" }}
               onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(251,191,36,.06)"; }}
               onMouseLeave={function(e) { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
-              <div style={{ fontFamily: F.m, fontSize: 9, color: $.dim, letterSpacing: 1.5, marginBottom: 12 }}>Technical</div>
+              <div style={{ fontFamily: F.m, fontSize: 9, color: $.dim, letterSpacing: 1.5, marginBottom: 12 }}>Verify</div>
               <div style={{ fontSize: 18, fontWeight: 700, color: $.tx, marginBottom: 10 }}>Dashboard</div>
-              <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.75, marginBottom: 20 }}>120 batches. Live charts. Every finding backed by data.</p>
+              <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.75, marginBottom: 20 }}>120 batches of live monitoring. Every chart explained. Every finding backed by data.</p>
               <span style={{ fontFamily: F.m, fontSize: 11, color: $.glow, fontWeight: 600 }}>Open →</span>
             </div>
           </div>
           </Rv>
-        </div>
-      </section>
-
-      {/* ═══ EVIDENCE ═══ */}
-      <section id="proof" style={{ padding: "80px 24px 80px", background: $.bg2 }}>
-        <div style={{ maxWidth: 600, margin: "0 auto" }}>
-          <Rv><h2 style={{ fontSize: "clamp(24px, 3.5vw, 34px)", fontWeight: 700, fontFamily: F.s, marginBottom: 40 }}>What the data showed</h2></Rv>
-
-          {[
-            { before: "99.99%", after: "88.34%", tag: "Accuracy", color: $.rd,
-              plain: "In the lab, the model got almost every prediction right. Once deployed into the real world, 1 in 9 predictions went wrong. The model did not know it was getting worse",
-              technical: "AUC dropped from 0.9999 to 0.8834 across 120 streaming batches under distribution drift, adversarial perturbation, and regime shift" },
-            { before: "Accurate", after: "214× wrong", tag: "Confidence", color: $.rd,
-              plain: "When the model said \"I am 90% sure this is safe,\" it used to be right. After deployment, that confidence became 214 times less reliable. It was still saying 90% while being wrong",
-              technical: "Expected Calibration Error (ECE) increased 214× from baseline. Post-hoc LaSCal recalibration recovered alignment" },
-            { before: "Problem visible", after: "26 batches earlier", tag: "Early warning", color: $.glow,
-              plain: "The accuracy only visibly dropped at batch 81. But the system spotted something was wrong at batch 55, twenty-six steps earlier. That early warning is the whole point",
-              technical: "PSI crossed the 0.25 alert threshold 26 batches before AUC degradation became statistically significant" },
-            { before: "19.8% flipped", after: "0.04% flipped", tag: "Attack resistance", color: $.gn,
-              plain: "Under standard adversarial robustness testing, one model's predictions flipped almost 20% of the time. A different model held at 0.04%. Same test, different architecture, completely different resilience",
-              technical: "SVM RBF flip rate 19.8% under FGSM at ε=0.1. Random Forest flip rate 0.04%, immune due to discrete leaf structure" },
-          ].map(function(d, i) { return (
-            <Rv key={i} d={0.06 * i}><EvidenceCard d={d} last={i===3} /></Rv>
-          ); })}
         </div>
       </section>
 
