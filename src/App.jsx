@@ -647,8 +647,8 @@ function CinematicPipeline(props) {
 
   var _act = useState(0);         var actIdx = _act[0];   var setActIdx = _act[1];
   var _t   = useState(0);         var t      = _t[0];     var setT      = _t[1];
-  var _playing = useState(true);  var playing= _playing[0];var setPlaying= _playing[1];
-  var _speed   = useState(1);     var speed  = _speed[0]; var setSpeed  = _speed[1];
+  var _playing = useState(true);  var playing= _playing[0];var setPlaying= _playing[0.5];
+  var _speed   = useState(1);     var speed  = _speed[0]; var setSpeed  = _speed[0.5];
   var rafRef = useRef(null);
   var tRef = useRef(0);
   var aRef = useRef(0);
