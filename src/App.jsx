@@ -3,6 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, AreaChart, Area, ReferenceLine
 } from "recharts";
+import CinematicPipeline from "./PipelineCinematic";
 
 /* ═══ PALETTE ═══ */
 var $ = {
@@ -516,7 +517,7 @@ function PipeVis(props) {
 
 function CommandCentre(props) {
   useStyles();
-  var _tab  = useState("sim");   var tab   = _tab[0];   var setTab   = _tab[1];
+  var _tab  = useState(props.initialTab || "sim");   var tab   = _tab[0];   var setTab   = _tab[1];
   var _b    = useState(0);       var batch = _b[0];     var setBatch = _b[1];
   var _demo = useState(false);   var demo  = _demo[0];  var setDemo  = _demo[1];
   var _card = useState(null);    var card  = _card[0];  var setCard  = _card[1];
@@ -624,7 +625,7 @@ function CommandCentre(props) {
         <button onClick={props.onBack} style={{background:"transparent",border:"1px solid rgba(255,255,255,.08)",borderRadius:6,color:$.dim,padding:"5px 14px",fontSize:11,fontFamily:F.s,cursor:"pointer"}}>Exit</button>
       </div>
       <div style={{display:"flex",borderTop:"1px solid rgba(255,255,255,.04)"}}>
-        {[{id:"sim",label:"Simulation"},{id:"pipe",label:"Pipeline · 22 Stages"},{id:"finds",label:"Findings"}].map(function(t){
+        {[{id:"sim",label:"Simulation"},{id:"pipe",label:"How it works"},{id:"finds",label:"Findings"}].map(function(t){
           var a=tab===t.id;
           return (<button key={t.id} onClick={function(){setTab(t.id);setCard(null);}} style={{flex:1,padding:"10px 0",fontFamily:F.m,fontSize:10,fontWeight:a?600:400,color:a?$.glow:$.dim,background:"transparent",border:"none",cursor:"pointer",borderBottom:"2px solid "+(a?$.glow:"transparent"),letterSpacing:".04em",transition:"all .2s"}}>{t.label}</button>);
         })}
@@ -785,106 +786,12 @@ function CommandCentre(props) {
   if (tab==="pipe") return (
     <div style={{minHeight:"100vh",background:$.bg,fontFamily:F.s,color:$.tx2}}>
       {nav}
-      <div style={{maxWidth:880,margin:"0 auto",padding:"28px 20px 56px"}}>
-        <div style={{marginBottom:28}}>
-          <p style={{fontFamily:F.m,fontSize:10,color:$.glow,letterSpacing:4,marginBottom:8}}>A.G.N.E.S. PIPELINE v4.2</p>
-          <h2 style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:8}}>22 stages from raw data to deployed model</h2>
-          <p style={{fontSize:13,color:$.tx3,lineHeight:1.75}}>Every stage feeds into the next. Click any stage to see what it does and why</p>
-        </div>
-
-        {/* Run button + progress */}
-        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:24}}>
-          <button onClick={runPipeline} disabled={pipeRunning}
-            style={{background:pipeRunning?$.bg2:$.glow,color:pipeRunning?$.dim:$.bg,border:"none",borderRadius:8,padding:"10px 24px",fontSize:12,fontWeight:700,cursor:pipeRunning?"default":"pointer",fontFamily:F.m,letterSpacing:0.5}}>
-            {pipeRunning?"Running...":pipeStage>=totalStages?"Run again":"Run pipeline"}
-          </button>
-          <div style={{flex:1,height:3,background:"rgba(255,255,255,.04)",borderRadius:2,overflow:"hidden"}}>
-            <div style={{width:progress+"%",height:"100%",background:$.glow,borderRadius:2,transition:"width .2s ease"}}/>
-          </div>
-          <span style={{fontFamily:F.m,fontSize:10,color:$.glow,fontWeight:600,minWidth:36}}>{pipeStage}/{totalStages}</span>
-        </div>
-
-        {(function() {
-          var stageCount = 0;
-          return PIPELINE.map(function(ph) {
-            var phaseStart = stageCount;
-            var phaseComplete = true;
-            ph.stages.forEach(function() { stageCount++; if (stageCount > pipeStage) phaseComplete = false; });
-            var phaseActive = stageCount > pipeStage && phaseStart < pipeStage;
-
-            return (
-              <div key={ph.phase} style={{marginBottom:20,opacity:phaseStart<pipeStage?1:0.3,transition:"opacity .4s ease"}}>
-                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
-                  <div style={{width:8,height:8,borderRadius:"50%",background:ph.color,flexShrink:0,animation:phaseActive?"wpulse 1s ease-in-out infinite":"none"}}/>
-                  <span style={{fontFamily:F.m,fontSize:9,color:ph.color,letterSpacing:".06em",fontWeight:600}}>{ph.phase.toUpperCase()}</span>
-                  <div style={{flex:1,height:1,background:ph.color,opacity:.12}}/>
-                  
-                </div>
-                <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                  {(function() {
-                    var localCount = phaseStart;
-                    return ph.stages.map(function(s) {
-                      localCount++;
-                      var reached = localCount <= pipeStage;
-                      var current = localCount === pipeStage && pipeRunning;
-                      var isOpen = pipeOpen === s.n;
-                      return (
-                        <div key={s.n}
-                          onClick={function(){if(reached)setPipeOpen(isOpen?null:s.n);}}
-                          style={{background:current?"rgba(251,191,36,.04)":$.bg2,border:"1px solid "+(current?$.glow+"44":isOpen?ph.color+"44":$.brd),borderRadius:9,padding:"12px 14px",cursor:reached?"pointer":"default",transition:"all .3s",opacity:reached?1:0.25,transform:reached?"none":"translateX(8px)"}}>
-                          <div style={{display:"flex",alignItems:"center",gap:12}}>
-                            <div style={{width:32,height:32,borderRadius:8,background:reached?ph.color+"10":"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontFamily:F.m,fontSize:11,fontWeight:700,color:reached?ph.color:$.dim,transition:"all .3s"}}>
-                              {s.n}
-                            </div>
-                            <div style={{flex:1,minWidth:0}}>
-                              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                                <div style={{fontSize:13,fontWeight:600,color:reached?$.tx:$.dim}}>{s.name}</div>
-                                {reached && !isOpen && <span style={{fontFamily:F.m,fontSize:7,color:$.dim}}>→</span>}
-                              </div>
-                              {!isOpen && reached && <div style={{fontSize:11,color:$.tx3,marginTop:2}}>{s.plain}</div>}
-                            </div>
-                            {current && <div style={{width:6,height:6,borderRadius:"50%",background:$.glow,animation:"wpulse 0.6s ease-in-out infinite",flexShrink:0}}/>}
-                          </div>
-
-                          {isOpen && reached && (
-                            <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,.04)",animation:"wup .2s ease both"}}>
-                              {/* Stage visual */}
-                              <div style={{marginBottom:10}}><PipeVis n={s.n} color={ph.color}/></div>
-                              {/* Input → Output */}
-                              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-                                <div style={{background:"rgba(255,255,255,.03)",borderRadius:6,padding:"6px 10px"}}>
-                                  <div style={{fontFamily:F.m,fontSize:7,color:$.dim,letterSpacing:1}}>INPUT</div>
-                                  <div style={{fontFamily:F.m,fontSize:10,color:$.tx2,marginTop:2}}>{s.input}</div>
-                                </div>
-                                <span style={{color:ph.color,fontSize:14}}>→</span>
-                                <div style={{background:ph.color+"08",border:"1px solid "+ph.color+"22",borderRadius:6,padding:"6px 10px"}}>
-                                  <div style={{fontFamily:F.m,fontSize:7,color:ph.color,letterSpacing:1}}>OUTPUT</div>
-                                  <div style={{fontFamily:F.m,fontSize:10,color:$.tx,marginTop:2,fontWeight:600}}>{s.output}</div>
-                                </div>
-                              </div>
-                              {/* Technical detail */}
-                              <div style={{fontSize:11,color:$.dim,lineHeight:1.7,fontFamily:F.m}}>{s.desc}</div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    });
-                  })()}
-                </div>
-              </div>
-            );
-          });
-        })()}
-
-        <div style={{background:$.acD,border:"1px solid "+$.glow+"22",borderRadius:10,padding:"16px 20px",textAlign:"center",marginTop:8}}>
-          <div style={{fontFamily:F.m,fontSize:9,color:$.glow,letterSpacing:4,marginBottom:10}}>ENVIRONMENT</div>
-          <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
-            {["Python 3.13","scikit learn 1.8","LightGBM 4.6","SHAP 0.50","Optuna 4.7","NumPy","Pandas","SciPy"].map(function(t){
-              return (<span key={t} style={{fontFamily:F.m,fontSize:9,color:$.tx3,background:"rgba(255,255,255,.04)",padding:"3px 10px",borderRadius:5}}>{t}</span>);
-            })}
-          </div>
-        </div>
-      </div>
+      <CinematicPipeline
+        PIPELINE={PIPELINE}
+        pipeOpen={pipeOpen}
+        setPipeOpen={setPipeOpen}
+        PipeVis={PipeVis}
+      />
     </div>
   );
 
@@ -1334,7 +1241,7 @@ function HeroSection(props) {
             style={{ background: $.glow, color: $.bg, border: "none", borderRadius: 8, padding: "clamp(8px, 1.5vw, 10px) clamp(16px, 3vw, 24px)", fontSize: "clamp(11px, 1.8vw, 13px)", fontWeight: 700, cursor: "pointer", fontFamily: F.s }}>
             Enter Ops Centre
           </button>
-          <button onClick={function() { go("demo"); }}
+           <button onClick={function() { setPage("story"); }}
             style={{ background: "rgba(255,255,255,.04)", color: $.tx3, border: "1px solid rgba(255,255,255,.08)", borderRadius: 8, padding: "clamp(8px, 1.5vw, 10px) clamp(14px, 2.5vw, 20px)", fontSize: "clamp(11px, 1.8vw, 13px)", fontWeight: 500, cursor: "pointer", fontFamily: F.s, backdropFilter: "blur(8px)" }}>
             See It Live
           </button>
@@ -2474,7 +2381,8 @@ export default function App() {
 
   var pageContent;
 
-  if (page === "command") pageContent = <CommandCentre onBack={function() { setPage("landing"); }} />;
+  if (page === "command") pageContent = <CommandCentre onBack={function() { setPage("landing"); }} initialTab="sim" />;
+  else if (page === "story") pageContent = <CommandCentre onBack={function() { setPage("landing"); }} initialTab="pipe" />;
   else if (page === "ops") pageContent = <OpsCenter onBack={function() { setPage("landing"); }} />;
   else {
 
@@ -2508,26 +2416,35 @@ export default function App() {
 
       {/* ═══ EXPLORE ═══ */}
       <section style={{ padding: "80px 24px" }}>
-        <div style={{ maxWidth: 640, margin: "0 auto" }}>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
           <Rv><h2 style={{ fontSize: "clamp(24px, 4vw, 34px)", fontWeight: 700, fontFamily: F.s, textAlign: "center", marginBottom: 48 }}>Go deeper</h2></Rv>
           <Rv d={0.1}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+            <div onClick={function() { setPage("story"); }}
+              style={{ background: $.bg2, borderRadius: 14, padding: "32px 24px", cursor: "pointer", transition: "all .25s", border: "1px solid " + $.glow + "22" }}
+              onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(251,191,36,.1)"; e.currentTarget.style.borderColor = $.glow + "55"; }}
+              onMouseLeave={function(e) { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = $.glow + "22"; }}>
+              <div style={{ fontFamily: F.m, fontSize: 9, color: $.glow, letterSpacing: 1.5, marginBottom: 12 }}>For everyone</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: $.tx, marginBottom: 10 }}>The Story</div>
+              <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.75, marginBottom: 20 }}>Seven steps, no jargon. Watch how the AI learns to keep the power on.</p>
+              <span style={{ fontFamily: F.m, fontSize: 11, color: $.glow, fontWeight: 600 }}>Watch →</span>
+            </div>
             <div onClick={function() { setPage("ops"); }}
-              style={{ background: $.bg2, borderRadius: 14, padding: "32px 28px", cursor: "pointer", transition: "all .25s" }}
+              style={{ background: $.bg2, borderRadius: 14, padding: "32px 24px", cursor: "pointer", transition: "all .25s" }}
               onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(251,191,36,.06)"; }}
               onMouseLeave={function(e) { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
               <div style={{ fontFamily: F.m, fontSize: 9, color: $.dim, letterSpacing: 1.5, marginBottom: 12 }}>Interactive</div>
               <div style={{ fontSize: 18, fontWeight: 700, color: $.tx, marginBottom: 10 }}>Operations Centre</div>
-              <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.75, marginBottom: 20 }}>Three incidents. Briefings, mini tasks, timed decisions, and a full debrief</p>
+              <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.75, marginBottom: 20 }}>Three incidents. Briefings, mini tasks, timed decisions, a full debrief.</p>
               <span style={{ fontFamily: F.m, fontSize: 11, color: $.glow, fontWeight: 600 }}>Enter →</span>
             </div>
             <div onClick={function() { setPage("command"); }}
-              style={{ background: $.bg2, borderRadius: 14, padding: "32px 28px", cursor: "pointer", transition: "all .25s" }}
+              style={{ background: $.bg2, borderRadius: 14, padding: "32px 24px", cursor: "pointer", transition: "all .25s" }}
               onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(251,191,36,.06)"; }}
               onMouseLeave={function(e) { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
               <div style={{ fontFamily: F.m, fontSize: 9, color: $.dim, letterSpacing: 1.5, marginBottom: 12 }}>Technical</div>
               <div style={{ fontSize: 18, fontWeight: 700, color: $.tx, marginBottom: 10 }}>Dashboard</div>
-              <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.75, marginBottom: 20 }}>120 batches. Full pipeline. Every chart explained.</p>
+              <p style={{ fontSize: 13, color: $.tx3, lineHeight: 1.75, marginBottom: 20 }}>120 batches. Live charts. Every finding backed by data.</p>
               <span style={{ fontFamily: F.m, fontSize: 11, color: $.glow, fontWeight: 600 }}>Open →</span>
             </div>
           </div>
