@@ -787,22 +787,39 @@ function CinematicPipeline(props) {
             </p>
           </div>
 
-          <div style={{marginLeft:isMobile?0:"clamp(0px, 28vw, 360px)",minHeight:isMobile?380:460,position:"relative"}}>
+          {isMobile && (
+            <div style={{position:"relative",marginBottom:16,display:"flex",alignItems:"center",gap:10}}>
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim,letterSpacing:1,minWidth:60}}>
+                {(elapsed/1000).toFixed(1)}s / {(totalDur/1000).toFixed(0)}s
+              </span>
+              <div style={{flex:1,height:1,background:"rgba(255,255,255,.05)",position:"relative"}}>
+                <div style={{position:"absolute",left:0,top:0,bottom:0,width:globalPct+"%",
+                  background:"linear-gradient(90deg,"+act.color+"aa,"+act.color+")",transition:"width .1s linear"}}/>
+              </div>
+              <span style={{fontFamily:F.m,fontSize:9,color:act.color,letterSpacing:1,fontWeight:600,minWidth:32,textAlign:"right"}}>
+                {Math.round(globalPct)}%
+              </span>
+            </div>
+          )}
+
+          <div style={{marginLeft:isMobile?0:"clamp(0px, 28vw, 360px)",minHeight:isMobile?"auto":460,position:"relative"}}>
             <SceneRenderer act={act} t={t} actIdx={actIdx} isMobile={isMobile}/>
           </div>
 
-          <div style={{position:isMobile?"relative":"absolute",left:isMobile?"auto":24,right:isMobile?"auto":24,bottom:isMobile?"auto":12,marginTop:isMobile?16:0,display:"flex",alignItems:"center",gap:12}}>
-            <span style={{fontFamily:F.m,fontSize:9,color:$.dim,letterSpacing:1}}>
-              {(elapsed/1000).toFixed(1)}s / {(totalDur/1000).toFixed(0)}s
-            </span>
-            <div style={{flex:1,height:1,background:"rgba(255,255,255,.05)",position:"relative"}}>
-              <div style={{position:"absolute",left:0,top:0,bottom:0,width:globalPct+"%",
-                background:"linear-gradient(90deg,"+act.color+"aa,"+act.color+")",transition:"width .1s linear"}}/>
+          {!isMobile && (
+            <div style={{position:"absolute",left:24,right:24,bottom:12,display:"flex",alignItems:"center",gap:12}}>
+              <span style={{fontFamily:F.m,fontSize:9,color:$.dim,letterSpacing:1}}>
+                {(elapsed/1000).toFixed(1)}s / {(totalDur/1000).toFixed(0)}s
+              </span>
+              <div style={{flex:1,height:1,background:"rgba(255,255,255,.05)",position:"relative"}}>
+                <div style={{position:"absolute",left:0,top:0,bottom:0,width:globalPct+"%",
+                  background:"linear-gradient(90deg,"+act.color+"aa,"+act.color+")",transition:"width .1s linear"}}/>
+              </div>
+              <span style={{fontFamily:F.m,fontSize:9,color:act.color,letterSpacing:1,fontWeight:600,minWidth:38,textAlign:"right"}}>
+                {Math.round(globalPct)}%
+              </span>
             </div>
-            <span style={{fontFamily:F.m,fontSize:9,color:act.color,letterSpacing:1,fontWeight:600,minWidth:38,textAlign:"right"}}>
-              {Math.round(globalPct)}%
-            </span>
-          </div>
+          )}
         </div>
       </div>
 
@@ -876,7 +893,7 @@ function CinematicPipeline(props) {
 function SceneRenderer(props) {
   var act = props.act, t = props.t, actIdx = props.actIdx, isMobile = props.isMobile;
   return (
-    <div key={actIdx} style={{width:"100%",height:isMobile?380:460,position:"relative",animation:"cineFade .55s ease both"}}>
+    <div key={actIdx} style={{width:"100%",height:isMobile?"auto":460,minHeight:isMobile?380:460,position:"relative",animation:"cineFade .55s ease both"}}>
       {act.id==="load"     && <SceneLoad t={t} color={act.color} isMobile={isMobile}/>}
       {act.id==="engineer" && <SceneEngineer t={t} color={act.color} isMobile={isMobile}/>}
       {act.id==="select"   && <SceneSelect t={t} color={act.color} isMobile={isMobile}/>}
@@ -895,7 +912,7 @@ function SceneLoad(props) {
   var nan = t < 0.55 ? Math.floor(t*1800) : Math.max(0, Math.floor((1-t)*200));
   var pct = Math.min(1, t*1.3);
   return (
-    <div style={{width:"100%",height:"100%",display:"grid",gridTemplateRows:"1fr auto",gap:16}}>
+    <div style={{width:"100%",height:isMobile?"auto":"100%",display:"grid",gridTemplateRows:isMobile?"auto auto":"1fr auto",gap:16}}>
       <div style={{position:"relative",background:"rgba(255,255,255,.015)",border:"1px solid rgba(255,255,255,.04)",
         borderRadius:12,padding:"18px 22px",overflow:"hidden"}}>
         <div style={{fontFamily:F.m,fontSize:9,color:$.dim,letterSpacing:1.5,marginBottom:14}}>
@@ -959,7 +976,7 @@ function SceneEngineer(props) {
   var visibleN = Math.min(featCount, newFeats.length);
 
   return (
-    <div style={{width:"100%",height:"100%",display:"grid",gridTemplateRows:"1fr auto",gap:16}}>
+    <div style={{width:"100%",height:isMobile?"auto":"100%",display:"grid",gridTemplateRows:isMobile?"auto auto":"1fr auto",gap:16}}>
       <div style={{background:"rgba(255,255,255,.015)",border:"1px solid rgba(255,255,255,.04)",
         borderRadius:12,padding:"18px 22px",position:"relative",overflow:"hidden"}}>
         <div style={{fontFamily:F.m,fontSize:9,color:$.dim,letterSpacing:1.5,marginBottom:14}}>
@@ -1052,7 +1069,7 @@ function SceneSelect(props) {
   var markerY = 170 - (.9994-.94)*2000;
 
   return (
-    <div style={{width:"100%",height:"100%",display:"grid",gridTemplateRows:"1fr auto",gap:16}}>
+    <div style={{width:"100%",height:isMobile?"auto":"100%",display:"grid",gridTemplateRows:isMobile?"auto auto":"1fr auto",gap:16}}>
       <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1.1fr 1fr",gap:14}}>
 
         <div style={{background:"rgba(255,255,255,.015)",border:"1px solid rgba(255,255,255,.04)",
@@ -1153,7 +1170,7 @@ function SceneTrain(props) {
   var lcRows = [{data:LC_HYB,c:"#fbbf24",name:"TEAM"},{data:LC_LGBM,c:"#67e8f9",name:"H3"},{data:LC_RF,c:"#34d399",name:"H2"},{data:LC_LR,c:"#a78bfa",name:"H4"}];
 
   return (
-    <div style={{width:"100%",height:"100%",display:"grid",gridTemplateRows:"auto 1fr",gap:14}}>
+    <div style={{width:"100%",height:isMobile?"auto":"100%",display:"grid",gridTemplateRows:isMobile?"auto auto":"auto 1fr",gap:14}}>
       <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:10}}>
         {models.map(function(m,i){
           var localT = Math.max(0, Math.min(1, (t - i*0.08) * 1.5));
@@ -1303,7 +1320,7 @@ function SceneEvaluate(props) {
     {c:"#a78bfa",auc:0.998, name:"H1"}
   ];
   return (
-    <div style={{width:"100%",height:"100%",display:"grid",
+    <div style={{width:"100%",height:isMobile?"auto":"100%",display:"grid",
       gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gridTemplateRows:isMobile?"auto":"auto auto",gap:12}}>
 
       <div style={{background:"rgba(255,255,255,.015)",border:"1px solid rgba(255,255,255,.04)",
@@ -1423,8 +1440,8 @@ function SceneStress(props) {
     {name:"Helper 2", rate:0.04, color:"#34d399"},
   ];
   return (
-    <div style={{width:"100%",height:"100%",display:"grid",
-      gridTemplateRows:"1fr 1fr",gap:12}}>
+    <div style={{width:"100%",height:isMobile?"auto":"100%",display:"grid",
+      gridTemplateRows:isMobile?"auto auto":"1fr 1fr",gap:12}}>
 
       <div style={{background:"rgba(255,255,255,.015)",border:"1px solid rgba(255,255,255,.04)",
         borderRadius:12,padding:"14px 18px"}}>
@@ -1517,8 +1534,8 @@ function SceneDeploy(props) {
   var lastAucY = upto > 0 ? 100 - ((aucSlice[aucSlice.length-1]-.65)/.35)*85 : 100;
 
   return (
-    <div style={{width:"100%",height:"100%",display:"grid",
-      gridTemplateRows:"1fr 1fr auto",gap:12}}>
+    <div style={{width:"100%",height:isMobile?"auto":"100%",display:"grid",
+      gridTemplateRows:isMobile?"auto auto auto":"1fr 1fr auto",gap:12}}>
 
       <div style={{background:"rgba(255,255,255,.015)",border:"1px solid rgba(255,255,255,.04)",
         borderRadius:12,padding:"12px 18px",position:"relative"}}>
