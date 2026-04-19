@@ -1260,23 +1260,30 @@ function CinematicPipeline(props) {
                 <span style={{fontFamily:F.m,fontSize:9,color:ph.color,letterSpacing:".06em",fontWeight:600}}>{ph.phase.toUpperCase()}</span>
                 <div style={{flex:1,height:1,background:ph.color,opacity:.12}}/>
               </div>
-              <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                {ph.stages.map(function(s){
-                  var isOpen = pipeOpen === s.n;
-                  return (
-                    <div key={s.n}
-                      onClick={function(){ setPipeOpen(isOpen?null:s.n); }}
-                      style={{background:$.bg2,border:"1px solid "+(isOpen?ph.color+"44":$.brd),
-                        borderRadius:9,padding:"12px 14px",cursor:"pointer",transition:"all .25s"}}>
-                      <div style={{display:"flex",alignItems:"center",gap:12}}>
-                        <div style={{width:32,height:32,borderRadius:8,background:ph.color+"10",
-                          display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
-                          fontFamily:F.m,fontSize:11,fontWeight:700,color:ph.color}}>{s.n}</div>
-                        <div style={{flex:1,minWidth:0}}>
-                          <div style={{fontSize:13,fontWeight:600,color:$.tx}}>{s.name}</div>
-                          {!isOpen && <div style={{fontSize:11,color:$.tx3,marginTop:2}}>{s.plain}</div>}
-                        </div>
-                      </div>
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+  {ph.stages.map(function(s){
+    return (
+      <div key={s.n}
+        style={{background:$.bg2,border:"1px solid "+$.brd,
+          borderRadius:9,padding:"14px 16px",transition:"all .25s"}}>
+        <div style={{display:"flex",alignItems:"flex-start",gap:12,marginBottom:10}}>
+          <div style={{width:32,height:32,borderRadius:8,background:ph.color+"14",
+            display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
+            fontFamily:F.m,fontSize:11,fontWeight:700,color:ph.color}}>{s.n}</div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:13,fontWeight:600,color:$.tx,marginBottom:3}}>{s.name}</div>
+            <div style={{fontSize:11,color:$.tx3,lineHeight:1.55}}>{s.plain}</div>
+          </div>
+        </div>
+        {PipeVis && (
+          <div style={{paddingTop:10,borderTop:"1px solid rgba(255,255,255,.03)",display:"flex",justifyContent:"center"}}>
+            <PipeVis n={s.n} color={ph.color}/>
+          </div>
+        )}
+      </div>
+    );
+  })}
+</div>
                       {isOpen && (
                         <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,.04)",animation:"cineFade .25s ease both"}}>
                           {PipeVis && <div style={{marginBottom:10}}><PipeVis n={s.n} color={ph.color}/></div>}
