@@ -419,95 +419,512 @@ function SignatureDemo() {
 /* ═══ PIPELINE STAGE VISUALS ═══ */
 function PipeVis(props) {
   var n = props.n; var color = props.color;
-  var W = 220; var H = 48;
+  var W = 260; var H = 60;
   var c = color || $.glow;
 
-  // Data loading - dots streaming into a box
+  // ━━━ PHASE 1: COLLECTING ━━━
+
+  // 1. Data loading — file streams rows into a counter
   if (n === 1) return (
     <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
-      {[0,1,2,3,4,5,6,7].map(function(i){return <circle key={i} cx={20+i*12} cy={24} r="2.5" fill={c} opacity="0.4"><animate attributeName="opacity" values="0.1;0.8;0.1" dur="1.5s" begin={i*0.15+"s"} repeatCount="indefinite"/></circle>;})}
-      <rect x={130} y={12} width={60} height={24} rx="4" fill="none" stroke={c} strokeWidth="1" opacity="0.3"/>
-      <text x={160} y={28} textAnchor="middle" fill={c} fontSize="8" fontFamily={F.m} opacity="0.5">60K</text>
+      <rect x="10" y="16" width="28" height="28" rx="2" fill="none" stroke={c} strokeWidth="1" strokeOpacity="0.5"/>
+      <line x1="16" y1="24" x2="32" y2="24" stroke={c} strokeWidth="0.8" strokeOpacity="0.4"/>
+      <line x1="16" y1="28" x2="32" y2="28" stroke={c} strokeWidth="0.8" strokeOpacity="0.4"/>
+      <line x1="16" y1="32" x2="28" y2="32" stroke={c} strokeWidth="0.8" strokeOpacity="0.4"/>
+      <line x1="16" y1="36" x2="32" y2="36" stroke={c} strokeWidth="0.8" strokeOpacity="0.4"/>
+      <text x="24" y="54" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.5">file</text>
+      {[0,1,2,3,4,5].map(function(i){
+        return <circle key={i} cy="30" r="2.2" fill={c}>
+          <animate attributeName="cx" from="44" to="195" dur="1.4s" begin={i*0.23+"s"} repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.12;0.88;1" dur="1.4s" begin={i*0.23+"s"} repeatCount="indefinite"/>
+        </circle>;
+      })}
+      <rect x="195" y="16" width="55" height="28" rx="3" fill={c} fillOpacity="0.1" stroke={c} strokeWidth="1" strokeOpacity="0.6"/>
+      <text x="222.5" y="29" textAnchor="middle" fill={c} fontSize="10" fontFamily={F.m} fontWeight="700">60,000</text>
+      <text x="222.5" y="39" textAnchor="middle" fill={c} fontSize="6" fontFamily={F.m} opacity="0.6">rows</text>
     </svg>
   );
-  // Feature engineering - 12 dots expanding to 48
+
+  // 2. Feature engineering — 12 basics expand into 48 clues
   if (n === 2) return (
     <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
-      {[0,1,2,3,4,5,6,7,8,9,10,11].map(function(i){return <circle key={i} cx={15+i*5} cy={24} r="2" fill={c} opacity="0.6"/>;})}
-      <text x={85} y={27} fill={c} fontSize="10" fontFamily={F.m} opacity="0.4">→</text>
-      {Array.from({length:24}).map(function(_,i){return <circle key={i} cx={100+(i%12)*8} cy={i<12?16:32} r="1.5" fill={c} opacity="0.35"><animate attributeName="opacity" values="0.15;0.5;0.15" dur="2s" begin={i*0.06+"s"} repeatCount="indefinite"/></circle>;})}
+      {Array.from({length:12}).map(function(_,i){
+        return <circle key={i} cx={14+(i%6)*8} cy={20+Math.floor(i/6)*14} r="2.5" fill={c} opacity="0.8"/>;
+      })}
+      <text x="34" y="56" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.55">12 basics</text>
+      <line x1="72" y1="30" x2="106" y2="30" stroke={c} strokeWidth="1" strokeOpacity="0.4"/>
+      <polygon points="104,27 110,30 104,33" fill={c} fillOpacity="0.5"/>
+      <text x="89" y="22" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.6">combine</text>
+      {Array.from({length:48}).map(function(_,i){
+        return <circle key={i} cx={124+(i%12)*9} cy={14+Math.floor(i/12)*10} r="1.8" fill={c} opacity="0">
+          <animate attributeName="opacity" from="0" to="0.7" dur="0.3s" begin={(i*0.025)+"s"} fill="freeze"/>
+        </circle>;
+      })}
+      <text x="176" y="56" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.55">48 clues</text>
     </svg>
   );
-  // Data splitting - bar dividing into 3
+
+  // 3. Data splitting — one pile becomes three
   if (n === 3) return (
     <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
-      <rect x={10} y={18} width={70} height={12} rx="3" fill={c} opacity="0.2"/>
-      <text x={115} y={27} fill={c} fontSize="10" fontFamily={F.m} opacity="0.4">→</text>
-      <rect x={135} y={18} width={28} height={12} rx="2" fill={$.gn} opacity="0.35"/><text x={149} y={27} textAnchor="middle" fill={$.gn} fontSize="6" fontFamily={F.m}>TRN</text>
-      <rect x={166} y={18} width={20} height={12} rx="2" fill={$.ac} opacity="0.35"/><text x={176} y={27} textAnchor="middle" fill={$.ac} fontSize="6" fontFamily={F.m}>VAL</text>
-      <rect x={189} y={18} width={20} height={12} rx="2" fill={$.rd} opacity="0.35"/><text x={199} y={27} textAnchor="middle" fill={$.rd} fontSize="6" fontFamily={F.m}>TST</text>
+      <rect x="10" y="22" width="70" height="16" rx="3" fill={c} fillOpacity="0.25"/>
+      <text x="45" y="54" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.55">all data</text>
+      <line x1="86" y1="30" x2="112" y2="30" stroke={c} strokeWidth="1" strokeOpacity="0.4"/>
+      <polygon points="110,27 116,30 110,33" fill={c} fillOpacity="0.5"/>
+      <rect x="122" y="22" width="50" height="16" rx="3" fill={$.gn} fillOpacity="0">
+        <animate attributeName="fill-opacity" from="0" to="0.5" dur="0.4s" begin="0s" fill="freeze"/>
+      </rect>
+      <text x="147" y="34" textAnchor="middle" fill={$.gn} fontSize="8" fontFamily={F.m} fontWeight="700">TRAIN</text>
+      <rect x="175" y="22" width="35" height="16" rx="3" fill={$.ac} fillOpacity="0">
+        <animate attributeName="fill-opacity" from="0" to="0.5" dur="0.4s" begin="0.2s" fill="freeze"/>
+      </rect>
+      <text x="192.5" y="34" textAnchor="middle" fill={$.ac} fontSize="7" fontFamily={F.m} fontWeight="700">TUNE</text>
+      <rect x="213" y="22" width="35" height="16" rx="3" fill={$.rd} fillOpacity="0">
+        <animate attributeName="fill-opacity" from="0" to="0.5" dur="0.4s" begin="0.4s" fill="freeze"/>
+      </rect>
+      <text x="230.5" y="34" textAnchor="middle" fill={$.rd} fontSize="7" fontFamily={F.m} fontWeight="700">TEST</text>
+      <text x="185" y="54" textAnchor="middle" fill={c} fontSize="6" fontFamily={F.m} opacity="0.45">three piles</text>
     </svg>
   );
-  // Feature selection - dots disappearing
+
+  // ━━━ PHASE 2: CHOOSING ━━━
+
+  // 4. Feature selection — useless clues fade away
   if (n === 4) return (
     <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
-      {Array.from({length:24}).map(function(_,i){var keep=i<7;return <circle key={i} cx={10+(i%12)*8} cy={i<12?16:32} r="2" fill={keep?c:$.dim} opacity={keep?0.7:0.12}>{!keep&&<animate attributeName="r" values="2;0" dur="0.8s" begin={(i*0.05)+"s" } fill="freeze"/>}</circle>;})}
-      <text x={115} y={27} fill={c} fontSize="10" fontFamily={F.m} opacity="0.4">→</text>
-      <text x={140} y={28} fill={c} fontSize="9" fontFamily={F.m} opacity="0.6">14 kept</text>
+      {Array.from({length:48}).map(function(_,i){
+        var keep = [2,5,8,11,14,17,20,23,26,29,32,35,38,41].indexOf(i) >= 0;
+        return <circle key={i} cx={10+(i%12)*7} cy={14+Math.floor(i/12)*10} r="2" fill={c} opacity={keep?0.9:0.4}>
+          {!keep && <animate attributeName="opacity" values="0.4;0" dur="1s" begin={(i*0.02)+"s"} fill="freeze"/>}
+          {!keep && <animate attributeName="r" values="2;0" dur="1s" begin={(i*0.02)+"s"} fill="freeze"/>}
+          {keep && <animate attributeName="r" values="2;2.8;2" dur="1.8s" begin={(i*0.05)+"s"} repeatCount="indefinite"/>}
+        </circle>;
+      })}
+      <text x="50" y="56" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.45">test all 48</text>
+      <line x1="102" y1="30" x2="132" y2="30" stroke={c} strokeWidth="1" strokeOpacity="0.4"/>
+      <polygon points="130,27 136,30 130,33" fill={c} fillOpacity="0.5"/>
+      <rect x="142" y="20" width="82" height="20" rx="10" fill={c} fillOpacity="0.15" stroke={c} strokeWidth="1" strokeOpacity="0.5"/>
+      <text x="183" y="33" textAnchor="middle" fill={c} fontSize="10" fontFamily={F.m} fontWeight="700">14 kept</text>
+      <text x="183" y="54" textAnchor="middle" fill={c} fontSize="6" fontFamily={F.m} opacity="0.45">best ones</text>
     </svg>
   );
-  // Hyperparameter search - grid with one highlighted
+
+  // 5. Hyperparameter search — grid lights up, one winner
   if (n === 5) return (
     <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
-      {Array.from({length:25}).map(function(_,i){var x=15+(i%5)*14;var y=8+(Math.floor(i/5))*9;var best=i===12;return <rect key={i} x={x} y={y} width={10} height={6} rx="1" fill={best?$.glow:c} opacity={best?0.8:0.12}>{best&&<animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite"/>}</rect>;})}
-      <text x={105} y={27} fill={c} fontSize="10" fontFamily={F.m} opacity="0.4">→</text>
-      <text x={125} y={28} fill={$.glow} fontSize="9" fontFamily={F.m} opacity="0.6">optimal</text>
+      {Array.from({length:40}).map(function(_,i){
+        var x = 10 + (i%10)*10;
+        var y = 10 + Math.floor(i/10)*11;
+        var best = i === 23;
+        return <rect key={i} x={x} y={y} width="7" height="7" rx="1" fill={c} opacity={best?1:0.18}>
+          {!best && <animate attributeName="opacity" values="0.15;0.5;0.15" dur="2s" begin={(i*0.04)+"s"} repeatCount="indefinite"/>}
+          {best && <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite"/>}
+        </rect>;
+      })}
+      <text x="57" y="56" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.45">100 tried</text>
+      <line x1="118" y1="30" x2="148" y2="30" stroke={c} strokeWidth="1" strokeOpacity="0.4"/>
+      <polygon points="146,27 152,30 146,33" fill={c} fillOpacity="0.5"/>
+      <circle cx="188" cy="30" r="16" fill="none" stroke={c} strokeWidth="1" strokeOpacity="0.4">
+        <animate attributeName="r" values="10;18;10" dur="1.5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.6;0;0.6" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="188" cy="30" r="10" fill={c} fillOpacity="0.8"/>
+      <text x="188" y="34" textAnchor="middle" fill={$.bg} fontSize="11" fontFamily={F.m} fontWeight="700">★</text>
+      <text x="224" y="33" fill={c} fontSize="9" fontFamily={F.m} opacity="0.65">best</text>
     </svg>
   );
-  // Four base learners - 4 different shapes
+
+  // ━━━ PHASE 3: TEACHING ━━━
+
+  // 6. Four base learners — four distinct shapes
   if (n === 6) return (
     <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
-      <circle cx={30} cy={24} r="10" fill="none" stroke="#a78bfa" strokeWidth="1.5" opacity="0.5"/><text x={30} y={27} textAnchor="middle" fill="#a78bfa" fontSize="6" fontFamily={F.m}>SVM</text>
-      <rect x={55} y={14} width={20} height={20} rx="3" fill="none" stroke={$.gn} strokeWidth="1.5" opacity="0.5"/><text x={65} y={27} textAnchor="middle" fill={$.gn} fontSize="6" fontFamily={F.m}>RF</text>
-      <polygon points="100,14 110,34 90,34" fill="none" stroke="#67e8f9" strokeWidth="1.5" opacity="0.5"/><text x={100} y={30} textAnchor="middle" fill="#67e8f9" fontSize="5" fontFamily={F.m}>LGB</text>
-      <rect x={120} y={14} width={20} height={20} rx="10" fill="none" stroke={$.ac} strokeWidth="1.5" opacity="0.5"/><text x={130} y={27} textAnchor="middle" fill={$.ac} fontSize="6" fontFamily={F.m}>LR</text>
+      <circle cx="40" cy="26" r="13" fill="none" stroke="#a78bfa" strokeWidth="1.5" strokeOpacity="0.6"/>
+      <circle cx="40" cy="26" r="4" fill="#a78bfa" fillOpacity="0.3"/>
+      <text x="40" y="54" textAnchor="middle" fill="#a78bfa" fontSize="7" fontFamily={F.m} fontWeight="700">H1</text>
+      <rect x="84" y="13" width="26" height="26" rx="2" fill="none" stroke={$.gn} strokeWidth="1.5" strokeOpacity="0.6"/>
+      <line x1="97" y1="18" x2="91" y2="24" stroke={$.gn} strokeWidth="1" strokeOpacity="0.6"/>
+      <line x1="97" y1="18" x2="103" y2="24" stroke={$.gn} strokeWidth="1" strokeOpacity="0.6"/>
+      <line x1="97" y1="24" x2="89" y2="35" stroke={$.gn} strokeWidth="1" strokeOpacity="0.6"/>
+      <line x1="97" y1="24" x2="105" y2="35" stroke={$.gn} strokeWidth="1" strokeOpacity="0.6"/>
+      <text x="97" y="54" textAnchor="middle" fill={$.gn} fontSize="7" fontFamily={F.m} fontWeight="700">H2</text>
+      <polygon points="154,13 168,39 140,39" fill="none" stroke="#67e8f9" strokeWidth="1.5" strokeOpacity="0.6"/>
+      <polygon points="154,22 160,34 148,34" fill="#67e8f9" fillOpacity="0.3"/>
+      <text x="154" y="54" textAnchor="middle" fill="#67e8f9" fontSize="7" fontFamily={F.m} fontWeight="700">H3</text>
+      <line x1="198" y1="37" x2="226" y2="15" stroke={$.ac} strokeWidth="1.5" strokeOpacity="0.6"/>
+      <circle cx="200" cy="35" r="2" fill={$.ac} fillOpacity="0.7"/>
+      <circle cx="212" cy="26" r="2" fill={$.ac} fillOpacity="0.7"/>
+      <circle cx="224" cy="17" r="2" fill={$.ac} fillOpacity="0.7"/>
+      <text x="212" y="54" textAnchor="middle" fill={$.ac} fontSize="7" fontFamily={F.m} fontWeight="700">H4</text>
     </svg>
   );
-  // Calibration - crooked line becoming straight
+
+  // 7. Calibration — wavy (dishonest) → straight (honest)
   if (n === 7) return (
     <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
-      <path d="M10,38 Q30,10 50,30 Q70,42 90,20" fill="none" stroke={$.rd} strokeWidth="1.2" opacity="0.3" strokeDasharray="3 3"/>
-      <text x={105} y={27} fill={c} fontSize="10" fontFamily={F.m} opacity="0.4">→</text>
-      <line x1={120} y1={38} x2={200} y2={12} stroke={$.gn} strokeWidth="1.5" opacity="0.5"/>
-      <line x1={120} y1={38} x2={200} y2={12} stroke={$.gn} strokeWidth="1" opacity="0.15" strokeDasharray="3 3"/>
+      <text x="48" y="10" textAnchor="middle" fill={$.rd} fontSize="7" fontFamily={F.m} opacity="0.65">dishonest</text>
+      <path d="M 12 44 Q 30 14 48 38 Q 66 52 84 18" fill="none" stroke={$.rd} strokeWidth="1.3" strokeOpacity="0.6" strokeDasharray="3 3"/>
+      <line x1="98" y1="30" x2="128" y2="30" stroke={c} strokeWidth="1" strokeOpacity="0.4"/>
+      <polygon points="126,27 132,30 126,33" fill={c} fillOpacity="0.5"/>
+      <text x="113" y="22" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.55">align</text>
+      <text x="188" y="10" textAnchor="middle" fill={$.gn} fontSize="7" fontFamily={F.m} opacity="0.65">honest</text>
+      <line x1="142" y1="44" x2="232" y2="16" stroke={$.gn} strokeWidth="1.8" strokeOpacity="0.7"/>
+      <circle cx="142" cy="44" r="2.2" fill={$.gn}/>
+      <circle cx="232" cy="16" r="2.2" fill={$.gn}/>
+      <text x="187" y="54" textAnchor="middle" fill={$.gn} fontSize="6" fontFamily={F.m} opacity="0.55">says 90%, is 90% right</text>
     </svg>
   );
-  // Stacking ensemble - shapes merging
+
+  // 8. Stacking — two helpers merge into team
   if (n === 8) return (
     <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
-      <circle cx={25} cy={24} r="8" fill="none" stroke="#a78bfa" strokeWidth="1" opacity="0.4"/>
-      <rect x={50} y={16} width={16} height={16} rx="2" fill="none" stroke={$.gn} strokeWidth="1" opacity="0.4"/>
-      <text x={85} y={27} fill={c} fontSize="10" fontFamily={F.m} opacity="0.4">→</text>
-      <rect x={105} y={10} width={50} height={28} rx="6" fill={$.glow} opacity="0.1" stroke={$.glow} strokeWidth="1.5" opacity="0.4"/>
-      <text x={130} y={28} textAnchor="middle" fill={$.glow} fontSize="8" fontFamily={F.m} opacity="0.6">HYBRID</text>
+      <circle cx="22" cy="18" r="9" fill="none" stroke="#a78bfa" strokeWidth="1.2" strokeOpacity="0.6"/>
+      <text x="22" y="22" textAnchor="middle" fill="#a78bfa" fontSize="8" fontFamily={F.m} fontWeight="700">H1</text>
+      <rect x="12" y="34" width="20" height="14" rx="2" fill="none" stroke={$.gn} strokeWidth="1.2" strokeOpacity="0.6"/>
+      <text x="22" y="44" textAnchor="middle" fill={$.gn} fontSize="8" fontFamily={F.m} fontWeight="700">H2</text>
+      <line x1="35" y1="20" x2="105" y2="26" stroke={c} strokeWidth="0.8" strokeOpacity="0.5" strokeDasharray="3 2"/>
+      <line x1="35" y1="42" x2="105" y2="34" stroke={c} strokeWidth="0.8" strokeOpacity="0.5" strokeDasharray="3 2"/>
+      <polygon points="103,23 109,26 103,29" fill={c} fillOpacity="0.5"/>
+      <polygon points="103,31 109,34 103,37" fill={c} fillOpacity="0.5"/>
+      <rect x="118" y="14" width="92" height="30" rx="6" fill={c} fillOpacity="0.15" stroke={c} strokeWidth="1.5" strokeOpacity="0.7">
+        <animate attributeName="stroke-opacity" values="0.4;0.9;0.4" dur="2s" repeatCount="indefinite"/>
+      </rect>
+      <text x="164" y="34" textAnchor="middle" fill={c} fontSize="12" fontFamily={F.m} fontWeight="700">TEAM</text>
+      <text x="230" y="24" fill={c} fontSize="7" fontFamily={F.m} opacity="0.55">beats</text>
+      <text x="230" y="36" fill={c} fontSize="7" fontFamily={F.m} opacity="0.55">both</text>
     </svg>
   );
-  // Score bar
+
+  // ━━━ PHASE 4: TESTING ━━━
+
+  // 9. Grade — score bar fills to near-perfect
   if (n === 9) return (
     <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
-      <rect x={10} y={20} width={140} height={8} rx="4" fill="rgba(255,255,255,.06)"/>
-      <rect x={10} y={20} width={139.8} height={8} rx="4" fill={$.gn} opacity="0.4"><animate attributeName="width" from="0" to="139.8" dur="1.2s" fill="freeze"/></rect>
-      <text x={160} y={27} fill={$.gn} fontSize="9" fontFamily={F.m} fontWeight="700" opacity="0.7">0.9999</text>
+      <text x="10" y="17" fill={$.dim} fontSize="7" fontFamily={F.m}>score</text>
+      <rect x="10" y="22" width="180" height="16" rx="8" fill="rgba(255,255,255,.06)"/>
+      <rect x="10" y="22" width="0" height="16" rx="8" fill={$.gn} fillOpacity="0.6">
+        <animate attributeName="width" from="0" to="179.82" dur="1.2s" fill="freeze"/>
+      </rect>
+      <text x="100" y="34" textAnchor="middle" fill={$.tx} fontSize="10" fontFamily={F.m} fontWeight="700" opacity="0">
+        <animate attributeName="opacity" from="0" to="1" dur="0.3s" begin="1s" fill="freeze"/>
+        99.99%
+      </text>
+      <text x="225" y="34" textAnchor="middle" fill={$.gn} fontSize="16" fontFamily={F.m} fontWeight="700" opacity="0">
+        <animate attributeName="opacity" from="0" to="1" dur="0.3s" begin="1.2s" fill="freeze"/>
+        ✓
+      </text>
+      <text x="100" y="52" textAnchor="middle" fill={$.dim} fontSize="6" fontFamily={F.m}>almost perfect</text>
     </svg>
   );
-  // Default - simple pulse dot + label
-  var labels = {10:"10:1 cost",11:"95% bound",12:"p<0.05",13:"plateau",14:"5 folds",15:"F_gain #1",16:"explainable",17:"robust",18:"RF immune","18b":"120 batches",19:"26 early",20:"generalises",21:"stabilised",22:"deployed"};
+
+  // 10. Alarm level — three lights: SAFE / WATCH / DANGER
+  if (n === 10) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <rect x="10" y="14" width="240" height="32" rx="16" fill="rgba(255,255,255,.02)" stroke={c} strokeWidth="0.5" strokeOpacity="0.2"/>
+      <circle cx="50" cy="30" r="11" fill={$.gn} fillOpacity="0.25" stroke={$.gn} strokeWidth="1.2" strokeOpacity="0.7">
+        <animate attributeName="stroke-opacity" values="0.3;0.9;0.3" dur="2s" begin="0s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="50" cy="30" r="4" fill={$.gn} fillOpacity="0.9"/>
+      <text x="50" y="55" textAnchor="middle" fill={$.gn} fontSize="7" fontFamily={F.m} fontWeight="700">SAFE</text>
+      <circle cx="130" cy="30" r="11" fill={$.ac} fillOpacity="0.25" stroke={$.ac} strokeWidth="1.2" strokeOpacity="0.7">
+        <animate attributeName="stroke-opacity" values="0.3;0.9;0.3" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="130" cy="30" r="4" fill={$.ac} fillOpacity="0.9"/>
+      <text x="130" y="55" textAnchor="middle" fill={$.ac} fontSize="7" fontFamily={F.m} fontWeight="700">WATCH</text>
+      <circle cx="210" cy="30" r="11" fill={$.rd} fillOpacity="0.25" stroke={$.rd} strokeWidth="1.2" strokeOpacity="0.7">
+        <animate attributeName="stroke-opacity" values="0.3;0.9;0.3" dur="2s" begin="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="210" cy="30" r="4" fill={$.rd} fillOpacity="0.9"/>
+      <text x="210" y="55" textAnchor="middle" fill={$.rd} fontSize="7" fontFamily={F.m} fontWeight="700">DANGER</text>
+    </svg>
+  );
+
+  // 11. Safety promise — 19 of 20 dots green
+  if (n === 11) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      {Array.from({length:20}).map(function(_,i){
+        var covered = i < 19;
+        var x = 10 + (i%10)*14;
+        var y = 14 + Math.floor(i/10)*16;
+        return <circle key={i} cx={x} cy={y} r="4" fill={covered?$.gn:$.rd} opacity="0">
+          <animate attributeName="opacity" from="0" to={covered?0.75:0.55} dur="0.2s" begin={(i*0.06)+"s"} fill="freeze"/>
+        </circle>;
+      })}
+      <text x="195" y="24" fill={$.gn} fontSize="13" fontFamily={F.m} fontWeight="700" opacity="0">
+        <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="1.3s" fill="freeze"/>
+        95%
+      </text>
+      <text x="195" y="36" fill={$.gn} fontSize="7" fontFamily={F.m} opacity="0.7">of 100</text>
+      <text x="195" y="46" fill={$.gn} fontSize="7" fontFamily={F.m} opacity="0.7">right</text>
+    </svg>
+  );
+
+  // 12. Bootstrap — many rounds, team wins every time
+  if (n === 12) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      {Array.from({length:10}).map(function(_,i){
+        return <g key={i}>
+          <circle cx={14+i*13} cy="26" r="5" fill={c} fillOpacity="0.15" stroke={c} strokeWidth="0.8" strokeOpacity="0.5">
+            <animate attributeName="stroke-opacity" values="0.2;0.7;0.2" dur="1.5s" begin={(i*0.12)+"s"} repeatCount="indefinite"/>
+          </circle>
+          <text x={14+i*13} y="29" textAnchor="middle" fill={$.gn} fontSize="7" fontFamily={F.m} fontWeight="700" opacity="0">
+            <animate attributeName="opacity" from="0" to="0.9" dur="0.2s" begin={(i*0.12+0.1)+"s"} fill="freeze"/>
+            ✓
+          </text>
+        </g>;
+      })}
+      <text x="77" y="12" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.55">team wins every round</text>
+      <text x="77" y="48" textAnchor="middle" fill={$.dim} fontSize="7" fontFamily={F.m}>2,000 random tests</text>
+      <rect x="160" y="14" width="86" height="28" rx="4" fill={c} fillOpacity="0.12" stroke={c} strokeWidth="1" strokeOpacity="0.6"/>
+      <text x="203" y="28" textAnchor="middle" fill={c} fontSize="11" fontFamily={F.m} fontWeight="700">skill</text>
+      <text x="203" y="38" textAnchor="middle" fill={$.dim} fontSize="7" fontFamily={F.m}>not luck</text>
+    </svg>
+  );
+
+  // 13. Learning curve — rises then plateaus
+  if (n === 13) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <line x1="15" y1="48" x2="185" y2="48" stroke={c} strokeWidth="0.5" strokeOpacity="0.3"/>
+      <line x1="15" y1="48" x2="15" y2="10" stroke={c} strokeWidth="0.5" strokeOpacity="0.3"/>
+      <path d="M 15 46 Q 40 36 70 22 Q 100 14 130 14 L 185 14" fill="none" stroke={c} strokeWidth="2" strokeOpacity="0.75" strokeDasharray="220" strokeDashoffset="220">
+        <animate attributeName="stroke-dashoffset" from="220" to="0" dur="1.4s" fill="freeze"/>
+      </path>
+      <line x1="100" y1="14" x2="185" y2="14" stroke={$.gn} strokeWidth="1" strokeOpacity="0.6" strokeDasharray="3 3"/>
+      <text x="142" y="10" textAnchor="middle" fill={$.gn} fontSize="7" fontFamily={F.m} opacity="0.85" fontWeight="700">plateau</text>
+      <text x="100" y="58" textAnchor="middle" fill={$.dim} fontSize="7" fontFamily={F.m}>more data →</text>
+      <rect x="195" y="20" width="55" height="22" rx="4" fill={$.gn} fillOpacity="0.12" stroke={$.gn} strokeWidth="1" strokeOpacity="0.5"/>
+      <text x="222.5" y="28" textAnchor="middle" fill={$.gn} fontSize="8" fontFamily={F.m} fontWeight="700">enough</text>
+      <text x="222.5" y="37" textAnchor="middle" fill={$.dim} fontSize="6" fontFamily={F.m}>data</text>
+    </svg>
+  );
+
+  // 14. 5-fold CV — five tests, all pass
+  if (n === 14) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      {[0,1,2,3,4].map(function(i){
+        return <g key={i}>
+          <rect x={16+i*48} y="16" width="36" height="28" rx="3" fill={c} fillOpacity="0" stroke={c} strokeWidth="0.8" strokeOpacity="0">
+            <animate attributeName="fill-opacity" from="0" to="0.12" dur="0.3s" begin={(i*0.3)+"s"} fill="freeze"/>
+            <animate attributeName="stroke-opacity" from="0" to="0.5" dur="0.3s" begin={(i*0.3)+"s"} fill="freeze"/>
+          </rect>
+          <text x={34+i*48} y="36" textAnchor="middle" fill={$.gn} fontSize="15" fontFamily={F.m} fontWeight="700" opacity="0">
+            <animate attributeName="opacity" from="0" to="1" dur="0.2s" begin={(i*0.3+0.2)+"s"} fill="freeze"/>
+            ✓
+          </text>
+          <text x={34+i*48} y="55" textAnchor="middle" fill={c} fontSize="6" fontFamily={F.m} opacity="0.55">test {i+1}</text>
+        </g>;
+      })}
+    </svg>
+  );
+
+  // 15. Permutation importance — bars with clear winner
+  if (n === 15) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      {[
+        {n:"power flow", w:115, hi:true},
+        {n:"timing", w:50, hi:false},
+        {n:"avg gain", w:42, hi:false},
+        {n:"weak node", w:30, hi:false},
+        {n:"swing", w:22, hi:false},
+      ].map(function(f, i){
+        return <g key={i}>
+          <text x="68" y={13+i*9} textAnchor="end" fill={f.hi?c:$.dim} fontSize="7" fontFamily={F.m} opacity={f.hi?0.95:0.55} fontWeight={f.hi?700:400}>{f.n}</text>
+          <rect x="73" y={8+i*9} width="0" height="6" fill={f.hi?c:$.dim} fillOpacity={f.hi?0.8:0.35} rx="1">
+            <animate attributeName="width" from="0" to={f.w} dur="0.7s" begin={(i*0.1)+"s"} fill="freeze"/>
+          </rect>
+        </g>;
+      })}
+      <g>
+        <rect x="200" y="10" width="50" height="40" rx="4" fill={c} fillOpacity="0.1" stroke={c} strokeWidth="1" strokeOpacity="0.5"/>
+        <text x="225" y="25" textAnchor="middle" fill={c} fontSize="11" fontFamily={F.m} fontWeight="700">#1</text>
+        <text x="225" y="36" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.7">power</text>
+        <text x="225" y="44" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.7">flow</text>
+      </g>
+    </svg>
+  );
+
+  // 16. SHAP — show why, with contributing arrows
+  if (n === 16) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      {[
+        {x:14, y:14, label:"flow", v:"+40%"},
+        {x:14, y:30, label:"timing", v:"+25%"},
+        {x:14, y:46, label:"gain", v:"+22%"},
+      ].map(function(f, i){
+        return <g key={i}>
+          <text x={f.x} y={f.y+3} fill={c} fontSize="7" fontFamily={F.m} opacity="0.75">{f.label}</text>
+          <text x={f.x+38} y={f.y+3} fill={$.gn} fontSize="7" fontFamily={F.m} opacity="0.75" fontWeight="700">{f.v}</text>
+          <line x1={f.x+64} y1={f.y+1} x2="148" y2="30" stroke={c} strokeWidth="0.8" strokeOpacity="0" strokeDasharray="80">
+            <animate attributeName="stroke-opacity" from="0" to="0.5" dur="0.4s" begin={(i*0.15)+"s"} fill="freeze"/>
+          </line>
+        </g>;
+      })}
+      <circle cx="170" cy="30" r="18" fill={c} fillOpacity="0.2" stroke={c} strokeWidth="1.2" strokeOpacity="0.75"/>
+      <text x="170" y="27" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} fontWeight="700">prediction</text>
+      <text x="170" y="37" textAnchor="middle" fill={c} fontSize="8" fontFamily={F.m}>87%</text>
+      <text x="222" y="22" fill={c} fontSize="8" fontFamily={F.m} opacity="0.6" fontWeight="700">why?</text>
+      <text x="222" y="36" fill={c} fontSize="6" fontFamily={F.m} opacity="0.5">no black</text>
+      <text x="222" y="44" fill={c} fontSize="6" fontFamily={F.m} opacity="0.5">box</text>
+    </svg>
+  );
+
+  // 17. Stress test — messy input → team filter → clean output
+  if (n === 17) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <text x="42" y="12" textAnchor="middle" fill={$.rd} fontSize="7" fontFamily={F.m} opacity="0.65">messy input</text>
+      <path d="M 10 30 L 14 22 L 18 38 L 22 26 L 26 42 L 30 20 L 34 36 L 38 24 L 42 40 L 46 28 L 50 44 L 54 22 L 58 38 L 62 30 L 66 42 L 70 24 L 74 36" fill="none" stroke={$.rd} strokeWidth="1.2" strokeOpacity="0.7"/>
+      <line x1="82" y1="30" x2="94" y2="30" stroke={c} strokeWidth="0.8" strokeOpacity="0.4"/>
+      <polygon points="92,27 98,30 92,33" fill={c} fillOpacity="0.5"/>
+      <rect x="102" y="18" width="46" height="24" rx="4" fill={c} fillOpacity="0.12" stroke={c} strokeWidth="1" strokeOpacity="0.7"/>
+      <text x="125" y="33" textAnchor="middle" fill={c} fontSize="9" fontFamily={F.m} fontWeight="700">TEAM</text>
+      <line x1="152" y1="30" x2="164" y2="30" stroke={c} strokeWidth="0.8" strokeOpacity="0.4"/>
+      <polygon points="162,27 168,30 162,33" fill={c} fillOpacity="0.5"/>
+      <text x="206" y="12" textAnchor="middle" fill={$.gn} fontSize="7" fontFamily={F.m} opacity="0.65">stable output</text>
+      <line x1="172" y1="30" x2="246" y2="30" stroke={$.gn} strokeWidth="1.8" strokeOpacity="0.75"/>
+      <circle cx="246" cy="30" r="3" fill={$.gn}>
+        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+  );
+
+  // 18. Adversarial — SVM is tricked, RF deflects
+  if (n === 18) return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <text x="50" y="10" textAnchor="middle" fill={$.rd} fontSize="7" fontFamily={F.m} opacity="0.65">broken</text>
+      <circle cx="50" cy="28" r="12" fill="none" stroke="#a78bfa" strokeWidth="1.5" strokeOpacity="0.5" strokeDasharray="2 2"/>
+      <text x="50" y="31" textAnchor="middle" fill="#a78bfa" fontSize="8" fontFamily={F.m} fontWeight="700">H1</text>
+      <line x1="14" y1="28" x2="36" y2="28" stroke={$.rd} strokeWidth="1.4"/>
+      <polygon points="34,25 40,28 34,31" fill={$.rd}/>
+      <text x="50" y="54" textAnchor="middle" fill={$.rd} fontSize="7" fontFamily={F.m} fontWeight="700">20% flip</text>
+      <text x="115" y="32" textAnchor="middle" fill={$.dim} fontSize="11" fontFamily={F.m} opacity="0.4">vs</text>
+      <text x="180" y="10" textAnchor="middle" fill={$.gn} fontSize="7" fontFamily={F.m} opacity="0.65">immune</text>
+      <rect x="166" y="16" width="28" height="24" rx="3" fill={$.gn} fillOpacity="0.08" stroke={$.gn} strokeWidth="1.5" strokeOpacity="0.7"/>
+      <text x="180" y="32" textAnchor="middle" fill={$.gn} fontSize="8" fontFamily={F.m} fontWeight="700">H2</text>
+      <line x1="144" y1="28" x2="162" y2="28" stroke={$.rd} strokeWidth="1.4"/>
+      <path d="M 162 28 Q 152 34 144 42" fill="none" stroke={$.rd} strokeWidth="1.2" strokeOpacity="0.6"/>
+      <polygon points="146,40 142,42 144,38" fill={$.rd} fillOpacity="0.6"/>
+      <text x="180" y="54" textAnchor="middle" fill={$.gn} fontSize="7" fontFamily={F.m} fontWeight="700">0.04%</text>
+      <text x="234" y="32" textAnchor="middle" fill={$.dim} fontSize="6" fontFamily={F.m}>same</text>
+      <text x="234" y="40" textAnchor="middle" fill={$.dim} fontSize="6" fontFamily={F.m}>attack</text>
+    </svg>
+  );
+
+  // ━━━ PHASE 6: LIVE TESTING ━━━
+
+  // 18b. Simulation — 120-batch timeline with phases
+  if (n === "18b") return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <rect x="10" y="24" width="75" height="14" rx="2" fill={$.gn} fillOpacity="0.4"/>
+      <rect x="85" y="24" width="35" height="14" fill={$.ac} fillOpacity="0.5"/>
+      <rect x="120" y="24" width="40" height="14" fill={$.rd} fillOpacity="0.55"/>
+      <rect x="160" y="24" width="90" height="14" rx="2" fill={$.rd} fillOpacity="0.65"/>
+      <text x="47" y="20" textAnchor="middle" fill={$.gn} fontSize="6" fontFamily={F.m} fontWeight="700">CALM</text>
+      <text x="102" y="20" textAnchor="middle" fill={$.ac} fontSize="6" fontFamily={F.m} fontWeight="700">DRIFT</text>
+      <text x="140" y="20" textAnchor="middle" fill={$.rd} fontSize="6" fontFamily={F.m} fontWeight="700">ATTACK</text>
+      <text x="205" y="20" textAnchor="middle" fill={$.rd} fontSize="6" fontFamily={F.m} fontWeight="700">REGIME</text>
+      <circle cy="31" r="4.5" fill={c} stroke={$.bg} strokeWidth="1">
+        <animate attributeName="cx" values="10;250;10" dur="4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.6;1;0.6" dur="4s" repeatCount="indefinite"/>
+      </circle>
+      <text x="130" y="54" textAnchor="middle" fill={$.dim} fontSize="7" fontFamily={F.m}>120 pretend days</text>
+    </svg>
+  );
+
+  // 19. Change detection — 3 alarm bells + early warning badge
+  if (n === "19") return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      {[0,1,2].map(function(i){
+        var x = 20 + i*28;
+        return <g key={i}>
+          <path d={"M "+x+" 18 Q "+(x-8)+" 18 "+(x-8)+" 32 L "+(x+8)+" 32 Q "+(x+8)+" 18 "+x+" 18 Z"} fill={c} fillOpacity="0.2" stroke={c} strokeWidth="1" strokeOpacity="0.65">
+            <animate attributeName="stroke-opacity" values="0.3;0.9;0.3" dur="1.3s" begin={(i*0.17)+"s"} repeatCount="indefinite"/>
+          </path>
+          <line x1={x} y1="32" x2={x} y2="36" stroke={c} strokeWidth="1.2" strokeOpacity="0.7"/>
+          <circle cx={x} cy="37" r="1.8" fill={c} fillOpacity="0.8"/>
+          <circle cx={x} cy="26" r="10" fill="none" stroke={c} strokeWidth="0.6" strokeOpacity="0">
+            <animate attributeName="r" from="8" to="18" dur="1.3s" begin={(i*0.17)+"s"} repeatCount="indefinite"/>
+            <animate attributeName="stroke-opacity" values="0.6;0" dur="1.3s" begin={(i*0.17)+"s"} repeatCount="indefinite"/>
+          </circle>
+        </g>;
+      })}
+      <text x="48" y="54" textAnchor="middle" fill={$.dim} fontSize="7" fontFamily={F.m}>3 alarm systems</text>
+      <rect x="128" y="16" width="118" height="28" rx="14" fill={c} fillOpacity="0.15" stroke={c} strokeWidth="1" strokeOpacity="0.6">
+        <animate attributeName="stroke-opacity" values="0.4;0.9;0.4" dur="1.8s" repeatCount="indefinite"/>
+      </rect>
+      <text x="187" y="34" textAnchor="middle" fill={c} fontSize="11" fontFamily={F.m} fontWeight="700">26 days early</text>
+    </svg>
+  );
+
+  // 20. Generalisation — known zone, new situations still classified
+  if (n === "20") return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <rect x="10" y="12" width="80" height="36" rx="4" fill={c} fillOpacity="0.08" stroke={c} strokeWidth="1" strokeDasharray="4 3" strokeOpacity="0.55"/>
+      <text x="50" y="9" textAnchor="middle" fill={c} fontSize="6" fontFamily={F.m} opacity="0.65">trained on</text>
+      {[[22,22],[32,34],[42,18],[52,28],[66,40],[76,22],[48,42],[28,42],[62,20]].map(function(p,i){
+        return <circle key={i} cx={p[0]} cy={p[1]} r="2" fill={c} fillOpacity="0.75"/>;
+      })}
+      <line x1="96" y1="30" x2="128" y2="30" stroke={c} strokeWidth="1" strokeOpacity="0.5" strokeDasharray="3 2"/>
+      <polygon points="126,27 132,30 126,33" fill={c} fillOpacity="0.5"/>
+      <text x="112" y="22" textAnchor="middle" fill={c} fontSize="6" fontFamily={F.m} opacity="0.55">new</text>
+      <rect x="138" y="8" width="108" height="44" rx="4" fill={c} fillOpacity="0.04" stroke={c} strokeWidth="1" strokeOpacity="0.35"/>
+      <text x="192" y="9" textAnchor="middle" fill={c} fontSize="6" fontFamily={F.m} opacity="0.55">never seen before</text>
+      {[[152,22],[168,36],[184,15],[202,26],[222,42],[236,30],[158,46],[216,14],[180,42]].map(function(p,i){
+        return <circle key={i} cx={p[0]} cy={p[1]} r="2" fill={$.gn} opacity="0">
+          <animate attributeName="opacity" from="0" to="0.75" dur="0.3s" begin={(i*0.1)+"s"} fill="freeze"/>
+        </circle>;
+      })}
+    </svg>
+  );
+
+  // 21. Auto stabilizer — wobble → smoothed flat
+  if (n === "21") return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <text x="40" y="10" textAnchor="middle" fill={$.rd} fontSize="7" fontFamily={F.m} opacity="0.65">wobbly</text>
+      <path d="M 10 30 Q 20 10 30 30 Q 40 50 50 30 Q 60 12 70 30" fill="none" stroke={$.rd} strokeWidth="1.4" strokeOpacity="0.7"/>
+      <line x1="84" y1="30" x2="124" y2="30" stroke={c} strokeWidth="1" strokeOpacity="0.4"/>
+      <polygon points="122,27 128,30 122,33" fill={c} fillOpacity="0.5"/>
+      <text x="104" y="22" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.6">auto fix</text>
+      <text x="104" y="44" textAnchor="middle" fill={$.dim} fontSize="6" fontFamily={F.m}>&lt;500 steps</text>
+      <text x="195" y="10" textAnchor="middle" fill={$.gn} fontSize="7" fontFamily={F.m} opacity="0.65">stable</text>
+      <path d="M 138 30 Q 148 22 158 28 Q 168 33 178 30 L 246 30" fill="none" stroke={$.gn} strokeWidth="1.5" strokeOpacity="0.75"/>
+      <circle cx="246" cy="30" r="2.8" fill={$.gn}>
+        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+  );
+
+  // 22. Browser export — package flies into browser window
+  if (n === "22") return (
+    <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
+      <g>
+        <rect x="10" y="16" width="30" height="28" rx="2" fill={c} fillOpacity="0.15" stroke={c} strokeWidth="1" strokeOpacity="0.65"/>
+        <line x1="10" y1="24" x2="40" y2="24" stroke={c} strokeWidth="0.8" strokeOpacity="0.5"/>
+        <line x1="25" y1="16" x2="25" y2="44" stroke={c} strokeWidth="0.8" strokeOpacity="0.5"/>
+        <text x="25" y="56" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.6">model</text>
+      </g>
+      <line x1="48" y1="30" x2="96" y2="30" stroke={c} strokeWidth="1" strokeOpacity="0.4" strokeDasharray="3 2"/>
+      <polygon points="94,27 100,30 94,33" fill={c} fillOpacity="0.5"/>
+      <circle cy="30" r="2" fill={c}>
+        <animate attributeName="cx" from="42" to="100" dur="1.4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+      <text x="72" y="22" textAnchor="middle" fill={c} fontSize="7" fontFamily={F.m} opacity="0.6">export</text>
+      <g>
+        <rect x="110" y="12" width="140" height="36" rx="3" fill={c} fillOpacity="0.08" stroke={c} strokeWidth="1" strokeOpacity="0.65"/>
+        <rect x="110" y="12" width="140" height="8" rx="3" fill={c} fillOpacity="0.22"/>
+        <circle cx="117" cy="16" r="1.6" fill={$.rd} fillOpacity="0.7"/>
+        <circle cx="123" cy="16" r="1.6" fill={$.ac} fillOpacity="0.7"/>
+        <circle cx="129" cy="16" r="1.6" fill={$.gn} fillOpacity="0.7"/>
+        <text x="180" y="34" textAnchor="middle" fill={c} fontSize="9" fontFamily={F.m} fontWeight="700">this website!</text>
+        <text x="180" y="44" textAnchor="middle" fill={c} fontSize="6" fontFamily={F.m} opacity="0.55">runs in browser</text>
+      </g>
+    </svg>
+  );
+
+  // Fallback
   return (
     <svg width={W} height={H} viewBox={"0 0 "+W+" "+H}>
-      <circle cx={20} cy={24} r="6" fill={c} opacity="0.15"><animate attributeName="r" values="4;8;4" dur="2s" repeatCount="indefinite"/></circle>
-      <circle cx={20} cy={24} r="3" fill={c} opacity="0.4"/>
-      <line x1={32} y1={24} x2={90} y2={24} stroke={c} strokeWidth="0.8" opacity="0.15" strokeDasharray="3 3"/>
-      <text x={100} y={28} fill={c} fontSize="10" fontFamily={F.m} opacity="0.5">{labels[n]||""}</text>
+      <circle cx={W/2} cy={H/2} r="6" fill={c} fillOpacity="0.3"/>
     </svg>
   );
 }
