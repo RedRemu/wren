@@ -1250,6 +1250,7 @@ function CinematicPipeline(props) {
           <p style={{fontSize:12,color:$.tx3,margin:0}}>
           Each step, with a simple explanation and what it looks like.
           </p>
+        </div>
 
         {PIPELINE.filter(function(ph){ return ph && ph.stages && ph.stages.length; }).map(function(ph) {
           return (
@@ -1283,17 +1284,10 @@ function CinematicPipeline(props) {
     );
   })}
 </div>
-                          <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>{s.desc}</div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
             </div>
           );
         })}
-      </div>
+        </div>
     </div>
   );
 }
