@@ -47,7 +47,34 @@ function useStyles() {
     l.href = "https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap";
     document.head.appendChild(l);
     var s = document.createElement("style"); s.id = "wrn";
-    s.textContent = "@keyframes wup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}@keyframes wpulse{0%,100%{opacity:1}50%{opacity:.3}}@keyframes wblink{0%,100%{opacity:.5}50%{opacity:1}}@keyframes wsweep{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes wshake{0%,100%{transform:translateX(0)}15%,45%,75%{transform:translateX(-3px)}30%,60%,90%{transform:translateX(3px)}}@keyframes lhSweep{0%,100%{transform:rotate(-35deg)}50%{transform:rotate(35deg)}}@keyframes wLoad{0%{width:0%}100%{width:100%}}@keyframes wTransSweep{0%{transform:rotate(-40deg)}50%{transform:rotate(40deg)}100%{transform:rotate(-40deg)}}@keyframes bIdlePulse{0%,100%{opacity:.55}50%{opacity:.95}}*{box-sizing:border-box;margin:0;padding:0}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(251,191,36,.1);border-radius:2px}";
+    s.textContent = "@keyframes wup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}@keyframes wpulse{0%,100%{opacity:1}50%{opacity:.3}}@keyframes wblink{0%,100%{opacity:.5}50%{opacity:1}}@keyframes wsweep{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes wshake{0%,100%{transform:translateX(0)}15%,45%,75%{transform:translateX(-3px)}30%,60%,90%{transform:translateX(3px)}}@keyframes lhSweep{0%,100%{transform:rotate(-35deg)}50%{transform:rotate(35deg)}}@keyframes wLoad{0%{width:0%}100%{width:100%}}@keyframes wTransSweep{0%{transform:rotate(-40deg)}50%{transform:rotate(40deg)}100%{transform:rotate(-40deg)}}@keyframes bIdlePulse{0%,100%{opacity:.55}50%{opacity:.95}}"
+      + "@keyframes findingIn{0%{opacity:0;transform:translateY(24px)}100%{opacity:1;transform:none}}"
+      + "@keyframes findingPulse{0%,100%{transform:scale(1);opacity:.75}50%{transform:scale(1.4);opacity:1}}"
+      + "@keyframes numPop{0%{opacity:0;transform:scale(.55)}60%{transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}"
+      + "@keyframes barGrowW{from{width:0;opacity:0}to{opacity:1}}"
+      + "@keyframes barGrowH{from{height:0;opacity:0}to{opacity:1}}"
+      + "@keyframes gapBadge{0%{opacity:0;transform:scaleX(.2)}100%{opacity:1;transform:scaleX(1)}}"
+      + "@keyframes softFadeIn{from{opacity:0}to{opacity:1}}"
+      + "@keyframes detectorFire{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}"
+      + "@keyframes detectorRing{0%{transform:scale(1);opacity:.8}100%{transform:scale(2.4);opacity:0}}"
+      + "@keyframes phaseShift{0%{opacity:0;transform:translateY(-4px)}100%{opacity:1;transform:none}}"
+      + "@keyframes liveSweep{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}"
+      + "@keyframes toastIn{0%{opacity:0;transform:translate(-50%,-140%)scale(.92)}65%{opacity:1;transform:translate(-50%,6px)scale(1.005)}100%{opacity:1;transform:translate(-50%,0)scale(1)}}"
+      + "@keyframes toastOut{0%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-40%)}}"
+      + "@keyframes toastProgress{0%{width:100%}100%{width:0%}}"
+      + "@keyframes typewipe{0%{clip-path:inset(0 100% 0 0)}100%{clip-path:inset(0 0 0 0)}}"
+      + "@keyframes chipBurst{0%{box-shadow:0 0 0 0 var(--burst)}70%{box-shadow:0 0 0 20px rgba(0,0,0,0)}100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}"
+      + "@keyframes logRowIn{0%{opacity:0;transform:translateX(-14px)}100%{opacity:1;transform:none}}"
+      + "@keyframes iconRing{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.3);opacity:0}}"
+      + "@keyframes chipShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-2px)}40%,80%{transform:translateX(2px)}}"
+      + "@keyframes cardBloom{0%{opacity:0;transform:scale(.88)translateY(-6px);filter:blur(4px)}55%{opacity:1;transform:scale(1.012)translateY(0);filter:blur(0)}100%{opacity:1;transform:scale(1)translateY(0);filter:blur(0)}}"
+      + "@keyframes cardBreathe{0%,100%{box-shadow:0 18px 44px rgba(0,0,0,.55),0 0 22px var(--breathe-a)}50%{box-shadow:0 22px 54px rgba(0,0,0,.62),0 0 44px var(--breathe-b)}}"
+      + "@keyframes shockRing{0%{transform:scale(.5);opacity:1;border-width:3px}85%{opacity:.15}100%{transform:scale(4.2);opacity:0;border-width:.5px}}"
+      + "@keyframes dotHalo{0%,100%{transform:scale(1);opacity:.18}50%{transform:scale(1.9);opacity:.38}}"
+      + "@keyframes labelSlide{0%{opacity:0;transform:translateX(-10px);letter-spacing:.3em}100%{opacity:1;transform:none;letter-spacing:.18em}}"
+      + "@keyframes titleRise{0%{opacity:0;transform:translateY(14px);filter:blur(3px)}55%{filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}"
+      + "@keyframes linePop{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:none}}"
+      + "*{box-sizing:border-box;margin:0;padding:0}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(251,191,36,.1);border-radius:2px}";
     document.head.appendChild(s);
   }, []);
 }
@@ -2034,6 +2061,14 @@ function Stat(props) {
   );
 }
 
+/* ═══ DETECTOR EVENT CATALOGUE ═══ */
+var DETECTOR_EVENTS = [
+  { batch:  9, key:"ph",    name:"PAGE HINKLEY", title:"First warning",         sub:"Something just shifted in the data. The earliest detector caught it.",              color:"#a78bfa", severity:"info", metric:"Signal 4.2 (alert at 3.5)" },
+  { batch: 34, key:"cusum", name:"CUSUM",        title:"Drift is building",     sub:"Small changes are stacking up over time. The trend is real now.",                    color:"#67e8f9", severity:"warn", metric:"Signal 8.1 (alert at 5.0)" },
+  { batch: 55, key:"psi",   name:"PSI DRIFT",    title:"Data looks different",  sub:"The live data no longer matches what the model learned from.",                       color:$.glow,    severity:"warn", metric:"Score 0.26 (alert at 0.25)" },
+  { batch: 81, key:"auc",   name:"AUC BREAK",    title:"Accuracy has dropped",  sub:"The model is making more mistakes. Three detectors warned us before this happened.", color:$.rd,      severity:"crit", metric:"Accuracy 89.2 percent" },
+];
+
 function CommandCentre(props) {
   useStyles();
   var _tab  = useState(props.initialTab || "sim");   var tab   = _tab[0];   var setTab   = _tab[1];
@@ -2046,6 +2081,69 @@ function CommandCentre(props) {
   var pipeTimers = useRef([]);
   var _findOpen = useState(null); var findOpen = _findOpen[0]; var setFindOpen = _findOpen[1];
   var demoRef = useRef(null);
+  var _activeToast = useState(null); var activeToast = _activeToast[0]; var setActiveToast = _activeToast[1];
+  var _countdown = useState(5); var countdown = _countdown[0]; var setCountdown = _countdown[1];
+  var lastFiredRef = useRef(null);
+  var toastTimerRef = useRef(null);
+  var countdownIvRef = useRef(null);
+  var pausedByToastRef = useRef(false);
+  var prevBatchRef = useRef(0);
+
+  var TOAST_DURATION_MS = 10000;
+
+  // Watch the batch counter; when it crosses a detector threshold, fire a toast AND pause playback
+  useEffect(function(){
+    var movingForward = batch >= prevBatchRef.current;
+    prevBatchRef.current = batch;
+
+    var firedNow = DETECTOR_EVENTS.filter(function(e){ return batch >= e.batch; });
+    var mostRecent = firedNow[firedNow.length - 1];
+    if (!mostRecent) {
+      lastFiredRef.current = null;
+      setActiveToast(null);
+      return;
+    }
+    if (mostRecent.key !== lastFiredRef.current) {
+      lastFiredRef.current = mostRecent.key;
+      // Only fire the toast + pause when the user is moving forward through time
+      if (!movingForward) return;
+      var stamped = {};
+      for (var k in mostRecent) stamped[k] = mostRecent[k];
+      stamped.id = Date.now();
+      setActiveToast(stamped);
+
+      // Pause the demo; remember we were the one who paused it
+      if (demoRef.current) { clearInterval(demoRef.current); demoRef.current = null; }
+      if (demo) { pausedByToastRef.current = true; setDemo(false); }
+
+      // Countdown interval
+      setCountdown(Math.ceil(TOAST_DURATION_MS / 1000));
+      if (countdownIvRef.current) clearInterval(countdownIvRef.current);
+      countdownIvRef.current = setInterval(function(){ setCountdown(function(c){ return Math.max(0, c - 1); }); }, 1000);
+
+      // Auto-dismiss + auto-resume
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = setTimeout(function(){
+        setActiveToast(null);
+        if (countdownIvRef.current) clearInterval(countdownIvRef.current);
+        if (pausedByToastRef.current) {
+          pausedByToastRef.current = false;
+          setDemo(true);
+        }
+      }, TOAST_DURATION_MS);
+    }
+  }, [batch]);
+
+  function dismissToast(){
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    if (countdownIvRef.current) clearInterval(countdownIvRef.current);
+    setActiveToast(null);
+    // Manual dismiss also resumes playback (if we paused it)
+    if (pausedByToastRef.current) {
+      pausedByToastRef.current = false;
+      setDemo(true);
+    }
+  }
   var aucData = useMemo(function(){ return SH.map(function(v,i){ return {b:i,H:v,S:SV[i],R:SR[i],L:SL[i]}; }); },[]);
   var psiData = useMemo(function(){ return SP.map(function(v,i){ return {b:i,P:v}; }); },[]);
   var covData = useMemo(function(){ return SC.map(function(v,i){ return {b:i,C:v}; }); },[]);
@@ -2144,7 +2242,7 @@ function CommandCentre(props) {
         <button onClick={props.onBack} style={{background:"transparent",border:"1px solid rgba(255,255,255,.08)",borderRadius:6,color:$.dim,padding:"5px 14px",fontSize:11,fontFamily:F.s,cursor:"pointer"}}>Exit</button>
       </div>
       <div style={{display:"flex",borderTop:"1px solid rgba(255,255,255,.04)"}}>
-        {[{id:"sim",label:"Simulation"},{id:"pipe",label:"How it works"},{id:"finds",label:"Findings"}].map(function(t){
+        {[{id:"pipe",label:"How it works"},{id:"sim",label:"Simulation"},{id:"finds",label:"Findings"}].map(function(t){
           var a=tab===t.id;
           return (<button key={t.id} onClick={function(){setTab(t.id);setCard(null);}} style={{flex:1,padding:"10px 0",fontFamily:F.m,fontSize:10,fontWeight:a?600:400,color:a?$.glow:$.dim,background:"transparent",border:"none",cursor:"pointer",borderBottom:"2px solid "+(a?$.glow:"transparent"),letterSpacing:".04em",transition:"all .2s"}}>{t.label}</button>);
         })}
@@ -2152,21 +2250,27 @@ function CommandCentre(props) {
     </div>
   );
 
-  /* helper chart card wrapper with click-to-flashcard */
+  /* helper chart card wrapper — chart is always visible; "Click to explain" toggles a panel below */
   function ChartCard(cp) {
     var open = card===cp.id;
     return (
-      <div style={{background:$.bg2,border:"1px solid "+(open?$.glow+"55":$.brd),borderRadius:10,padding:"14px 14px 8px",cursor:"pointer",transition:"border-color .2s",position:"relative"}}
-        onClick={function(){setCard(open?null:cp.id);}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+      <div style={{background:$.bg2,border:"1px solid "+(open?$.glow+"55":$.brd),borderRadius:10,padding:"14px 14px 10px",transition:"border-color .2s",position:"relative"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6,gap:10}}>
           <div style={{fontSize:12,fontWeight:600,color:$.tx}}>{cp.title}</div>
-          <div style={{fontFamily:F.m,fontSize:8,color:open?$.glow:$.dim,background:open?"rgba(251,191,36,.08)":"transparent",padding:"2px 8px",borderRadius:999,border:"1px solid "+(open?$.glow+"33":"transparent"),transition:"all .2s"}}>
-            {open?"Close":"Click to explain"}
-          </div>
+          <button onClick={function(){setCard(open?null:cp.id);}}
+            style={{fontFamily:F.m,fontSize:8,color:open?$.glow:$.dim,background:open?"rgba(251,191,36,.08)":"transparent",padding:"3px 10px",borderRadius:999,border:"1px solid "+(open?$.glow+"33":"rgba(255,255,255,.06)"),transition:"all .2s",cursor:"pointer",fontWeight:600,letterSpacing:.5,whiteSpace:"nowrap"}}>
+            {open?"Close":"Click to explain ↓"}
+          </button>
         </div>
         {cp.sub && <div style={{fontFamily:F.m,fontSize:8,color:$.dim,marginBottom:8}}>{cp.sub}</div>}
-        {open ? (
-          <div style={{padding:"14px 0 6px",animation:"wup .25s ease both"}}>
+        {/* Chart is ALWAYS visible — overlay sits on top of it for anchored pop-ups */}
+        <div style={{position:"relative"}}>
+          {cp.children}
+          {cp.overlay}
+        </div>
+        {/* Explanation panel opens BELOW the animated chart */}
+        {open && (
+          <div style={{marginTop:12,paddingTop:12,borderTop:"1px dashed "+$.brd,animation:"findingIn .35s cubic-bezier(.16,1,.3,1) both"}}>
             <div style={{fontFamily:F.m,fontSize:9,color:$.glow,letterSpacing:".06em",marginBottom:8}}>{CARDS[cp.id].title}</div>
             <p style={{fontSize:12,color:$.tx,lineHeight:1.8,marginBottom:10}}>{CARDS[cp.id].plain}</p>
             <p style={{fontSize:12,color:$.tx3,lineHeight:1.8,marginBottom: CARDS[cp.id].lines?12:0}}>{CARDS[cp.id].insight}</p>
@@ -2176,7 +2280,7 @@ function CommandCentre(props) {
               </div>
             )}
           </div>
-        ) : cp.children}
+        )}
       </div>
     );
   }
@@ -2192,14 +2296,13 @@ function CommandCentre(props) {
           <span style={{fontFamily:F.m,fontSize:9,color:pCol,opacity:.6}}>Batch {batch} · AUC {(SH[batch]||0).toFixed(4)} · PSI {(SP[batch]||0).toFixed(2)}</span>
         </div>
         <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
-          <button onClick={function(){if(demo){setDemo(false);}else{setBatch(0);setDemo(true);}}} style={{padding:"4px 12px",borderRadius:5,border:"1px solid "+(demo?$.rd:$.glow),background:demo?$.rdD:$.acD,color:demo?$.rd:$.glow,fontFamily:F.m,fontSize:9,fontWeight:600,cursor:"pointer"}}>{demo?"Pause":batch>=119?"Replay":"Play"}</button>
-          <input type="range" min={0} max={119} value={batch} onChange={function(e){setDemo(false);setBatch(+e.target.value);}} style={{width:"clamp(100px, 25vw, 150px)",accentColor:$.glow}}/>
+          <button onClick={function(){pausedByToastRef.current=false;if(demo){setDemo(false);}else{if(batch>=119)setBatch(0);setDemo(true);}}} style={{padding:"4px 12px",borderRadius:5,border:"1px solid "+(demo?$.rd:$.glow),background:demo?$.rdD:$.acD,color:demo?$.rd:$.glow,fontFamily:F.m,fontSize:9,fontWeight:600,cursor:"pointer"}}>{demo?"Pause":batch>=119?"Replay":"Play"}</button>
+          <input type="range" min={0} max={119} value={batch} onChange={function(e){pausedByToastRef.current=false;setDemo(false);setBatch(+e.target.value);}} style={{width:"clamp(100px, 25vw, 150px)",accentColor:$.glow}}/>
           <span style={{fontFamily:F.m,fontSize:11,color:$.glow,fontWeight:700,minWidth:20}}>{batch}</span>
         </div>
       </div>
 
       <div style={{maxWidth:960,margin:"0 auto",padding:"16px 20px 48px"}}>
-        <p style={{fontFamily:F.m,fontSize:9,color:$.dim,marginBottom:14,textAlign:"right"}}>Click any chart to see a plain-English explanation</p>
 
         {/* KPIs */}
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:1,marginBottom:14,background:$.brd,borderRadius:10,overflow:"hidden",border:"1px solid "+$.brd}}>
@@ -2216,10 +2319,92 @@ function CommandCentre(props) {
           ); })}
         </div>
 
-        {/* AUC chart clickable */}
+        {/* AUC chart clickable — pop-ups anchor inside the chart at the fire batch position */}
         <div style={{marginBottom:14}}>
           <ChartCard id="auc" title="Model Confidence. AUC over 120 Batches"
             sub="Three models, three drift phases. Click to understand what you're looking at."
+            overlay={activeToast && (
+              <div key={activeToast.id} style={{position:"absolute", inset:0, pointerEvents:"none"}}>
+
+                {/* ── Fire-point beacon: halo + shockwave rings + glowing dot ── */}
+                <div style={{
+                  position:"absolute",
+                  left:"calc(" + (4.5 + (activeToast.batch / 119) * 94) + "% - 18px)",
+                  top:-18,
+                  width:36, height:36,
+                  pointerEvents:"none"
+                }}>
+                  {/* Outer breathing halo */}
+                  <div style={{position:"absolute", inset:0, borderRadius:"50%", background:activeToast.color, animation:"dotHalo 2.4s ease-in-out infinite"}}/>
+                  {/* Entrance shockwaves (three, staggered, then gone) */}
+                  <div style={{position:"absolute", inset:12, borderRadius:"50%", border:"2px solid "+activeToast.color, animation:"shockRing 1.4s cubic-bezier(.16,1,.3,1) both"}}/>
+                  <div style={{position:"absolute", inset:12, borderRadius:"50%", border:"2px solid "+activeToast.color, animation:"shockRing 1.4s cubic-bezier(.16,1,.3,1) .35s both"}}/>
+                  <div style={{position:"absolute", inset:12, borderRadius:"50%", border:"1px solid "+activeToast.color, animation:"shockRing 1.4s cubic-bezier(.16,1,.3,1) .7s both"}}/>
+                  {/* Centre dot, ongoing pulse */}
+                  <div style={{position:"absolute", left:12, top:12, width:12, height:12, borderRadius:"50%", background:activeToast.color, boxShadow:"0 0 18px "+activeToast.color+", 0 0 6px #fff", animation:"wpulse 1.4s ease-in-out infinite"}}/>
+                </div>
+
+                {/* ── Pop-up card: blooms in with a focus-pull, then breathes softly ── */}
+                <div style={{
+                  position:"absolute",
+                  top:6, right:6,
+                  width:"min(340px, calc(100% - 12px))",
+                  pointerEvents:"auto",
+                  background:"linear-gradient(155deg, rgba(14,18,32,.97) 0%, rgba(12,16,28,.95) 60%, "+activeToast.color+"0c 100%)",
+                  border:"1px solid "+activeToast.color+"66",
+                  borderRadius:12,
+                  backdropFilter:"blur(16px)",
+                  animation:"cardBloom .7s cubic-bezier(.22,1.4,.36,1) both, cardBreathe 3.2s ease-in-out .75s infinite",
+                  ["--breathe-a"]: activeToast.color + "1f",
+                  ["--breathe-b"]: activeToast.color + "3a",
+                  overflow:"hidden",
+                  transformOrigin:"top right"
+                }}>
+                  {/* Soft colour wash in the top-left corner of the card, echoing the detector colour */}
+                  <div style={{position:"absolute", left:-40, top:-40, width:140, height:140, borderRadius:"50%", background:"radial-gradient(circle, "+activeToast.color+"22 0%, transparent 70%)", pointerEvents:"none"}}/>
+                  {/* Left accent bar with glow */}
+                  <div style={{position:"absolute", left:0, top:0, bottom:0, width:3, background:activeToast.color, boxShadow:"0 0 12px "+activeToast.color, animation:"softFadeIn .4s ease .1s both"}}/>
+
+                  <div style={{position:"relative", padding:"16px 18px 14px 22px"}}>
+                    {/* Label row */}
+                    <div style={{display:"flex", alignItems:"center", gap:10, marginBottom:12, animation:"labelSlide .5s cubic-bezier(.16,1,.3,1) .15s both"}}>
+                      <span style={{width:7, height:7, borderRadius:"50%", background:activeToast.color, boxShadow:"0 0 8px "+activeToast.color}}/>
+                      <span style={{fontFamily:F.m, fontSize:10, color:activeToast.color, letterSpacing:".18em", fontWeight:700}}>{activeToast.name}</span>
+                      <span style={{fontFamily:F.m, fontSize:8, color:$.dim, marginLeft:"auto", letterSpacing:".1em"}}>BATCH {String(activeToast.batch).padStart(3,"0")}</span>
+                      <button onClick={dismissToast} style={{background:"transparent", border:"none", color:$.dim, cursor:"pointer", padding:"0 2px", fontSize:15, lineHeight:1, marginLeft:2}}>×</button>
+                    </div>
+
+                    {/* Editorial serif title — the "headline" of this moment */}
+                    <div style={{fontFamily:serif, fontStyle:"italic", fontSize:22, fontWeight:500, color:$.tx, lineHeight:1.2, marginBottom:10, animation:"titleRise .75s cubic-bezier(.16,1,.3,1) .3s both", textShadow:"0 0 28px "+activeToast.color+"33"}}>
+                      {activeToast.title}
+                    </div>
+
+                    {/* Explanation */}
+                    <div style={{fontSize:12.5, color:$.tx2, lineHeight:1.65, marginBottom:12, animation:"linePop .55s cubic-bezier(.16,1,.3,1) .55s both"}}>
+                      {activeToast.sub}
+                    </div>
+
+                    {/* Metric reading */}
+                    <div style={{fontFamily:F.m, fontSize:9.5, color:$.dim, letterSpacing:".04em", marginBottom:14, paddingLeft:10, borderLeft:"1px solid "+activeToast.color+"44", animation:"linePop .55s cubic-bezier(.16,1,.3,1) .75s both"}}>
+                      {activeToast.metric}
+                    </div>
+
+                    {/* Footer: countdown + skip */}
+                    <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", gap:10, fontFamily:F.m, fontSize:9, color:$.dim, letterSpacing:".06em", animation:"linePop .5s ease .95s both"}}>
+                      <span>Resumes in <span style={{color:activeToast.color, fontWeight:700, fontSize:11}}>{countdown}s</span></span>
+                      <button onClick={dismissToast} style={{background:"transparent", border:"1px solid "+activeToast.color+"66", color:activeToast.color, cursor:"pointer", padding:"4px 12px", fontSize:8.5, fontWeight:700, letterSpacing:".18em", borderRadius:4, fontFamily:F.m, transition:"all .2s"}}
+                        onMouseEnter={function(e){e.currentTarget.style.background=activeToast.color+"18";}}
+                        onMouseLeave={function(e){e.currentTarget.style.background="transparent";}}>SKIP</button>
+                    </div>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div style={{height:2, background:"rgba(255,255,255,.04)", position:"relative"}}>
+                    <div style={{height:"100%", background:"linear-gradient(90deg, "+activeToast.color+" 0%, "+activeToast.color+"bb 100%)", boxShadow:"0 0 8px "+activeToast.color, animation:"toastProgress 10s linear both", transformOrigin:"left"}}/>
+                  </div>
+                </div>
+              </div>
+            )}
             children={
               <ResponsiveContainer width="100%" height={210}>
                 <LineChart data={aucData.slice(0,batch+1)} margin={{top:8,right:8,bottom:4,left:0}}>
@@ -2227,7 +2412,10 @@ function CommandCentre(props) {
                   <XAxis dataKey="b" tick={TK} tickLine={false} domain={[0,119]} type="number"/>
                   <YAxis domain={["dataMin - 0.01","dataMax + 0.01"]} tick={TK} tickLine={false} width={36}/>
                   <Tooltip contentStyle={TT}/>
+                  {batch>=9  && <ReferenceLine x={9}  stroke="#a78bfa" strokeDasharray="2 3" strokeOpacity={.4} label={{value:"PH",position:"insideBottomLeft",fill:"#a78bfa",fontSize:7}}/>}
+                  {batch>=34 && <ReferenceLine x={34} stroke="#67e8f9" strokeDasharray="2 3" strokeOpacity={.4} label={{value:"CUSUM",position:"insideBottomLeft",fill:"#67e8f9",fontSize:7}}/>}
                   {batch>=40 && <ReferenceLine x={40} stroke={$.ac} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Drift",position:"insideTopLeft",fill:$.ac,fontSize:8}}/>}
+                  {batch>=55 && <ReferenceLine x={55} stroke={$.glow} strokeDasharray="2 3" strokeOpacity={.45} label={{value:"PSI",position:"insideBottomLeft",fill:$.glow,fontSize:7}}/>}
                   {batch>=65 && <ReferenceLine x={65} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Attack",position:"insideTopLeft",fill:$.rd,fontSize:8}}/>}
                   {batch>=80 && <ReferenceLine x={80} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Regime",position:"insideTopLeft",fill:$.rd,fontSize:8}}/>}
                   <ReferenceLine x={batch} stroke={$.glow} strokeWidth={1.5} strokeOpacity={.9}/>
@@ -2249,6 +2437,9 @@ function CommandCentre(props) {
                   <XAxis dataKey="b" tick={false} axisLine={false} domain={[0,119]} type="number"/>
                   <YAxis tick={false} axisLine={false} width={0} domain={[0, function(max){ return Math.max(0.35, max*1.1); }]}/>
                   <ReferenceLine y={0.25} stroke={$.rd} strokeDasharray="3 3" strokeOpacity={.5} label={{value:"Alert 0.25",position:"insideTopLeft",fill:$.rd,fontSize:8}}/>
+                  {batch>=9  && <ReferenceLine x={9}  stroke="#a78bfa" strokeDasharray="2 3" strokeOpacity={.4}/>}
+                  {batch>=34 && <ReferenceLine x={34} stroke="#67e8f9" strokeDasharray="2 3" strokeOpacity={.4}/>}
+                  {batch>=55 && <ReferenceLine x={55} stroke={$.glow} strokeDasharray="2 3" strokeOpacity={.5}/>}
                   <ReferenceLine x={batch} stroke={$.glow} strokeWidth={1.2} strokeOpacity={.7}/>
                   <Area type="monotone" dataKey="P" stroke={$.ac} fill={$.acD} strokeWidth={2} isAnimationActive={false}/>
                 </AreaChart>
@@ -2321,23 +2512,27 @@ function CommandCentre(props) {
       {nav}
       <div style={{maxWidth:820,margin:"0 auto",padding:"28px 20px 56px"}}>
         <div style={{marginBottom:28}}>
-          <p style={{fontFamily:F.m,fontSize:10,color:$.glow,letterSpacing:4,marginBottom:8}}>RESEARCH FINDINGS</p>
-          <h2 style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:8}}>The data behind every claim</h2>
-          <p style={{fontSize:13,color:$.tx3,lineHeight:1.75}}>Click any finding to see the actual evidence</p>
+          <p style={{fontFamily:F.m,fontSize:10,color:$.glow,letterSpacing:4,marginBottom:8,animation:"findingIn .6s cubic-bezier(.16,1,.3,1) 0s both"}}>RESEARCH FINDINGS</p>
+          <h2 style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:600,fontFamily:serif,color:$.tx,marginBottom:8,animation:"findingIn .7s cubic-bezier(.16,1,.3,1) .08s both"}}>The data behind every claim</h2>
+          <p style={{fontSize:13,color:$.tx3,lineHeight:1.75,animation:"findingIn .7s cubic-bezier(.16,1,.3,1) .16s both"}}>Click any finding to see the actual evidence</p>
         </div>
 
         {/* Finding 1: AUC degradation */}
-        <div style={{marginBottom:14}}>
-          <div onClick={function(){setFindOpen(findOpen===1?null:1);}} style={{background:$.bg2,border:"1px solid "+(findOpen===1?$.rd+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+        <div style={{marginBottom:14,animation:"findingIn .7s cubic-bezier(.16,1,.3,1) .28s both"}}>
+          <div onClick={function(){setFindOpen(findOpen===1?null:1);}}
+            onMouseEnter={function(e){if(findOpen!==1){e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.borderColor=$.rd+"44";}}}
+            onMouseLeave={function(e){if(findOpen!==1){e.currentTarget.style.transform="none";e.currentTarget.style.borderColor=$.brd;}}}
+            style={{background:$.bg2,border:"1px solid "+(findOpen===1?$.rd+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .3s cubic-bezier(.16,1,.3,1)",position:"relative"}}>
+            <div style={{position:"absolute",top:24,right:72,width:7,height:7,borderRadius:"50%",background:$.rd,animation:"findingPulse 2.2s ease-in-out infinite"}}/>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===1?14:0}}>
               <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.rd}}>0.9999 → 0.8834</div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.rd,display:"inline-block",animation:"numPop .7s cubic-bezier(.16,1,.3,1) .5s both"}}>0.9999 → 0.8834</div>
                 <div style={{fontSize:13,color:$.tx,marginTop:4}}>The model was near-perfect in the lab. Deployment told a different story</div>
               </div>
               <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===1?"Close":"See proof"}</span>
             </div>
             {findOpen===1 && (
-              <div style={{animation:"wup .2s ease both"}}>
+              <div style={{animation:"findingIn .4s ease both"}}>
                 <ResponsiveContainer width="100%" height={180}>
                   <LineChart data={aucData} margin={{top:8,right:8,bottom:4,left:0}}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(251,191,36,.04)"/>
@@ -2346,9 +2541,9 @@ function CommandCentre(props) {
                     <ReferenceLine x={40} stroke={$.ac} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Drift",fill:$.ac,fontSize:8}}/>
                     <ReferenceLine x={65} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Attack",fill:$.rd,fontSize:8}}/>
                     <ReferenceLine x={80} stroke={$.rd} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Regime",fill:$.rd,fontSize:8}}/>
-                    <Line type="monotone" dataKey="H" stroke={$.glow} strokeWidth={2} dot={false} name="Hybrid" isAnimationActive={false}/>
-                    <Line type="monotone" dataKey="S" stroke="#a78bfa" strokeWidth={1} dot={false} opacity={.4} name="SVM" isAnimationActive={false}/>
-                    <Line type="monotone" dataKey="R" stroke={$.gn} strokeWidth={1} dot={false} opacity={.4} name="RF" isAnimationActive={false}/>
+                    <Line type="monotone" dataKey="H" stroke={$.glow} strokeWidth={2} dot={false} name="Hybrid" animationDuration={1600}/>
+                    <Line type="monotone" dataKey="S" stroke="#a78bfa" strokeWidth={1} dot={false} opacity={.4} name="SVM" animationDuration={1600} animationBegin={200}/>
+                    <Line type="monotone" dataKey="R" stroke={$.gn} strokeWidth={1} dot={false} opacity={.4} name="RF" animationDuration={1600} animationBegin={400}/>
                   </LineChart>
                 </ResponsiveContainer>
                 <div style={{fontSize:12,color:$.tx3,lineHeight:1.7,marginTop:8}}>Every line is a different model watching the same data stream. The vertical dashed lines mark when conditions changed. Between batch 40 and batch 120, 1 in 9 Hybrid predictions degraded. The model had no idea it was getting worse</div>
@@ -2358,26 +2553,30 @@ function CommandCentre(props) {
         </div>
 
         {/* Finding 2: ECE / Confidence */}
-        <div style={{marginBottom:14}}>
-          <div onClick={function(){setFindOpen(findOpen===2?null:2);}} style={{background:$.bg2,border:"1px solid "+(findOpen===2?$.rd+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+        <div style={{marginBottom:14,animation:"findingIn .7s cubic-bezier(.16,1,.3,1) .38s both"}}>
+          <div onClick={function(){setFindOpen(findOpen===2?null:2);}}
+            onMouseEnter={function(e){if(findOpen!==2){e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.borderColor=$.rd+"44";}}}
+            onMouseLeave={function(e){if(findOpen!==2){e.currentTarget.style.transform="none";e.currentTarget.style.borderColor=$.brd;}}}
+            style={{background:$.bg2,border:"1px solid "+(findOpen===2?$.rd+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .3s cubic-bezier(.16,1,.3,1)",position:"relative"}}>
+            <div style={{position:"absolute",top:24,right:72,width:7,height:7,borderRadius:"50%",background:$.rd,animation:"findingPulse 2.2s ease-in-out infinite .3s"}}/>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===2?14:0}}>
               <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.rd}}>Confidence error increased 214×</div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.rd,display:"inline-block",animation:"numPop .7s cubic-bezier(.16,1,.3,1) .6s both"}}>Confidence error increased 214×</div>
                 <div style={{fontSize:13,color:$.tx,marginTop:4}}>The model was still saying "90% sure" while being wrong</div>
               </div>
               <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===2?"Close":"See proof"}</span>
             </div>
             {findOpen===2 && (
-              <div style={{animation:"wup .2s ease both"}}>
+              <div style={{animation:"findingIn .4s ease both"}}>
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:12}}>
-                  <div style={{background:"rgba(52,211,153,.04)",borderRadius:8,padding:"16px",textAlign:"center"}}>
+                  <div style={{background:"rgba(52,211,153,.04)",borderRadius:8,padding:"16px",textAlign:"center",animation:"findingIn .5s cubic-bezier(.16,1,.3,1) .1s both"}}>
                     <div style={{fontFamily:F.m,fontSize:8,color:$.gn,letterSpacing:1,marginBottom:6}}>LAB (CLEAN DATA)</div>
-                    <div style={{fontFamily:F.m,fontSize:28,fontWeight:700,color:$.gn}}>1×</div>
+                    <div style={{fontFamily:F.m,fontSize:28,fontWeight:700,color:$.gn,animation:"numPop .7s cubic-bezier(.16,1,.3,1) .25s both"}}>1×</div>
                     <div style={{fontSize:11,color:$.tx3,marginTop:4}}>Model says 90%, is right 90% of the time</div>
                   </div>
-                  <div style={{background:"rgba(248,113,113,.04)",borderRadius:8,padding:"16px",textAlign:"center"}}>
+                  <div style={{background:"rgba(248,113,113,.04)",borderRadius:8,padding:"16px",textAlign:"center",animation:"findingIn .5s cubic-bezier(.16,1,.3,1) .2s both"}}>
                     <div style={{fontFamily:F.m,fontSize:8,color:$.rd,letterSpacing:1,marginBottom:6}}>DEPLOYED (DRIFT)</div>
-                    <div style={{fontFamily:F.m,fontSize:28,fontWeight:700,color:$.rd}}>214×</div>
+                    <div style={{fontFamily:F.m,fontSize:28,fontWeight:700,color:$.rd,animation:"numPop .9s cubic-bezier(.16,1,.3,1) .55s both"}}>214×</div>
                     <div style={{fontSize:11,color:$.tx3,marginTop:4}}>Model says 90%, is right far less often</div>
                   </div>
                 </div>
@@ -2388,17 +2587,21 @@ function CommandCentre(props) {
         </div>
 
         {/* Finding 3: PSI Early Warning */}
-        <div style={{marginBottom:14}}>
-          <div onClick={function(){setFindOpen(findOpen===3?null:3);}} style={{background:$.bg2,border:"1px solid "+(findOpen===3?$.glow+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+        <div style={{marginBottom:14,animation:"findingIn .7s cubic-bezier(.16,1,.3,1) .48s both"}}>
+          <div onClick={function(){setFindOpen(findOpen===3?null:3);}}
+            onMouseEnter={function(e){if(findOpen!==3){e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.borderColor=$.glow+"44";}}}
+            onMouseLeave={function(e){if(findOpen!==3){e.currentTarget.style.transform="none";e.currentTarget.style.borderColor=$.brd;}}}
+            style={{background:$.bg2,border:"1px solid "+(findOpen===3?$.glow+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .3s cubic-bezier(.16,1,.3,1)",position:"relative"}}>
+            <div style={{position:"absolute",top:24,right:72,width:7,height:7,borderRadius:"50%",background:$.glow,animation:"findingPulse 2.2s ease-in-out infinite .6s"}}/>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===3?14:0}}>
               <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.glow}}>PSI fired 26 batches early</div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.glow,display:"inline-block",animation:"numPop .7s cubic-bezier(.16,1,.3,1) .7s both"}}>PSI fired 26 batches early</div>
                 <div style={{fontSize:13,color:$.tx,marginTop:4}}>The system spotted trouble before accuracy dropped</div>
               </div>
               <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===3?"Close":"See proof"}</span>
             </div>
             {findOpen===3 && (
-              <div style={{animation:"wup .2s ease both"}}>
+              <div style={{animation:"findingIn .4s ease both"}}>
                 <ResponsiveContainer width="100%" height={140}>
                   <AreaChart data={psiData} margin={{top:8,right:8,bottom:4,left:0}}>
                     <XAxis dataKey="b" tick={TK} tickLine={false}/>
@@ -2406,12 +2609,12 @@ function CommandCentre(props) {
                     <ReferenceLine y={0.25} stroke={$.rd} strokeDasharray="3 3" strokeOpacity={.5} label={{value:"Alert threshold",fill:$.rd,fontSize:8}}/>
                     <ReferenceLine x={55} stroke={$.glow} strokeWidth={2} strokeOpacity={.5} label={{value:"PSI fires",fill:$.glow,fontSize:8,position:"top"}}/>
                     <ReferenceLine x={81} stroke={$.rd} strokeWidth={1} strokeOpacity={.3} label={{value:"AUC drops",fill:$.rd,fontSize:8,position:"top"}}/>
-                    <Area type="monotone" dataKey="P" stroke={$.ac} fill={$.acD} strokeWidth={2} isAnimationActive={false}/>
+                    <Area type="monotone" dataKey="P" stroke={$.ac} fill={$.acD} strokeWidth={2} animationDuration={1400}/>
                   </AreaChart>
                 </ResponsiveContainer>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,marginBottom:8}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,marginBottom:8,animation:"gapBadge .8s cubic-bezier(.16,1,.3,1) 1s both",transformOrigin:"center"}}>
                   <div style={{flex:1,height:1,background:$.glow+"33"}}/>
-                  <span style={{fontFamily:F.m,fontSize:11,color:$.glow,fontWeight:700}}>26 batch gap</span>
+                  <span style={{fontFamily:F.m,fontSize:11,color:$.glow,fontWeight:700,padding:"2px 8px",border:"1px solid "+$.glow+"44",borderRadius:4,background:$.glow+"0a"}}>26 batch gap</span>
                   <div style={{flex:1,height:1,background:$.glow+"33"}}/>
                 </div>
                 <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>The amber line is PSI, which measures how different incoming data looks from training data. It crossed the alert threshold at batch 55. Accuracy did not visibly drop until batch 81. That 26-batch window is the time you have to recalibrate, switch models, or alert an operator before the failure becomes visible</div>
@@ -2421,30 +2624,34 @@ function CommandCentre(props) {
         </div>
 
         {/* Finding 4: Adversarial Robustness */}
-        <div style={{marginBottom:14}}>
-          <div onClick={function(){setFindOpen(findOpen===4?null:4);}} style={{background:$.bg2,border:"1px solid "+(findOpen===4?$.gn+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+        <div style={{marginBottom:14,animation:"findingIn .7s cubic-bezier(.16,1,.3,1) .58s both"}}>
+          <div onClick={function(){setFindOpen(findOpen===4?null:4);}}
+            onMouseEnter={function(e){if(findOpen!==4){e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.borderColor=$.gn+"44";}}}
+            onMouseLeave={function(e){if(findOpen!==4){e.currentTarget.style.transform="none";e.currentTarget.style.borderColor=$.brd;}}}
+            style={{background:$.bg2,border:"1px solid "+(findOpen===4?$.gn+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .3s cubic-bezier(.16,1,.3,1)",position:"relative"}}>
+            <div style={{position:"absolute",top:24,right:72,width:7,height:7,borderRadius:"50%",background:$.gn,animation:"findingPulse 2.2s ease-in-out infinite .9s"}}/>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===4?14:0}}>
               <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.gn}}>SVM 19.8% flipped vs RF 0.04%</div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.gn,display:"inline-block",animation:"numPop .7s cubic-bezier(.16,1,.3,1) .8s both"}}>SVM 19.8% flipped vs RF 0.04%</div>
                 <div style={{fontSize:13,color:$.tx,marginTop:4}}>Same test, completely different resilience</div>
               </div>
               <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===4?"Close":"See proof"}</span>
             </div>
             {findOpen===4 && (
-              <div style={{animation:"wup .2s ease both"}}>
+              <div style={{animation:"findingIn .4s ease both"}}>
                 <div style={{display:"flex",gap:12,marginBottom:12}}>
                   {[
                     {name:"SVM",val:19.8,color:"#a78bfa"},
                     {name:"Hybrid",val:3.3,color:$.glow},
                     {name:"LGBM",val:1.2,color:"#67e8f9"},
                     {name:"RF",val:0.04,color:$.gn},
-                  ].map(function(m){return (
+                  ].map(function(m,i){return (
                     <div key={m.name} style={{flex:1,textAlign:"center"}}>
                       <div style={{height:100,display:"flex",alignItems:"flex-end",justifyContent:"center",marginBottom:6}}>
-                        <div style={{width:"100%",maxWidth:40,height:Math.max(2,m.val/19.8*90),background:m.color,opacity:0.5,borderRadius:"3px 3px 0 0",transition:"height .5s ease"}}/>
+                        <div style={{width:"100%",maxWidth:40,height:Math.max(2,m.val/19.8*90),background:m.color,opacity:0.5,borderRadius:"3px 3px 0 0",animation:"barGrowH .9s cubic-bezier(.16,1,.3,1) "+(0.15+i*0.12)+"s both"}}/>
                       </div>
-                      <div style={{fontFamily:F.m,fontSize:12,fontWeight:700,color:m.color}}>{m.val}%</div>
-                      <div style={{fontFamily:F.m,fontSize:8,color:$.dim,marginTop:2}}>{m.name}</div>
+                      <div style={{fontFamily:F.m,fontSize:12,fontWeight:700,color:m.color,animation:"numPop .6s cubic-bezier(.16,1,.3,1) "+(0.9+i*0.12)+"s both"}}>{m.val}%</div>
+                      <div style={{fontFamily:F.m,fontSize:8,color:$.dim,marginTop:2,animation:"softFadeIn .4s ease "+(1+i*0.12)+"s both"}}>{m.name}</div>
                     </div>
                   );})}
                 </div>
@@ -2455,23 +2662,27 @@ function CommandCentre(props) {
         </div>
 
         {/* Finding 5: Coverage */}
-        <div style={{marginBottom:14}}>
-          <div onClick={function(){setFindOpen(findOpen===5?null:5);}} style={{background:$.bg2,border:"1px solid "+(findOpen===5?$.ac+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+        <div style={{marginBottom:14,animation:"findingIn .7s cubic-bezier(.16,1,.3,1) .68s both"}}>
+          <div onClick={function(){setFindOpen(findOpen===5?null:5);}}
+            onMouseEnter={function(e){if(findOpen!==5){e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.borderColor=$.ac+"44";}}}
+            onMouseLeave={function(e){if(findOpen!==5){e.currentTarget.style.transform="none";e.currentTarget.style.borderColor=$.brd;}}}
+            style={{background:$.bg2,border:"1px solid "+(findOpen===5?$.ac+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .3s cubic-bezier(.16,1,.3,1)",position:"relative"}}>
+            <div style={{position:"absolute",top:24,right:72,width:7,height:7,borderRadius:"50%",background:$.ac,animation:"findingPulse 2.2s ease-in-out infinite 1.2s"}}/>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===5?14:0}}>
               <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.ac}}>Coverage dropped from 96% to 83%</div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.ac,display:"inline-block",animation:"numPop .7s cubic-bezier(.16,1,.3,1) .9s both"}}>Coverage dropped from 96% to 83%</div>
                 <div style={{fontSize:13,color:$.tx,marginTop:4}}>The safety guarantee expired. 1 in 6 predictions had no bound</div>
               </div>
               <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===5?"Close":"See proof"}</span>
             </div>
             {findOpen===5 && (
-              <div style={{animation:"wup .2s ease both"}}>
+              <div style={{animation:"findingIn .4s ease both"}}>
                 <ResponsiveContainer width="100%" height={130}>
                   <AreaChart data={covData} margin={{top:8,right:8,bottom:4,left:0}}>
                     <XAxis dataKey="b" tick={TK} tickLine={false}/>
                     <YAxis domain={[0.78,1]} tick={TK} tickLine={false} width={36}/>
                     <ReferenceLine y={0.95} stroke={$.gn} strokeDasharray="3 3" strokeOpacity={.5} label={{value:"95% guarantee",fill:$.gn,fontSize:8}}/>
-                    <Area type="monotone" dataKey="C" stroke={$.glow} fill={$.glowD} strokeWidth={2} isAnimationActive={false}/>
+                    <Area type="monotone" dataKey="C" stroke={$.glow} fill={$.glowD} strokeWidth={2} animationDuration={1600}/>
                   </AreaChart>
                 </ResponsiveContainer>
                 <div style={{fontSize:12,color:$.tx3,lineHeight:1.7,marginTop:8}}>Conformal prediction guarantees that at least 95% of predictions have a reliable confidence bound. When the data shifts far enough, that guarantee breaks. At batch 95, coverage was 83%, meaning 1 in 6 predictions had no valid safety net. A model that can tell you when its own guarantee has expired is more valuable than one that cannot</div>
@@ -2481,17 +2692,21 @@ function CommandCentre(props) {
         </div>
 
         {/* Finding 6: F_gain */}
-        <div style={{marginBottom:14}}>
-          <div onClick={function(){setFindOpen(findOpen===6?null:6);}} style={{background:$.bg2,border:"1px solid "+(findOpen===6?$.glow+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .2s"}}>
+        <div style={{marginBottom:14,animation:"findingIn .7s cubic-bezier(.16,1,.3,1) .78s both"}}>
+          <div onClick={function(){setFindOpen(findOpen===6?null:6);}}
+            onMouseEnter={function(e){if(findOpen!==6){e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.borderColor=$.glow+"33";}}}
+            onMouseLeave={function(e){if(findOpen!==6){e.currentTarget.style.transform="none";e.currentTarget.style.borderColor=$.brd;}}}
+            style={{background:$.bg2,border:"1px solid "+(findOpen===6?$.glow+"44":$.brd),borderRadius:12,padding:"20px 22px",cursor:"pointer",transition:"all .3s cubic-bezier(.16,1,.3,1)",position:"relative"}}>
+            <div style={{position:"absolute",top:24,right:72,width:7,height:7,borderRadius:"50%",background:$.glow,animation:"findingPulse 2.2s ease-in-out infinite 1.5s"}}/>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===6?14:0}}>
               <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.glow}}>F_gain dominated every phase</div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.glow,display:"inline-block",animation:"numPop .7s cubic-bezier(.16,1,.3,1) 1s both"}}>F_gain dominated every phase</div>
                 <div style={{fontSize:13,color:$.tx,marginTop:4}}>The physics held even when the statistics broke down</div>
               </div>
               <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===6?"Close":"See proof"}</span>
             </div>
             {findOpen===6 && (
-              <div style={{animation:"wup .2s ease both"}}>
+              <div style={{animation:"findingIn .4s ease both"}}>
                 <div style={{marginBottom:12}}>
                   {[
                     {name:"F_gain_mean",val:100,phase:"All phases"},
@@ -2499,11 +2714,11 @@ function CommandCentre(props) {
                     {name:"g_mean",val:58,phase:"Stable + Drift"},
                     {name:"H_net",val:41,phase:"Regime only"},
                     {name:"V_weak",val:33,phase:"Attack only"},
-                  ].map(function(f){return (
-                    <div key={f.name} style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+                  ].map(function(f,i){return (
+                    <div key={f.name} style={{display:"flex",alignItems:"center",gap:10,marginBottom:6,animation:"softFadeIn .4s ease "+(0.1+i*0.08)+"s both"}}>
                       <div style={{fontFamily:F.m,fontSize:9,color:$.tx2,width:90,textAlign:"right"}}>{f.name}</div>
                       <div style={{flex:1,height:6,background:"rgba(255,255,255,.04)",borderRadius:3,overflow:"hidden"}}>
-                        <div style={{width:f.val+"%",height:"100%",background:f.name==="F_gain_mean"?$.glow:$.dim,opacity:f.name==="F_gain_mean"?0.6:0.25,borderRadius:3}}/>
+                        <div style={{width:f.val+"%",height:"100%",background:f.name==="F_gain_mean"?$.glow:$.dim,opacity:f.name==="F_gain_mean"?0.6:0.25,borderRadius:3,animation:"barGrowW .9s cubic-bezier(.16,1,.3,1) "+(0.25+i*0.12)+"s both",boxShadow:f.name==="F_gain_mean"?"0 0 8px "+$.glow+"44":"none"}}/>
                       </div>
                       <div style={{fontFamily:F.m,fontSize:8,color:$.dim,width:80}}>{f.phase}</div>
                     </div>
@@ -2515,7 +2730,7 @@ function CommandCentre(props) {
           </div>
         </div>
 
-        <div style={{marginTop:28,background:"rgba(248,113,113,.04)",border:"1px solid rgba(248,113,113,.16)",borderRadius:12,padding:"20px 22px"}}>
+        <div style={{marginTop:28,background:"rgba(248,113,113,.04)",border:"1px solid rgba(248,113,113,.16)",borderRadius:12,padding:"20px 22px",animation:"findingIn .8s cubic-bezier(.16,1,.3,1) .95s both"}}>
           <div style={{fontFamily:F.m,fontSize:9,color:$.rd,letterSpacing:".06em",marginBottom:10}}>THE BOTTOM LINE</div>
           <p style={{fontSize:14,color:$.tx,lineHeight:1.85,fontFamily:serif}}>A model that scores <strong style={{color:$.glow}}>0.9999</strong> in the lab can still fail silently in the field. The only difference between knowing and not knowing is whether you built the monitoring to detect it</p>
         </div>
@@ -3963,7 +4178,7 @@ export default function App() {
       <section id="honour" style={{ padding: "60px 24px 80px", textAlign: "center" }}>
         <div style={{ maxWidth: 420, margin: "0 auto" }}>
           <Rv><div style={{ width: 24, height: 1, background: $.glow, margin: "0 auto 28px", opacity: 0.15 }} /></Rv>
-          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939-1945.</p></Rv>
+          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939–1945.</p></Rv>
           <Rv d={0.2}><p style={{ fontSize: 13, lineHeight: 1.9, color: $.dim }}>They sat in signals rooms, detecting anomalies in the noise and warning of danger before it arrived.</p></Rv>
         </div>
       </section>
@@ -3974,7 +4189,7 @@ export default function App() {
           <BeaconSmall s={12} />
           <span style={{ fontSize: 9, letterSpacing: 2, color: $.dim, fontFamily: F.m }}>W.R.E.N.</span>
         </div>
-        <div style={{ fontSize: 9, color: $.dim }}>University of Portsmouth | 2025-2026</div>
+        <div style={{ fontSize: 9, color: $.dim }}>University of Portsmouth | 2025–2026</div>
         <div style={{ fontSize: 9, color: $.dim, opacity: 0.5 }}>Powered by A.G.N.E.S. v4.2</div>
       </footer>
     </div>
