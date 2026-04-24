@@ -2087,6 +2087,189 @@ function CountdownDisplay(props) {
   return <span style={{color: props.color, fontWeight: 700, fontSize: 11}}>{c}s</span>;
 }
 
+/* ═══ COLD OPEN — the editorial moment before the hero ═══
+   Auto-advances through five beats, then waits for the user to tap ENTER.
+   Module-level flag so it only shows once per page load. */
+var _coldOpenDismissed = false;
+
+function ColdOpen(props) {
+  var _stage = useState(0); var stage = _stage[0]; var setStage = _stage[1];
+  var _out = useState(false); var out = _out[0]; var setOut = _out[1];
+
+  useEffect(function(){
+    var timers = [];
+    timers.push(setTimeout(function(){ setStage(1); },  900));
+    timers.push(setTimeout(function(){ setStage(2); }, 3800));
+    timers.push(setTimeout(function(){ setStage(3); }, 6600));
+    timers.push(setTimeout(function(){ setStage(4); }, 9800));
+    return function(){ timers.forEach(clearTimeout); };
+  }, []);
+
+  function dismiss(){
+    if (out) return;
+    setOut(true);
+    _coldOpenDismissed = true;
+    setTimeout(function(){ props.onDone && props.onDone(); }, 700);
+  }
+
+  useEffect(function(){
+    function onKey(e){ if (e.key === "Enter" || e.key === "Escape" || e.key === " ") dismiss(); }
+    window.addEventListener("keydown", onKey);
+    return function(){ window.removeEventListener("keydown", onKey); };
+  }, [out]);
+
+  return (
+    <div style={{
+      position:"fixed", inset:0, zIndex:9999,
+      background:"#050710",
+      display:"flex", alignItems:"center", justifyContent:"center",
+      padding:"clamp(28px, 5vh, 56px) clamp(20px, 5vw, 72px)",
+      opacity: out ? 0 : 1,
+      transition:"opacity .7s ease",
+      pointerEvents: out ? "none" : "auto",
+      overflowY:"auto", WebkitOverflowScrolling:"touch"
+    }}>
+      {/* Subtle vignette so the text feels centred even on wide monitors */}
+      <div style={{
+        position:"absolute", inset:0, pointerEvents:"none",
+        background:"radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,.55) 100%)"
+      }}/>
+
+      <div style={{maxWidth:720, width:"100%", position:"relative"}}>
+
+        {/* Dateline */}
+        <div style={{
+          fontFamily:F.m,
+          fontSize:"clamp(9px, 1.1vw, 10.5px)",
+          color:"#67e8f9",
+          letterSpacing:"clamp(.16em, .3vw, .32em)",
+          fontWeight:600,
+          marginBottom:"clamp(18px, 3.2vw, 32px)",
+          opacity: stage >= 0 ? 1 : 0,
+          transform: stage >= 0 ? "translateY(0)" : "translateY(6px)",
+          transition:"opacity 1s ease .1s, transform 1s ease .1s"
+        }}>
+          AUGUST 14, 2003 · NORTHEAST BLACKOUT
+        </div>
+
+        {/* Beat 1 — the technical context, not the shock */}
+        <div style={{
+          fontFamily:serif, fontStyle:"italic", fontWeight:400,
+          fontSize:"clamp(21px, 4.4vw, 38px)",
+          color:"#e8ecf5", lineHeight:1.32,
+          marginBottom:"clamp(14px, 2vw, 20px)",
+          opacity: stage >= 1 ? 1 : 0,
+          transform: stage >= 1 ? "translateY(0)" : "translateY(12px)",
+          transition:"opacity 1.2s ease, transform 1.2s cubic-bezier(.16,1,.3,1)"
+        }}>
+          A software race condition stalled the control room's alarm system for 62 minutes.
+        </div>
+
+        {/* Beat 2 — what it meant in human terms */}
+        <div style={{
+          fontFamily:serif, fontStyle:"italic", fontWeight:400,
+          fontSize:"clamp(16px, 2.8vw, 22px)",
+          color:"#cbd5e1", lineHeight:1.45,
+          marginBottom:"clamp(22px, 3.2vw, 32px)",
+          opacity: stage >= 2 ? 1 : 0,
+          transform: stage >= 2 ? "translateY(0)" : "translateY(10px)",
+          transition:"opacity 1.1s ease, transform 1.1s cubic-bezier(.16,1,.3,1)"
+        }}>
+          For over an hour, operators could not see the grid failing in front of them.
+        </div>
+
+        {/* Beat 3 — the cost, quiet mono, the context the user asked for */}
+        <div style={{
+          fontFamily:F.m,
+          fontSize:"clamp(10.5px, 1.4vw, 12.5px)",
+          color:"#94a3b8", lineHeight:1.75,
+          letterSpacing:".02em", maxWidth:580,
+          marginBottom:"clamp(24px, 3.6vw, 36px)",
+          opacity: stage >= 3 ? 1 : 0,
+          transform: stage >= 3 ? "translateY(0)" : "translateY(8px)",
+          transition:"opacity 1s ease, transform 1s ease"
+        }}>
+          Cascade outages crossed eight states and two provinces. 55 million without power. 11 people died. $6 billion in damages. No intelligent system was watching whether the monitoring itself was still working.
+        </div>
+
+        {/* Beat 4 — why W.R.E.N. exists, no yellow divider */}
+        <div style={{
+          opacity: stage >= 4 ? 1 : 0,
+          transform: stage >= 4 ? "translateY(0)" : "translateY(10px)",
+          transition:"opacity 1.2s ease, transform 1.2s cubic-bezier(.16,1,.3,1)"
+        }}>
+          <div style={{
+            fontFamily:F.s,
+            fontSize:"clamp(13px, 1.7vw, 16px)",
+            color:"#e2e8f0", lineHeight:1.65, maxWidth:560,
+            marginBottom:"clamp(18px, 2.6vw, 24px)"
+          }}>
+            Today, machine learning models decide whether grids stay stable. W.R.E.N. is the deployment monitor that watches those models for the moment they quietly stop being reliable.
+          </div>
+          <div style={{
+            display:"flex", alignItems:"center", gap:"clamp(10px, 2vw, 14px)",
+            flexWrap:"wrap"
+          }}>
+            <span style={{
+              fontFamily:F.m,
+              fontSize:"clamp(11px, 1.4vw, 13px)",
+              color:"#fbbf24",
+              letterSpacing:"clamp(.22em, .4vw, .36em)",
+              fontWeight:700
+            }}>
+              W.R.E.N.
+            </span>
+            <span style={{
+              fontFamily:F.m,
+              fontSize:"clamp(8px, 1vw, 9px)",
+              color:"#64748b",
+              letterSpacing:".16em"
+            }}>
+              press enter to begin
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Skip / enter button */}
+      <button onClick={dismiss} style={{
+        position:"fixed",
+        bottom:"clamp(18px, 3vh, 32px)",
+        right:"clamp(14px, 4vw, 48px)",
+        background:"transparent",
+        border:"1px solid rgba(255,255,255,.14)",
+        color:"rgba(255,255,255,.55)",
+        padding:"clamp(7px, 1vw, 9px) clamp(14px, 2vw, 20px)",
+        borderRadius:6,
+        fontFamily:F.m,
+        fontSize:"clamp(8px, 1vw, 9.5px)",
+        letterSpacing:".22em",
+        fontWeight:600,
+        cursor:"pointer", transition:"all .2s",
+        zIndex:10
+      }}
+      onMouseEnter={function(e){e.currentTarget.style.borderColor="rgba(251,191,36,.45)";e.currentTarget.style.color="#fbbf24";}}
+      onMouseLeave={function(e){e.currentTarget.style.borderColor="rgba(255,255,255,.14)";e.currentTarget.style.color="rgba(255,255,255,.55)";}}>
+        {stage >= 4 ? "ENTER \u2192" : "SKIP"}
+      </button>
+
+      {/* Top progress bar — pacing indicator, not a decorative line */}
+      <div style={{
+        position:"fixed", top:0, left:0, right:0, height:2,
+        background:"rgba(255,255,255,.04)", zIndex:10
+      }}>
+        <div style={{
+          height:"100%",
+          background:"#fbbf24",
+          boxShadow:"0 0 8px #fbbf24",
+          width: (Math.min(stage, 4) * 25) + "%",
+          transition:"width 1.1s cubic-bezier(.16,1,.3,1)"
+        }}/>
+      </div>
+    </div>
+  );
+}
+
 /* ═══ DETECTOR EVENT CATALOGUE ═══ */
 var DETECTOR_EVENTS = [
   { batch:  9, key:"ph",    name:"PAGE HINKLEY", title:"First warning",         sub:"Something just shifted in the data. The earliest detector caught it.",              color:"#a78bfa", severity:"info", metric:"Signal 4.2 (alert at 3.5)" },
@@ -2734,9 +2917,65 @@ function CommandCentre(props) {
           </div>
         </div>
 
-        <div style={{marginTop:28,background:"rgba(248,113,113,.04)",border:"1px solid rgba(248,113,113,.16)",borderRadius:12,padding:"20px 22px",animation:"findingIn .8s cubic-bezier(.16,1,.3,1) .95s both"}}>
-          <div style={{fontFamily:F.m,fontSize:9,color:$.rd,letterSpacing:".06em",marginBottom:10}}>THE BOTTOM LINE</div>
-          <p style={{fontSize:14,color:$.tx,lineHeight:1.85,fontFamily:serif}}>A model that scores <strong style={{color:$.glow}}>0.9999</strong> in the lab can still fail silently in the field. The only difference between knowing and not knowing is whether you built the monitoring to detect it</p>
+        {/* ═══ THE CONVICTION — closing statement, not a summary ═══ */}
+        <div style={{
+          marginTop:44, marginBottom:8,
+          padding:"clamp(28px, 4vw, 40px) clamp(22px, 3vw, 32px)",
+          background:"linear-gradient(180deg, rgba(248,113,113,.03) 0%, transparent 100%)",
+          borderTop:"1px solid "+$.rd+"22",
+          borderBottom:"1px solid "+$.brd,
+          animation:"findingIn 1s cubic-bezier(.16,1,.3,1) .95s both"
+        }}>
+          <div style={{
+            fontFamily:F.m, fontSize:9, color:$.rd,
+            letterSpacing:".32em", marginBottom:"clamp(18px, 2.5vw, 26px)",
+            fontWeight:700
+          }}>
+            · THE ARGUMENT ·
+          </div>
+
+          <div style={{
+            fontFamily:serif, fontStyle:"italic", fontWeight:400,
+            fontSize:"clamp(22px, 3.6vw, 32px)",
+            color:$.tx, lineHeight:1.3,
+            marginBottom:"clamp(14px, 2vw, 20px)",
+            maxWidth:720
+          }}>
+            A confident model sounds exactly like an accurate one.
+          </div>
+
+          <div style={{
+            fontFamily:serif, fontStyle:"italic", fontWeight:400,
+            fontSize:"clamp(22px, 3.6vw, 32px)",
+            color:$.rd, lineHeight:1.3,
+            marginBottom:"clamp(26px, 3.5vw, 36px)",
+            maxWidth:720
+          }}>
+            Until it doesn't.
+          </div>
+
+          <div style={{
+            width:56, height:1, background:$.glow, opacity:.45,
+            marginBottom:"clamp(22px, 3vw, 28px)"
+          }}/>
+
+          <div style={{
+            fontFamily:serif, fontWeight:400,
+            fontSize:"clamp(15px, 2vw, 19px)",
+            color:$.tx2, lineHeight:1.55,
+            maxWidth:640,
+            marginBottom:"clamp(20px, 2.6vw, 26px)"
+          }}>
+            W.R.E.N. is the difference between finding out from the model, and finding out from the news.
+          </div>
+
+          <div style={{
+            display:"flex", alignItems:"center", gap:14,
+            fontFamily:F.m, fontSize:9, color:$.dim, letterSpacing:".2em"
+          }}>
+            <span style={{width:20, height:1, background:$.brd}}/>
+            <span>UNIVERSITY OF PORTSMOUTH · 2025 · 2026</span>
+          </div>
         </div>
       </div>
     </div>
@@ -4193,6 +4432,7 @@ export default function App() {
   var _s = useState(0); var scrollY = _s[0]; var setScrollY = _s[1];
   var _loading = useState(true); var loading = _loading[0]; var setLoading = _loading[1];
   var _fade = useState("visible"); var fade = _fade[0]; var setFade = _fade[1];
+  var _showIntro = useState(!_coldOpenDismissed); var showIntro = _showIntro[0]; var setShowIntro = _showIntro[1];
 
   useEffect(function() {
     var t = setTimeout(function() { setLoading(false); }, 1200);
@@ -4331,6 +4571,9 @@ export default function App() {
 
   return (
     <div style={{ position: "relative", minHeight: "100vh" }}>
+      {/* Cold open — shown once per session, before anything else */}
+      {showIntro && <ColdOpen onDone={function(){ setShowIntro(false); }}/>}
+
       {/* Page content */}
       <div style={{
         opacity: fade === "clear" || fade === "beacon" || fade === "flash" ? 0 : 1,
