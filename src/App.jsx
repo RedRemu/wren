@@ -74,6 +74,19 @@ function useStyles() {
       + "@keyframes labelSlide{0%{opacity:0;transform:translateX(-10px);letter-spacing:.3em}100%{opacity:1;transform:none;letter-spacing:.18em}}"
       + "@keyframes titleRise{0%{opacity:0;transform:translateY(14px);filter:blur(3px)}55%{filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}"
       + "@keyframes linePop{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:none}}"
+      + ".cin-card{animation:cardBloom .7s cubic-bezier(.22,1.4,.36,1) both,cardBreathe 3.2s ease-in-out .75s infinite;transform-origin:top right}"
+      + ".cin-accent{animation:softFadeIn .4s ease .1s both}"
+      + ".cin-label{animation:labelSlide .5s cubic-bezier(.16,1,.3,1) .15s both}"
+      + ".cin-title{animation:titleRise .75s cubic-bezier(.16,1,.3,1) .3s both}"
+      + ".cin-sub{animation:linePop .55s cubic-bezier(.16,1,.3,1) .55s both}"
+      + ".cin-metric{animation:linePop .55s cubic-bezier(.16,1,.3,1) .75s both}"
+      + ".cin-foot{animation:linePop .5s ease .95s both}"
+      + ".cin-progress{animation:toastProgress 10s linear both;transform-origin:left}"
+      + ".cin-ring-1{animation:shockRing 1.4s cubic-bezier(.16,1,.3,1) both}"
+      + ".cin-ring-2{animation:shockRing 1.4s cubic-bezier(.16,1,.3,1) .35s both}"
+      + ".cin-ring-3{animation:shockRing 1.4s cubic-bezier(.16,1,.3,1) .7s both}"
+      + ".cin-halo{animation:dotHalo 2.4s ease-in-out infinite}"
+      + ".cin-dot{animation:wpulse 1.4s ease-in-out infinite}"
       + "*{box-sizing:border-box;margin:0;padding:0}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(251,191,36,.1);border-radius:2px}";
     document.head.appendChild(s);
   }, []);
@@ -2061,6 +2074,19 @@ function Stat(props) {
   );
 }
 
+/* ═══ COUNTDOWN DISPLAY (self-contained, isolated from parent re-renders) ═══ */
+function CountdownDisplay(props) {
+  var s = useState(Math.ceil((props.durationMs || 10000) / 1000));
+  var c = s[0]; var setC = s[1];
+  useEffect(function(){
+    var iv = setInterval(function(){
+      setC(function(prev){ return Math.max(0, prev - 1); });
+    }, 1000);
+    return function(){ clearInterval(iv); };
+  }, []);
+  return <span style={{color: props.color, fontWeight: 700, fontSize: 11}}>{c}s</span>;
+}
+
 /* ═══ DETECTOR EVENT CATALOGUE ═══ */
 var DETECTOR_EVENTS = [
   { batch:  9, key:"ph",    name:"PAGE HINKLEY", title:"First warning",         sub:"Something just shifted in the data. The earliest detector caught it.",              color:"#a78bfa", severity:"info", metric:"Signal 4.2 (alert at 3.5)" },
@@ -2082,16 +2108,16 @@ function CommandCentre(props) {
   var _findOpen = useState(null); var findOpen = _findOpen[0]; var setFindOpen = _findOpen[1];
   var demoRef = useRef(null);
   var _activeToast = useState(null); var activeToast = _activeToast[0]; var setActiveToast = _activeToast[1];
-  var _countdown = useState(5); var countdown = _countdown[0]; var setCountdown = _countdown[1];
   var lastFiredRef = useRef(null);
   var toastTimerRef = useRef(null);
-  var countdownIvRef = useRef(null);
   var pausedByToastRef = useRef(false);
   var prevBatchRef = useRef(0);
 
   var TOAST_DURATION_MS = 10000;
 
-  // Watch the batch counter; when it crosses a detector threshold, fire a toast AND pause playback
+  // Watch the batch counter; when it crosses a detector threshold, fire a toast AND pause playback.
+  // No setInterval for countdown here — the countdown lives in its own sub-component so it
+  // doesn't trigger re-renders of the overlay (which would restart the entrance animations).
   useEffect(function(){
     var movingForward = batch >= prevBatchRef.current;
     prevBatchRef.current = batch;
@@ -2105,27 +2131,18 @@ function CommandCentre(props) {
     }
     if (mostRecent.key !== lastFiredRef.current) {
       lastFiredRef.current = mostRecent.key;
-      // Only fire the toast + pause when the user is moving forward through time
       if (!movingForward) return;
       var stamped = {};
       for (var k in mostRecent) stamped[k] = mostRecent[k];
       stamped.id = Date.now();
       setActiveToast(stamped);
 
-      // Pause the demo; remember we were the one who paused it
       if (demoRef.current) { clearInterval(demoRef.current); demoRef.current = null; }
       if (demo) { pausedByToastRef.current = true; setDemo(false); }
 
-      // Countdown interval
-      setCountdown(Math.ceil(TOAST_DURATION_MS / 1000));
-      if (countdownIvRef.current) clearInterval(countdownIvRef.current);
-      countdownIvRef.current = setInterval(function(){ setCountdown(function(c){ return Math.max(0, c - 1); }); }, 1000);
-
-      // Auto-dismiss + auto-resume
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
       toastTimerRef.current = setTimeout(function(){
         setActiveToast(null);
-        if (countdownIvRef.current) clearInterval(countdownIvRef.current);
         if (pausedByToastRef.current) {
           pausedByToastRef.current = false;
           setDemo(true);
@@ -2136,9 +2153,7 @@ function CommandCentre(props) {
 
   function dismissToast(){
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    if (countdownIvRef.current) clearInterval(countdownIvRef.current);
     setActiveToast(null);
-    // Manual dismiss also resumes playback (if we paused it)
     if (pausedByToastRef.current) {
       pausedByToastRef.current = false;
       setDemo(true);
@@ -2334,18 +2349,15 @@ function CommandCentre(props) {
                   width:36, height:36,
                   pointerEvents:"none"
                 }}>
-                  {/* Outer breathing halo */}
-                  <div style={{position:"absolute", inset:0, borderRadius:"50%", background:activeToast.color, animation:"dotHalo 2.4s ease-in-out infinite"}}/>
-                  {/* Entrance shockwaves (three, staggered, then gone) */}
-                  <div style={{position:"absolute", inset:12, borderRadius:"50%", border:"2px solid "+activeToast.color, animation:"shockRing 1.4s cubic-bezier(.16,1,.3,1) both"}}/>
-                  <div style={{position:"absolute", inset:12, borderRadius:"50%", border:"2px solid "+activeToast.color, animation:"shockRing 1.4s cubic-bezier(.16,1,.3,1) .35s both"}}/>
-                  <div style={{position:"absolute", inset:12, borderRadius:"50%", border:"1px solid "+activeToast.color, animation:"shockRing 1.4s cubic-bezier(.16,1,.3,1) .7s both"}}/>
-                  {/* Centre dot, ongoing pulse */}
-                  <div style={{position:"absolute", left:12, top:12, width:12, height:12, borderRadius:"50%", background:activeToast.color, boxShadow:"0 0 18px "+activeToast.color+", 0 0 6px #fff", animation:"wpulse 1.4s ease-in-out infinite"}}/>
+                  <div className="cin-halo" style={{position:"absolute", inset:0, borderRadius:"50%", background:activeToast.color}}/>
+                  <div className="cin-ring-1" style={{position:"absolute", inset:12, borderRadius:"50%", border:"2px solid "+activeToast.color}}/>
+                  <div className="cin-ring-2" style={{position:"absolute", inset:12, borderRadius:"50%", border:"2px solid "+activeToast.color}}/>
+                  <div className="cin-ring-3" style={{position:"absolute", inset:12, borderRadius:"50%", border:"1px solid "+activeToast.color}}/>
+                  <div className="cin-dot" style={{position:"absolute", left:12, top:12, width:12, height:12, borderRadius:"50%", background:activeToast.color, boxShadow:"0 0 18px "+activeToast.color+", 0 0 6px #fff"}}/>
                 </div>
 
                 {/* ── Pop-up card: blooms in with a focus-pull, then breathes softly ── */}
-                <div style={{
+                <div className="cin-card" style={{
                   position:"absolute",
                   top:6, right:6,
                   width:"min(340px, calc(100% - 12px))",
@@ -2354,53 +2366,43 @@ function CommandCentre(props) {
                   border:"1px solid "+activeToast.color+"66",
                   borderRadius:12,
                   backdropFilter:"blur(16px)",
-                  animation:"cardBloom .7s cubic-bezier(.22,1.4,.36,1) both, cardBreathe 3.2s ease-in-out .75s infinite",
                   ["--breathe-a"]: activeToast.color + "1f",
                   ["--breathe-b"]: activeToast.color + "3a",
-                  overflow:"hidden",
-                  transformOrigin:"top right"
+                  overflow:"hidden"
                 }}>
-                  {/* Soft colour wash in the top-left corner of the card, echoing the detector colour */}
                   <div style={{position:"absolute", left:-40, top:-40, width:140, height:140, borderRadius:"50%", background:"radial-gradient(circle, "+activeToast.color+"22 0%, transparent 70%)", pointerEvents:"none"}}/>
-                  {/* Left accent bar with glow */}
-                  <div style={{position:"absolute", left:0, top:0, bottom:0, width:3, background:activeToast.color, boxShadow:"0 0 12px "+activeToast.color, animation:"softFadeIn .4s ease .1s both"}}/>
+                  <div className="cin-accent" style={{position:"absolute", left:0, top:0, bottom:0, width:3, background:activeToast.color, boxShadow:"0 0 12px "+activeToast.color}}/>
 
                   <div style={{position:"relative", padding:"16px 18px 14px 22px"}}>
-                    {/* Label row */}
-                    <div style={{display:"flex", alignItems:"center", gap:10, marginBottom:12, animation:"labelSlide .5s cubic-bezier(.16,1,.3,1) .15s both"}}>
+                    <div className="cin-label" style={{display:"flex", alignItems:"center", gap:10, marginBottom:12}}>
                       <span style={{width:7, height:7, borderRadius:"50%", background:activeToast.color, boxShadow:"0 0 8px "+activeToast.color}}/>
                       <span style={{fontFamily:F.m, fontSize:10, color:activeToast.color, letterSpacing:".18em", fontWeight:700}}>{activeToast.name}</span>
                       <span style={{fontFamily:F.m, fontSize:8, color:$.dim, marginLeft:"auto", letterSpacing:".1em"}}>BATCH {String(activeToast.batch).padStart(3,"0")}</span>
                       <button onClick={dismissToast} style={{background:"transparent", border:"none", color:$.dim, cursor:"pointer", padding:"0 2px", fontSize:15, lineHeight:1, marginLeft:2}}>×</button>
                     </div>
 
-                    {/* Editorial serif title — the "headline" of this moment */}
-                    <div style={{fontFamily:serif, fontStyle:"italic", fontSize:22, fontWeight:500, color:$.tx, lineHeight:1.2, marginBottom:10, animation:"titleRise .75s cubic-bezier(.16,1,.3,1) .3s both", textShadow:"0 0 28px "+activeToast.color+"33"}}>
+                    <div className="cin-title" style={{fontFamily:serif, fontStyle:"italic", fontSize:22, fontWeight:500, color:$.tx, lineHeight:1.2, marginBottom:10, textShadow:"0 0 28px "+activeToast.color+"33"}}>
                       {activeToast.title}
                     </div>
 
-                    {/* Explanation */}
-                    <div style={{fontSize:12.5, color:$.tx2, lineHeight:1.65, marginBottom:12, animation:"linePop .55s cubic-bezier(.16,1,.3,1) .55s both"}}>
+                    <div className="cin-sub" style={{fontSize:12.5, color:$.tx2, lineHeight:1.65, marginBottom:12}}>
                       {activeToast.sub}
                     </div>
 
-                    {/* Metric reading */}
-                    <div style={{fontFamily:F.m, fontSize:9.5, color:$.dim, letterSpacing:".04em", marginBottom:14, paddingLeft:10, borderLeft:"1px solid "+activeToast.color+"44", animation:"linePop .55s cubic-bezier(.16,1,.3,1) .75s both"}}>
+                    <div className="cin-metric" style={{fontFamily:F.m, fontSize:9.5, color:$.dim, letterSpacing:".04em", marginBottom:14, paddingLeft:10, borderLeft:"1px solid "+activeToast.color+"44"}}>
                       {activeToast.metric}
                     </div>
 
-                    {/* Footer: countdown + skip */}
-                    <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", gap:10, fontFamily:F.m, fontSize:9, color:$.dim, letterSpacing:".06em", animation:"linePop .5s ease .95s both"}}>
-                      <span>Resumes in <span style={{color:activeToast.color, fontWeight:700, fontSize:11}}>{countdown}s</span></span>
+                    <div className="cin-foot" style={{display:"flex", justifyContent:"space-between", alignItems:"center", gap:10, fontFamily:F.m, fontSize:9, color:$.dim, letterSpacing:".06em"}}>
+                      <span>Resumes in <CountdownDisplay key={activeToast.id} durationMs={TOAST_DURATION_MS} color={activeToast.color} /></span>
                       <button onClick={dismissToast} style={{background:"transparent", border:"1px solid "+activeToast.color+"66", color:activeToast.color, cursor:"pointer", padding:"4px 12px", fontSize:8.5, fontWeight:700, letterSpacing:".18em", borderRadius:4, fontFamily:F.m, transition:"all .2s"}}
                         onMouseEnter={function(e){e.currentTarget.style.background=activeToast.color+"18";}}
                         onMouseLeave={function(e){e.currentTarget.style.background="transparent";}}>SKIP</button>
                     </div>
                   </div>
 
-                  {/* Progress bar */}
                   <div style={{height:2, background:"rgba(255,255,255,.04)", position:"relative"}}>
-                    <div style={{height:"100%", background:"linear-gradient(90deg, "+activeToast.color+" 0%, "+activeToast.color+"bb 100%)", boxShadow:"0 0 8px "+activeToast.color, animation:"toastProgress 10s linear both", transformOrigin:"left"}}/>
+                    <div className="cin-progress" style={{height:"100%", background:"linear-gradient(90deg, "+activeToast.color+" 0%, "+activeToast.color+"bb 100%)", boxShadow:"0 0 8px "+activeToast.color}}/>
                   </div>
                 </div>
               </div>
@@ -2461,10 +2463,12 @@ function CommandCentre(props) {
         </div>
 
         {/* Stress Test */}
-        <div style={{marginTop:24,marginBottom:24}}>
-          <div style={{fontFamily:F.m,fontSize:9,color:$.glow,letterSpacing:".06em",marginBottom:8}}>INTERACTIVE</div>
-          <h3 style={{fontSize:16,fontWeight:600,color:$.tx,marginBottom:6}}>Break it yourself</h3>
-          <p style={{fontSize:12,color:$.tx3,marginBottom:16}}>Drag the slider. Watch four models respond differently to the same threat</p>
+        <div style={{marginTop:32,marginBottom:24}}>
+          <div style={{fontFamily:F.m,fontSize:9,color:$.glow,letterSpacing:".18em",marginBottom:10}}>· INTERACTIVE ·</div>
+          <h3 style={{fontFamily:serif,fontStyle:"italic",fontWeight:500,fontSize:"clamp(22px,3.4vw,30px)",color:$.tx,marginBottom:10,lineHeight:1.2}}>Break it yourself.</h3>
+          <p style={{fontSize:12.5,color:$.tx3,marginBottom:20,lineHeight:1.65,maxWidth:620}}>
+            Pick a threat. Drag the slider. Watch what happens to four models under the same pressure, and what that pressure would cost in the real world. Every percent you move the slider is a choice a grid operator would be forced to make.
+          </p>
           <StressTestWidget />
         </div>
       </div>
@@ -3096,6 +3100,28 @@ function StressTestWidget() {
     : mode === "noise" ? "A sensor is sending bad readings. The model sees chaos in the data. Is the power grid actually failing, or is the sensor just broken? The system has to figure out the difference."
     : "Standard adversarial robustness testing. Small mathematical perturbations applied to inputs to test whether the model can be pushed into wrong predictions. This is a real threat in critical infrastructure.";
 
+  // ═══ HUMAN-SCALE CONSEQUENCES ═══ translates the abstract stress level into lives
+  var homesAffected    = Math.round(Math.pow(t, 1.8) * 850000);
+  var hospitalsBackup  = Math.floor(Math.pow(t, 1.5) * 14);
+  var damagesPerHourM  = Math.round(Math.pow(t, 2.2) * 18 * 10) / 10;  // $M, one decimal
+
+  var impactTier =
+    t < 0.15 ? { label: "STABLE",               narr: "A grid of this size would be running normally.",                         accent: $.gn,  tint: "transparent",            border: $.brd,      numCol: $.tx2 } :
+    t < 0.35 ? { label: "LOCAL IMPACT",         narr: "A grid of this size would be showing its first warning signs.",          accent: $.gn,  tint: "rgba(52,211,153,.03)",   border: $.gn+"22",  numCol: $.tx2 } :
+    t < 0.55 ? { label: "REGIONAL IMPACT",      narr: "A grid of this size would be moving into emergency operations.",         accent: $.ac,  tint: "rgba(251,191,36,.04)",   border: $.ac+"33",  numCol: $.ac  } :
+    t < 0.75 ? { label: "CRITICAL IMPACT",      narr: "A grid of this size would be in cascade failure.",                       accent: $.rd,  tint: "rgba(248,113,113,.045)", border: $.rd+"44",  numCol: $.rd  } :
+               { label: "CATASTROPHIC IMPACT",  narr: "A grid of this size would be beyond recovery.",                          accent: $.rd,  tint: "rgba(248,113,113,.07)",  border: $.rd+"66",  numCol: $.rd  };
+
+  // Real blackouts the current stress profile most closely resembles
+  var historicalEvent =
+    t < 0.20 ? null :
+    t < 0.35 ? { when: "July 1977",       where: "New York City",          cost: "9 hours dark · 1,600 stores looted · $300M in damages" } :
+    t < 0.50 ? { when: "August 2006",     where: "Queens, New York",       cost: "100,000 without power for 9 days · 9 deaths in heatwave" } :
+    t < 0.68 ? { when: "August 2003",     where: "Northeast North America", cost: "55 million affected · $6 billion in damages · 11 deaths" } :
+    t < 0.82 ? { when: "February 2021",   where: "Texas",                   cost: "4.5 million without heat · $200 billion in damages · 246 deaths" } :
+    t < 0.95 ? { when: "September 2003",  where: "Italy",                   cost: "57 million affected · near total national grid failure" } :
+               { when: "No precedent",    where: "Beyond recorded history", cost: "There is nothing at this scale on record" };
+
   return (
     <div style={{ maxWidth: 740, margin: "0 auto" }}>
       {/* Mode selector */}
@@ -3152,6 +3178,111 @@ function StressTestWidget() {
         {/* Mode explainer */}
         <div style={{ fontSize: 11, color: $.tx3, lineHeight: 1.5, marginBottom: 16, fontStyle: "italic", opacity: 0.75 }}>
           {modeExplain}
+        </div>
+
+        {/* ═══ CONSEQUENCE PANEL ═══ what this stress level would mean for real people */}
+        <div style={{
+          marginBottom: 18,
+          padding: "18px 20px 16px",
+          background: impactTier.tint,
+          border: "1px solid " + impactTier.border,
+          borderRadius: 12,
+          transition: "background .5s, border-color .5s",
+          position: "relative",
+          overflow: "hidden"
+        }}>
+          {/* Phase classification stamp */}
+          <div style={{
+            display: "flex", alignItems: "center", gap: 10, marginBottom: 10
+          }}>
+            <div style={{
+              width: 6, height: 6, borderRadius:"50%",
+              background: impactTier.accent,
+              boxShadow: t > 0.55 ? "0 0 8px " + impactTier.accent : "none",
+              animation: t > 0.55 ? "wpulse 1.6s ease-in-out infinite" : "none",
+              transition: "background .4s"
+            }}/>
+            <span style={{
+              fontFamily: F.m, fontSize: 9, color: impactTier.accent,
+              letterSpacing: ".22em", fontWeight: 700, transition: "color .4s"
+            }}>
+              {impactTier.label}
+            </span>
+            <span style={{ flex: 1, height: 1, background: impactTier.border, marginLeft: 4 }}/>
+            <span style={{ fontFamily: F.m, fontSize: 8, color: $.dim, letterSpacing: ".08em" }}>
+              {Math.round(level)}% STRESS
+            </span>
+          </div>
+
+          {/* Editorial narrative — the line that does the heavy lifting */}
+          <div style={{
+            fontFamily: serif, fontStyle: "italic", fontWeight: 400,
+            fontSize: 19, color: $.tx, lineHeight: 1.35,
+            marginBottom: 16, transition: "color .4s"
+          }}>
+            {impactTier.narr}
+          </div>
+
+          {/* Three big stat columns — these climb in real time as the slider moves */}
+          <div style={{
+            display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14,
+            paddingTop: 14, borderTop: "1px dashed " + $.brd
+          }}>
+            <div>
+              <div style={{ fontFamily: F.m, fontSize: 7.5, color: $.dim, letterSpacing: "0.14em", marginBottom: 5 }}>HOMES WITHOUT POWER</div>
+              <div style={{ fontFamily: F.m, fontSize: 22, fontWeight: 700, color: impactTier.numCol, transition: "color .4s", letterSpacing: "-0.01em" }}>
+                {homesAffected.toLocaleString()}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontFamily: F.m, fontSize: 7.5, color: $.dim, letterSpacing: "0.14em", marginBottom: 5 }}>HOSPITALS ON BACKUP</div>
+              <div style={{ fontFamily: F.m, fontSize: 22, fontWeight: 700, color: impactTier.numCol, transition: "color .4s", letterSpacing: "-0.01em" }}>
+                {hospitalsBackup}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontFamily: F.m, fontSize: 7.5, color: $.dim, letterSpacing: "0.14em", marginBottom: 5 }}>DAMAGES PER HOUR</div>
+              <div style={{ fontFamily: F.m, fontSize: 22, fontWeight: 700, color: impactTier.numCol, transition: "color .4s", letterSpacing: "-0.01em" }}>
+                ${damagesPerHourM}M
+              </div>
+            </div>
+          </div>
+
+          {/* Historical anchor — the quiet, devastating part */}
+          {historicalEvent && (
+            <div style={{
+              marginTop: 16, paddingTop: 14,
+              borderTop: "1px dashed " + (t > 0.68 ? $.rd + "33" : $.brd)
+            }}>
+              <div style={{ fontFamily: F.m, fontSize: 7.5, color: $.dim, letterSpacing: "0.2em", marginBottom: 6 }}>
+                STRESS PROFILE MATCHES
+              </div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
+                <span style={{ fontFamily: serif, fontStyle: "italic", fontSize: 14, color: $.tx2, fontWeight: 500 }}>
+                  {historicalEvent.where}
+                </span>
+                <span style={{ fontFamily: F.m, fontSize: 9, color: $.dim, letterSpacing: ".05em" }}>
+                  {historicalEvent.when}
+                </span>
+              </div>
+              <div style={{ fontSize: 11, color: $.tx3, lineHeight: 1.55 }}>
+                {historicalEvent.cost}
+              </div>
+            </div>
+          )}
+
+          {/* The final gravity line — only appears at the highest levels */}
+          {t > 0.78 && (
+            <div style={{
+              marginTop: 14, paddingTop: 12,
+              borderTop: "1px solid " + $.rd + "33",
+              fontFamily: serif, fontStyle: "italic",
+              fontSize: 12.5, color: $.rd, lineHeight: 1.55,
+              animation: "wup .4s ease both"
+            }}>
+              A decision based on a model this wrong is not a prediction. It is a guess. At this scale, the cost of guessing is measured in lives.
+            </div>
+          )}
         </div>
 
         {/* Grid + Chart side by side */}
