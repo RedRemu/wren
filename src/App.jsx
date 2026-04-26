@@ -21,12 +21,12 @@ var TK = { fontSize: 9, fill: $.dim, fontFamily: F.m };
 var serif = "'Iowan Old Style','Palatino Linotype',Georgia,serif";
 
 /* ═══ DATA ═══ */
-var SH=[.9878,.9658,.9603,.9632,.9599,.9504,.9473,.9476,.9446,.9387,.9322,.9358,.9322,.9307,.9334,.9377,.9381,.9391,.9445,.9499,.9444,.9403,.9438,.9461,.9448,.9396,.9423,.9343,.9279,.9305,.9386,.9406,.9381,.9367,.937,.9436,.9417,.9469,.9474,.9414,.9437,.9382,.9445,.9393,.9316,.9267,.9286,.931,.9378,.9449,.935,.9423,.9367,.9379,.939,.9369,.9324,.9308,.9241,.9224,.927,.9112,.9075,.9096,.9169,.9159,.9179,.9178,.9198,.9183,.9131,.9224,.9295,.928,.9261,.9263,.9251,.9215,.9202,.9184,.9055,.8995,.8914,.8861,.8743,.8779,.8726,.8687,.8679,.8631,.8686,.8639,.8635,.8642,.8722,.8657,.8678,.8702,.8663,.8682,.8809,.8938,.8984,.9052,.9085,.9127,.9132,.9146,.9169,.9169,.9138,.9021,.895,.8868,.8673,.8678,.8716,.868,.8683,.8723];
-var SV=[.9488,.9275,.9405,.9264,.929,.9205,.9153,.9109,.904,.9032,.9027,.8993,.8931,.8947,.8938,.8967,.8982,.9046,.9149,.9075,.9062,.9131,.9054,.9067,.902,.9,.9023,.8987,.8957,.9064,.9044,.8977,.9073,.9046,.9091,.9099,.913,.9159,.9184,.9139,.9173,.9193,.913,.9156,.9141,.917,.9087,.9061,.8915,.8921,.8885,.8846,.8855,.8877,.881,.8785,.8861,.8884,.8916,.8925,.889,.8908,.8903,.8891,.892,.8885,.8802,.8773,.8859,.8816,.8814,.8859,.8849,.874,.8769,.8771,.867,.8534,.8423,.8415,.8335,.8134,.8148,.8155,.7988,.7885,.7846,.7869,.7881,.7897,.785,.7911,.7847,.7822,.792,.789,.7952,.7925,.79,.7867,.784,.7892,.791,.7921,.7821,.7855,.7909,.7867,.7784,.7702,.7751,.7657,.7582,.753,.7521,.7528,.7475,.7495,.7565,.7579];
-var SR=[.9899,.9562,.9522,.9566,.95,.9347,.9333,.9309,.9317,.9331,.9279,.9339,.9358,.9309,.9299,.936,.938,.9422,.9465,.9463,.9467,.9413,.9347,.9391,.9384,.938,.9348,.9305,.9258,.9275,.9284,.9286,.9265,.9215,.927,.9235,.9261,.923,.9212,.9185,.9182,.9179,.9193,.9181,.9177,.9181,.918,.9234,.9261,.9276,.9217,.9199,.9246,.9292,.9173,.9147,.9097,.9101,.9099,.9056,.8963,.8982,.8903,.8883,.8972,.895,.894,.8877,.8865,.8857,.893,.8916,.8967,.894,.897,.8981,.901,.905,.9022,.9036,.8953,.8933,.8898,.886,.8715,.8779,.87,.8646,.8653,.8595,.8585,.8539,.8481,.8492,.8546,.8546,.8544,.8599,.8588,.86,.868,.8684,.8678,.8738,.8752,.8758,.886,.8847,.8904,.8965,.9,.901,.9103,.9039,.9027,.9008,.8976,.893,.8855,.8822];
-var SP=[.10,.08,.09,.11,.12,.08,.08,.08,.12,.08,.10,.09,.11,.10,.13,.11,.09,.10,.10,.08,.10,.11,.10,.10,.08,.11,.11,.10,.11,.12,.10,.08,.08,.12,.07,.13,.09,.12,.11,.08,.07,.09,.08,.14,.09,.14,.10,.12,.11,.16,.15,.18,.12,.16,.18,.35,.22,.26,.23,.19,.27,.26,.31,.31,.30,.41,.57,.42,.30,.38,.44,.48,.40,.59,.38,.47,.60,.66,.43,.62,1.16,.98,.9,1.28,.89,1.22,1.4,.88,1.19,1.21,1.76,1.36,1.1,1.22,1.57,1.8,1.62,1.6,1.9,2.11,2,1.82,1.43,1.79,1.28,1.88,1.79,1.72,2.74,1.76,2.36,2.29,2.31,1.77,1.7,1.87,2.34,2.32,1.94,2.36];
-var SC=[.96,.935,.93,.935,.934,.925,.919,.921,.92,.917,.911,.915,.917,.917,.919,.926,.929,.93,.934,.936,.929,.926,.923,.924,.921,.912,.915,.91,.905,.905,.914,.915,.916,.914,.916,.919,.918,.92,.924,.923,.925,.925,.925,.92,.913,.91,.91,.909,.907,.91,.902,.9,.898,.897,.896,.895,.886,.882,.877,.875,.875,.865,.86,.86,.865,.865,.866,.864,.867,.863,.858,.857,.857,.855,.852,.849,.845,.843,.84,.844,.833,.838,.835,.83,.819,.821,.821,.817,.815,.808,.81,.8,.799,.8,.806,.805,.804,.81,.809,.815,.831,.842,.844,.853,.859,.86,.858,.861,.863,.858,.853,.85,.848,.842,.83,.831,.84,.833,.832,.836];
-var SL=[.9856,.9612,.9558,.9601,.9545,.9398,.9378,.9362,.9355,.9372,.9318,.9382,.9395,.9348,.9335,.9401,.9418,.9458,.9498,.9501,.9504,.9448,.9388,.9425,.9418,.9412,.9385,.9340,.9295,.9312,.9320,.9325,.9300,.9255,.9305,.9272,.9298,.9265,.9248,.9222,.9218,.9215,.9230,.9218,.9213,.9216,.9215,.9270,.9296,.9312,.9252,.9234,.9282,.9328,.9208,.9182,.9132,.9136,.9134,.9090,.8998,.9016,.8938,.8918,.9006,.8984,.8974,.8912,.8900,.8892,.8964,.8950,.9002,.8974,.9004,.9015,.9044,.9084,.9056,.9070,.8988,.8967,.8932,.8894,.8750,.8812,.8734,.8680,.8688,.8630,.8618,.8572,.8514,.8526,.8580,.8580,.8578,.8634,.8622,.8634,.8714,.8718,.8712,.8772,.8786,.8792,.8894,.8880,.8938,.8998,.9034,.9044,.9136,.9072,.9060,.9042,.9010,.8964,.8888,.8856];
+var SH=[.9569,.9389,.928,.9425,.944,.9396,.9409,.941,.9409,.9368,.9371,.9415,.943,.9353,.9354,.9408,.9456,.9414,.9454,.9495,.9382,.9335,.9285,.9297,.9272,.9282,.9231,.9287,.9218,.9188,.9285,.9324,.9373,.9441,.9448,.94,.9394,.9352,.9366,.9327,.9352,.9337,.9372,.9325,.9339,.9309,.9305,.9322,.9352,.9453,.9454,.9486,.9516,.9488,.9431,.9417,.9444,.9395,.9365,.9372,.9305,.9228,.9095,.9068,.911,.9138,.9145,.9214,.9105,.9025,.9041,.9071,.9148,.9124,.9117,.9057,.8994,.8936,.9004,.8947,.8873,.8762,.8707,.8696,.8598,.8693,.8632,.8648,.8715,.8778,.879,.8787,.8779,.879,.8891,.8871,.892,.8907,.889,.8855,.8922,.898,.9022,.9106,.9083,.8986,.896,.8996,.8972,.9029,.9008,.9008,.8919,.8774,.8666,.8757,.8797,.8752,.8725,.8674];
+var SV=[.9259,.9148,.9101,.9238,.9204,.9152,.9179,.9195,.9188,.9147,.9132,.9118,.9096,.9032,.9036,.905,.8951,.892,.8912,.893,.8924,.8928,.8924,.8888,.8842,.8866,.8984,.9054,.9068,.907,.9112,.9153,.9178,.9287,.9363,.9368,.9286,.9235,.9228,.9221,.9235,.9143,.9109,.9074,.9021,.9007,.8953,.8898,.8824,.8812,.8755,.8813,.8895,.8826,.8822,.8847,.8923,.8998,.9026,.9055,.904,.9061,.9022,.904,.9045,.9042,.9003,.8953,.8975,.8915,.884,.8791,.8676,.8622,.8653,.8595,.8645,.8524,.8551,.8604,.8675,.8547,.8656,.8629,.8505,.8482,.8335,.8386,.8248,.8203,.8119,.82,.8161,.816,.8276,.8249,.8287,.8262,.8303,.8304,.835,.8312,.8273,.8274,.8153,.8073,.8079,.8061,.8002,.7803,.7662,.7638,.7532,.7516,.7432,.7378,.7394,.7333,.735,.7343];
+var SR=[.9607,.937,.9576,.9574,.9493,.949,.9413,.9351,.9348,.9342,.9364,.941,.9373,.9344,.9291,.9287,.934,.9432,.949,.9538,.9456,.944,.943,.9417,.9453,.9442,.9425,.9402,.9316,.9272,.9308,.9299,.9278,.9318,.9362,.938,.9386,.9256,.9248,.9206,.9214,.9168,.9199,.9182,.9175,.9129,.9131,.9237,.928,.932,.9246,.931,.927,.9218,.9208,.9198,.9169,.9115,.9153,.9156,.917,.9113,.9088,.9097,.9056,.9076,.9068,.9113,.9018,.8996,.8988,.903,.9026,.8979,.8977,.8953,.8975,.8963,.901,.9007,.8862,.8813,.8751,.873,.8689,.869,.8602,.8563,.8532,.8456,.8582,.8526,.844,.8464,.8529,.8557,.8584,.8636,.8633,.8715,.872,.8766,.8881,.8936,.8965,.8931,.898,.8953,.9007,.904,.9032,.909,.907,.9023,.8952,.8944,.8893,.8936,.8854,.8806];
+var SP=[.1,.08,.09,.11,.12,.08,.08,.08,.12,.08,.1,.09,.11,.1,.13,.11,.09,.1,.1,.08,.1,.11,.1,.1,.08,.11,.11,.1,.11,.12,.1,.08,.08,.12,.07,.13,.09,.12,.11,.08,.07,.09,.08,.14,.09,.14,.1,.12,.11,.16,.15,.18,.12,.16,.18,.35,.22,.26,.23,.19,.27,.26,.31,.31,.3,.41,.57,.42,.3,.38,.44,.48,.4,.59,.38,.47,.6,.66,.43,.62,1.16,.98,.9,1.28,.89,1.22,1.40,.88,1.19,1.21,1.76,1.36,1.10,1.22,1.57,1.80,1.62,1.60,1.90,2.11,2.00,1.82,1.43,1.79,1.28,1.88,1.79,1.72,2.74,1.76,2.36,2.29,2.31,1.77,1.70,1.87,2.34,2.32,1.94,2.36];
+var SC=[.97,.94,.933,.942,.94,.935,.936,.934,.931,.927,.922,.926,.924,.921,.92,.924,.928,.929,.934,.938,.932,.926,.928,.928,.929,.931,.929,.931,.926,.923,.93,.934,.933,.938,.937,.93,.924,.92,.922,.921,.923,.923,.926,.92,.919,.916,.916,.917,.918,.923,.921,.921,.92,.917,.913,.912,.906,.898,.888,.887,.878,.869,.86,.858,.858,.86,.859,.862,.857,.848,.845,.845,.847,.841,.839,.837,.835,.832,.842,.841,.835,.831,.826,.825,.823,.827,.829,.833,.831,.833,.84,.836,.831,.83,.837,.835,.838,.836,.838,.837,.844,.856,.869,.877,.874,.866,.866,.872,.872,.88,.878,.879,.872,.863,.854,.863,.861,.857,.856,.852];
+var SL=[.9592,.9226,.9172,.9216,.9241,.9185,.9207,.9156,.9167,.9114,.9079,.9145,.9075,.9101,.9056,.9071,.9111,.9183,.9182,.9257,.9259,.9267,.9355,.9346,.9346,.9358,.9296,.927,.9255,.9232,.9248,.9201,.9119,.9129,.9193,.9206,.9173,.9124,.9115,.914,.9127,.9122,.916,.9124,.9104,.9104,.9109,.9186,.92,.9152,.9117,.914,.9173,.9143,.9054,.9033,.9055,.8998,.9012,.899,.8987,.8994,.9012,.9041,.9094,.9077,.9075,.9054,.8961,.8974,.8938,.8908,.8909,.8893,.8935,.8893,.8854,.8875,.8948,.8964,.8862,.8822,.8702,.8614,.8458,.8444,.838,.8359,.8346,.8304,.8388,.8353,.8375,.8414,.8509,.8624,.8654,.8661,.8556,.8596,.8611,.8661,.8653,.8712,.8749,.8698,.8741,.865,.8835,.8876,.8897,.8867,.8885,.8832,.8802,.8805,.882,.8866,.8768,.8715];
 var NS = Array.from({ length: 2000 }, function(_, i) { return Math.sin(i * 127.1 + i * i * .013) * .5 + Math.cos(i * 269.5 - i * .017) * .5; });
 
 /* ═══ SCENARIOS ═══ */
@@ -34,8 +34,8 @@ var SCENARIOS = {
   nominal: { label: "Normal Operation", batch: 20, desc: "Stable grid. All systems nominal. Model predictions are trustworthy.", plain: "Everything is working. The AI model was trained on data that looks like this. Predictions are accurate.", status: "STABLE", color: $.gn, health: 98, action: "Continue monitoring at standard interval.", feature: "None. All features within training distribution.", alert: "No alerts", showDrift: false, showRegime: false },
   gradual: { label: "Gradual Drift", batch: 55, desc: "Tau parameters shifting slowly. Model confidence degrading before accuracy drops.", plain: "The real world is slowly changing, but the model was trained on old data. It's getting less reliable, but doesn't know it yet.", status: "DRIFT DETECTED", color: $.ac, health: 87, action: "Recalibrate model. Increase damping at Node 2 (LOAD). Reduce trust threshold to 0.90.", feature: "tau_std rising +40%, F_gain_mean shifting from training mean", alert: "PSI crossed 0.25 threshold at batch 55", showDrift: true, showRegime: false },
   noise: { label: "Sensor Noise", batch: 45, desc: "SCADA sensor corruption injected. Testing whether the model can distinguish noise from real instability.", plain: "A sensor is feeding bad data. Is the grid actually unstable, or is the sensor broken? The system has to tell the difference.", status: "MONITORING", color: $.ac, health: 92, action: "Increase monitoring frequency to 2x. Verify sensor integrity at Node 1.", feature: "Broad noise across tau and g parameters. Not localised.", alert: "Early CUSUM deviation at batch 34", showDrift: true, showRegime: false },
-  adversarial: { label: "Adversarial Attack", batch: 65, desc: "FGSM perturbation applied to sensor readings. Simulates adversarial perturbation of grid telemetry.", plain: "This simulates adversarial perturbation. Small mathematical changes are applied to sensor readings to test whether the model holds or flips its predictions.", status: "AT RISK", color: $.rd, health: 74, action: "Switch to RF fallback model immediately. SVM boundary has been compromised by gradient attack.", feature: "SVM flip rate at 16.5%. Hybrid stacking absorbs to 3.3%.", alert: "Adversarial signature detected in gradient pattern", showDrift: true, showRegime: false },
-  collapse: { label: "Regime Collapse", batch: 95, desc: "Abrupt parameter shift. Generator response characteristics have fundamentally changed.", plain: "The grid itself has fundamentally changed. The world the model was trained for no longer exists. Nothing it learned applies anymore.", status: "CRITICAL", color: $.rd, health: 52, action: "Emergency recalibration via LaSCal pipeline. Alert grid operator. Reduce load at Nodes 2 and 3.", feature: "All features shifted beyond training bounds. Coverage at 82%.", alert: "All three detectors triggered. Regime change confirmed.", showDrift: true, showRegime: true },
+  adversarial: { label: "Adversarial Attack", batch: 65, desc: "FGSM perturbation applied to sensor readings. Simulates adversarial perturbation of grid telemetry.", plain: "This simulates adversarial perturbation. Small mathematical changes are applied to sensor readings to test whether the model holds or flips its predictions.", status: "AT RISK", color: $.rd, health: 74, action: "Switch to RF fallback model immediately. SVM boundary has been compromised by gradient attack.", feature: "SVM flip rate at 32.4% (ε=0.1). Hybrid stacking absorbs to 7.6%.", alert: "Adversarial signature detected in gradient pattern", showDrift: true, showRegime: false },
+  collapse: { label: "Regime Collapse", batch: 95, desc: "Abrupt parameter shift. Generator response characteristics have fundamentally changed.", plain: "The grid itself has fundamentally changed. The world the model was trained for no longer exists. Nothing it learned applies anymore.", status: "CRITICAL", color: $.rd, health: 52, action: "Emergency recalibration via LaSCal pipeline. Alert grid operator. Reduce load at Nodes 2 and 3.", feature: "All features shifted beyond training bounds. Coverage at 85%.", alert: "All three detectors triggered. Regime change confirmed.", showDrift: true, showRegime: true },
 };
 
 /* ═══ STYLES ═══ */
@@ -333,7 +333,7 @@ var SLIDES = [
   { key: "nominal", num: "01", title: "Stable Operation", serif: "The AI scores 99.99%. Every prediction is correct. Everything looks perfect.", detail: "This is what a static benchmark shows. If evaluation stopped here, every model would look production ready.", batch: 20, health: 98 },
   { key: "noise", num: "02", title: "Sensor Corruption", serif: "A sensor starts feeding bad data. The AI cannot tell the difference between a broken sensor and a real threat.", detail: "SCADA environments have noisy, imperfect measurements. A model that has only seen clean data does not know how to handle this.", batch: 45, health: 92 },
   { key: "gradual", num: "03", title: "The World Drifts", serif: "Consumer behaviour changes slowly. The AI was trained on old patterns. It does not know the world has moved.", detail: "Accuracy drops a little. Confidence becomes a lie. The model says 90% sure while being wrong more and more often.", batch: 55, health: 87 },
-  { key: "adversarial", num: "04", title: "Fake Data Attack", serif: "Carefully crafted false readings are injected into the sensor stream. One model is tricked a third of the time. Another holds at 0.04%.", detail: "The vulnerability depends entirely on what type of AI is used. The choice of model is a security decision, not just a performance decision.", batch: 65, health: 74 },
+  { key: "adversarial", num: "04", title: "Fake Data Attack", serif: "Carefully crafted false readings are injected into the sensor stream. One model is tricked a third of the time. Another holds at 0.05%.", detail: "The vulnerability depends entirely on what type of AI is used. The choice of model is a security decision, not just a performance decision.", batch: 65, health: 74 },
   { key: "collapse", num: "05", title: "Everything Changes", serif: "A generator trips offline. The grid operates in a way the AI has never seen. Its safety guarantees expire immediately.", detail: "One in six predictions now has no valid safety bound. The AI is still confident. That confidence is meaningless.", batch: 95, health: 52 },
 ];
 
@@ -835,7 +835,7 @@ function PipeVis(props) {
       <text x="50" y="31" textAnchor="middle" fill="#a78bfa" fontSize="8" fontFamily={F.m} fontWeight="700">H1</text>
       <line x1="14" y1="28" x2="36" y2="28" stroke={$.rd} strokeWidth="1.4"/>
       <polygon points="34,25 40,28 34,31" fill={$.rd}/>
-      <text x="50" y="54" textAnchor="middle" fill={$.rd} fontSize="7" fontFamily={F.m} fontWeight="700">20% flip</text>
+      <text x="50" y="54" textAnchor="middle" fill={$.rd} fontSize="7" fontFamily={F.m} fontWeight="700">32% flip</text>
       <text x="115" y="32" textAnchor="middle" fill={$.dim} fontSize="11" fontFamily={F.m} opacity="0.4">vs</text>
       <text x="180" y="10" textAnchor="middle" fill={$.gn} fontSize="7" fontFamily={F.m} opacity="0.65">immune</text>
       <rect x="166" y="16" width="28" height="24" rx="3" fill={$.gn} fillOpacity="0.08" stroke={$.gn} strokeWidth="1.5" strokeOpacity="0.7"/>
@@ -843,7 +843,7 @@ function PipeVis(props) {
       <line x1="144" y1="28" x2="162" y2="28" stroke={$.rd} strokeWidth="1.4"/>
       <path d="M 162 28 Q 152 34 144 42" fill="none" stroke={$.rd} strokeWidth="1.2" strokeOpacity="0.6"/>
       <polygon points="146,40 142,42 144,38" fill={$.rd} fillOpacity="0.6"/>
-      <text x="180" y="54" textAnchor="middle" fill={$.gn} fontSize="7" fontFamily={F.m} fontWeight="700">0.04%</text>
+      <text x="180" y="54" textAnchor="middle" fill={$.gn} fontSize="7" fontFamily={F.m} fontWeight="700">0.05%</text>
       <text x="234" y="32" textAnchor="middle" fill={$.dim} fontSize="6" fontFamily={F.m}>same</text>
       <text x="234" y="40" textAnchor="middle" fill={$.dim} fontSize="6" fontFamily={F.m}>attack</text>
     </svg>
@@ -998,7 +998,7 @@ var DEFAULT_PIPELINE = [
   {phase:"Testing", color:$.ac, stages:[
     {n:9,  name:"Grade it", plain:"Test every helper on grids they have never seen. The team scored almost perfect", desc:"We showed each helper power grids they had never seen before and graded their answers. The team got almost every single one right.", input:"New grids", output:"Almost perfect score"},
     {n:10, name:"Set the alarm level", plain:"Missing real trouble is 10 times worse than a false alarm, so tune it that way", desc:"Missing a real power failure is much worse than a false alarm. So we tuned the AI to be extra careful, treating a missed warning as 10 times more serious than a false one. This gives us three alert levels: safe, watch, and danger.", input:"Risk rules", output:"3 alert levels"},
-    {n:11, name:"Add a safety promise", plain:"Guarantee the AI will be right at least 95 times out of every 100", desc:"We added a mathematical safety net that promises the AI will be right at least 95 times out of every 100. When it is not sure, it says so instead of guessing. When we tested it, it was right 95.3% of the time.", input:"Practice scores", output:"95% promise kept"},
+    {n:11, name:"Add a safety promise", plain:"Guarantee the AI will be right at least 95 times out of every 100", desc:"We added a mathematical safety net that promises the AI will be right at least 95 times out of every 100. When it is not sure, it says so instead of guessing. When we tested it, it was right 99.95% of the time.", input:"Practice scores", output:"95% promise kept"},
     {n:12, name:"Check the luck", plain:"Run 2,000 random tests to prove the team is actually better, not just lucky", desc:"What if the team only won by luck? To check, we ran 2,000 random comparisons. The team won nearly every single time, which proves it really is better and not just lucky.", input:"All helper answers", output:"Not luck, skill"},
     {n:13, name:"Check if it needs more data", plain:"See if giving it more examples would help. It would not, it has enough", desc:"We measured how much the AI improved as we gave it more and more examples. At some point it stopped improving, which tells us it already has enough data and is not missing anything.", input:"Different data sizes", output:"Enough data"},
     {n:14, name:"Test it five times", plain:"Rerun the whole test five times with different data each time to be sure", desc:"One test could be lucky. So we ran the whole test five times, each time using a different mix of the data. The AI scored well every single time, which proves it is reliably good.", input:"5 different tests", output:"Good every time"},
@@ -1049,22 +1049,22 @@ function rocPath(auc) {
 }
 
 var SHAP_TOP = [
-  {f:"F_gain_mean", v:9.64, phys:true},
-  {f:"tau_std",     v:4.21, phys:true},
-  {f:"g_mean",      v:3.87, phys:true},
-  {f:"V_weak",      v:2.94, phys:true},
-  {f:"F_gain_std",  v:2.41, phys:true},
-  {f:"H_net",       v:1.88, phys:true},
-  {f:"tau_mean",    v:1.52, phys:false},
+  {f:"F_gain_mean", v:10.05, phys:true},
+  {f:"tau_std",     v:3.35,  phys:true},
+  {f:"tau_mean",    v:2.53,  phys:true},
+  {f:"g_mean",      v:2.51,  phys:true},
+  {f:"D_eff_std",   v:1.42,  phys:true},
+  {f:"D_eff_mean",  v:1.23,  phys:true},
+  {f:"R_min",       v:0.98,  phys:true},
 ];
 var CM_TARGET = [[4338, 6], [0, 7656]];
-var PSI_STREAM = [.10,.09,.11,.08,.12,.09,.10,.11,.10,.08,.11,.10,.12,.08,.13,.15,.18,.22,.26,.35,.42,.48,.59,.66,.88,1.16,1.22,1.40,1.57,1.76,1.80,1.90,2.11,1.82,2.00,1.79,1.88,2.34,2.32,2.36];
-var AUC_STREAM = [.96,.94,.95,.93,.94,.95,.93,.94,.95,.96,.94,.92,.93,.94,.93,.91,.92,.90,.91,.90,.89,.88,.87,.88,.85,.86,.87,.89,.86,.88,.85,.87,.86,.88,.87,.89,.88,.90,.89,.88];
+var PSI_STREAM = [.10,.11,.08,.08,.11,.11,.10,.11,.08,.10,.10,.12,.09,.08,.08,.14,.11,.18,.18,.26,.27,.31,.57,.38,.40,.47,.43,.98,.89,.88,1.76,1.22,1.62,2.11,1.43,1.88,2.74,2.29,1.70,2.32];
+var AUC_STREAM = [.96,.94,.94,.94,.94,.94,.95,.93,.93,.93,.93,.94,.94,.93,.94,.93,.94,.95,.94,.94,.93,.91,.91,.90,.91,.91,.90,.88,.86,.86,.88,.88,.89,.89,.90,.90,.90,.90,.87,.88];
 var ADV = [
-  {name:"SVM",    rate:19.8, color:"#f87171"},
-  {name:"LGBM",   rate:3.7,  color:"#67e8f9"},
-  {name:"HYBRID", rate:3.3,  color:"#fbbf24"},
-  {name:"RF",     rate:0.04, color:"#34d399"},
+  {name:"SVM",    rate:32.4, color:"#f87171"},
+  {name:"LGBM",   rate:0.26, color:"#67e8f9"},
+  {name:"HYBRID", rate:7.6,  color:"#fbbf24"},
+  {name:"RF",     rate:0.05, color:"#34d399"},
 ];
 
 /* ═══ STYLES ═══ */
@@ -1760,7 +1760,7 @@ function SceneEvaluate(props) {
     {c:"#fbbf24",auc:1.000, name:"TEAM"},
     {c:"#67e8f9",auc:1.000, name:"H3"},
     {c:"#34d399",auc:1.000, name:"H2"},
-    {c:"#a78bfa",auc:0.998, name:"H1"}
+    {c:"#a78bfa",auc:0.991, name:"H1"}
   ];
   return (
     <div style={{width:"100%",height:isMobile?"auto":"100%",display:"grid",
@@ -1857,7 +1857,7 @@ function SceneEvaluate(props) {
         <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:150,flexDirection:"column",gap:10}}>
           <div style={{fontFamily:serif,fontSize:44,color:color,fontWeight:500,lineHeight:1,
             animation:t>0.6?"cineFade .6s ease both":"none",opacity:t>0.6?1:0}}>
-            {t>0.6 ? "95.3%" : ""}
+            {t>0.6 ? "99.95%" : ""}
           </div>
           <div style={{fontSize:11,color:$.tx3,fontFamily:F.m,textAlign:"center"}}>
             right at least this often<br/>
@@ -1877,10 +1877,10 @@ function SceneStress(props) {
   var t = props.t, color = props.color, isMobile = props.isMobile;
   var noise = Math.sin(t * Math.PI * 2) * 0.5 + 0.5;
   var ADV_FRIENDLY = [
-    {name:"Helper 1", rate:19.8, color:"#f87171"},
-    {name:"Helper 3", rate:3.7,  color:"#67e8f9"},
-    {name:"TEAM",     rate:3.3,  color:"#fbbf24"},
-    {name:"Helper 2", rate:0.04, color:"#34d399"},
+    {name:"Helper 1", rate:32.4, color:"#f87171"},
+    {name:"Helper 3", rate:0.26, color:"#67e8f9"},
+    {name:"TEAM",     rate:7.6,  color:"#fbbf24"},
+    {name:"Helper 2", rate:0.05, color:"#34d399"},
   ];
   return (
     <div style={{width:"100%",height:isMobile?"auto":"100%",display:"grid",
@@ -1895,7 +1895,7 @@ function SceneStress(props) {
         <svg viewBox="0 0 600 140" style={{width:"100%",height:130}}>
           {ADV_FRIENDLY.map(function(m,i){
             var x = 30 + i*142;
-            var h = Math.min(1, t*1.3) * (m.rate/20) * 90;
+            var h = Math.min(1, t*1.3) * (m.rate/35) * 90;
             return (
               <g key={m.name}>
                 <rect x={x} y={110-h} width="80" height={h} rx="4" fill={m.color}
@@ -1925,7 +1925,7 @@ function SceneStress(props) {
           {SHAP_TOP.slice(0,7).map(function(f,i){
             var w = Math.min(1, (t*1.4) - i*0.04) * (f.v/10) * 100;
             if (w <= 0) return null;
-            var labels = ["Power flow","Timing wobble","Average power","Weakest node","Flow swing","Health score","Average timing"];
+            var labels = ["Power flow","Timing wobble","Average timing","Average power","Damping spread","Average damping","Lowest reserve"];
             return (
               <div key={f.f} style={{marginBottom:4,display:"flex",alignItems:"center",gap:8}}>
                 <span style={{fontFamily:F.m,fontSize:9,color:f.phys?color:$.tx3,width:90,textAlign:"right"}}>{labels[i]}</span>
@@ -1956,7 +1956,7 @@ function SceneStress(props) {
           <div style={{marginTop:12,paddingTop:10,borderTop:"1px solid rgba(255,255,255,.04)"}}>
             <div style={{display:"flex",justifyContent:"space-between",fontFamily:F.m,fontSize:9,color:$.tx3}}>
               <span>Team accuracy</span>
-              <span style={{color:color,fontWeight:700}}>{((0.998 - noise*0.06)*100).toFixed(1)}%</span>
+              <span style={{color:color,fontWeight:700}}>{((0.9999 - noise*0.06)*100).toFixed(1)}%</span>
             </div>
           </div>
         </div>
@@ -2274,8 +2274,8 @@ function ColdOpen(props) {
 var DETECTOR_EVENTS = [
   { batch:  9, key:"ph",    name:"PAGE HINKLEY", title:"First warning",         sub:"Something just shifted in the data. The earliest detector caught it.",              color:"#a78bfa", severity:"info", metric:"Signal 4.2 (alert at 3.5)" },
   { batch: 34, key:"cusum", name:"CUSUM",        title:"Drift is building",     sub:"Small changes are stacking up over time. The trend is real now.",                    color:"#67e8f9", severity:"warn", metric:"Signal 8.1 (alert at 5.0)" },
-  { batch: 55, key:"psi",   name:"PSI DRIFT",    title:"Data looks different",  sub:"The live data no longer matches what the model learned from.",                       color:$.glow,    severity:"warn", metric:"Score 0.26 (alert at 0.25)" },
-  { batch: 81, key:"auc",   name:"AUC BREAK",    title:"Accuracy has dropped",  sub:"The model is making more mistakes. Three detectors warned us before this happened.", color:$.rd,      severity:"crit", metric:"Accuracy 89.2 percent" },
+  { batch: 55, key:"psi",   name:"PSI DRIFT",    title:"Data looks different",  sub:"The live data no longer matches what the model learned from.",                       color:$.glow,    severity:"warn", metric:"Score 0.35 (alert at 0.25)" },
+  { batch: 81, key:"auc",   name:"AUC BREAK",    title:"Accuracy has dropped",  sub:"The model is making more mistakes. Three detectors warned us before this happened.", color:$.rd,      severity:"crit", metric:"Accuracy 87.6 percent" },
 ];
 
 function CommandCentre(props) {
@@ -2358,7 +2358,7 @@ function CommandCentre(props) {
   var PIPELINE = [
     {phase:"Data", color:$.gn, stages:[
       {n:1, name:"Data Loading", plain:"Load 60,000 real power grid measurements. Check for missing values and fix them", desc:"60,000 samples loaded from DSGC dataset. 12 raw electrical parameters. Class balance checked 37% unstable. NaN values detected and median imputed.", input:"Raw CSV", output:"Clean dataset"},
-      {n:2, name:"Physics Feature Engineering", plain:"Turn raw electrical readings into meaningful physics measurements. 12 values become 48", desc:"48 physics informed candidates generated. Key v4 features: F_gain_i = τ·g per node, H_net, V_weak, F_gain_mean/std/min. Raw 12 features expanded to 48.", input:"12 features", output:"48 features"},
+      {n:2, name:"Physics Feature Engineering", plain:"Turn raw electrical readings into meaningful physics measurements. 12 values become 48", desc:"48 physics informed candidates generated. Key v4 features: F_gain_i = τ·g per node, H_net, D_eff_mean, F_gain_mean/std/min. Raw 12 features expanded to 48.", input:"12 features", output:"48 features"},
       {n:3, name:"Data Splitting", plain:"Split the data into three groups: one to learn from, one to tune with, one to test on. None overlap", desc:"Stratified train / validation / test split. Class balance preserved across all three partitions. Reproducible seeding applied.", input:"Full dataset", output:"Train / Val / Test"},
     ]},
     {phase:"Feature Selection", color:"#a78bfa", stages:[
@@ -2371,7 +2371,7 @@ function CommandCentre(props) {
       {n:8, name:"Stacking Hybrid Ensemble", plain:"Combine the best two models into one that outperforms both. The hybrid uses SVM + RF predictions plus raw physics features", desc:"SVM + RF base predictions fed into a LogisticRegression meta learner. Also uses top physics features (F_gain_mean, tau_mean) as meta inputs. Final model outperforms all individual bases.", input:"SVM + RF outputs", output:"Hybrid model"},
     ]},
     {phase:"Evaluation", color:$.ac, stages:[
-      {n:9,  name:"Test Set Evaluation", plain:"Test all models on data they have never seen. The Hybrid scored 0.9999 out of 1.0, nearly perfect", desc:"Full metrics: AUC, F1, Accuracy, Brier score, ECE. Hybrid AUC: 0.9999. SVM: 0.9899. RF: 0.9899. LGBM comparable. Clean data performance established as deployment baseline.", input:"Test data", output:"AUC: 0.9999"},
+      {n:9,  name:"Test Set Evaluation", plain:"Test all models on data they have never seen. Every model scored at the ceiling: AUC ≥ 0.9999 across all four", desc:"Full metrics: AUC, F1, Accuracy, Brier score, ECE. AUC ≥ 0.9999 across all four models (Hybrid, SVM, RF, LGBM) on the held-out test set. Hybrid wins on calibration: ECE 0.0005, Brier 0.0003. Clean data performance establishes the deployment baseline.", input:"Test data", output:"AUC ≥ 0.9999"},
       {n:10, name:"Cost Optimal Threshold", plain:"Missing a real grid failure is 10× worse than a false alarm. Set the decision boundary accordingly", desc:"v4: Cost function penalises false negatives 10× more than false positives (grid failure cost >> false alarm cost). Three level risk index: STABLE / BORDERLINE / CRITICAL. Thresholds saved to JSON.", input:"Cost ratio 10:1", output:"Risk thresholds"},
       {n:11, name:"Conformal Prediction", plain:"Add a mathematical safety guarantee: at least 95% of predictions must have a reliable confidence bound", desc:"Split conformal prediction, \u03B1=0.05. Mathematical guarantee: at least 95% of prediction intervals contain the true class on exchangeable data. q_hat quantile computed from validation set.", input:"Validation scores", output:"95% guarantee"},
       {n:12, name:"Paired Bootstrap Test", plain:"Is the Hybrid actually better than the others, or did it just get lucky? Run 2,000 random tests to find out", desc:"2,000 bootstrap resamples comparing Hybrid vs LightGBM AUC. Delta AUC and 95% confidence interval computed. p value confirms statistical significance of Hybrid improvement.", input:"Model predictions", output:"p < 0.05 confirmed"},
@@ -2382,7 +2382,7 @@ function CommandCentre(props) {
     {phase:"Robustness", color:$.rd, stages:[
       {n:16, name:"SHAP Explainability", plain:"Ask the model why it made each decision. Every prediction can be traced back to specific input features", desc:"TreeSHAP for RF and LightGBM. KernelSHAP approximation for SVM. Global and local attributions saved. F_gain consistently top ranked. Model is explainable and physics aligned.", input:"Any prediction", output:"Feature attributions"},
       {n:17, name:"Stress Testing", plain:"Add noise, scale inputs, push boundaries. The Hybrid degrades most gracefully under every stress condition tested", desc:"Gaussian noise (4 levels), OOD scaling, boundary sensitivity, Monte Carlo (N=50, 3 noise levels). Hybrid degrades most gracefully under all stress conditions tested.", input:"4 noise levels", output:"Hybrid most robust"},
-      {n:18, name:"Adversarial Robustness", plain:"Apply mathematical perturbations to test if models can be pushed into wrong answers. SVM flipped 19.8%. Random Forest held at 0.04%", desc:"Fast Gradient Sign Method at 6 epsilon levels (0.01 to 0.30). SVM (RBF) flip rate: 19.8% at eps=0.1. RF flip rate: 0.04%. Tree models immune due to discrete leaf structure.", input:"FGSM ε=0.01–0.30", output:"RF immune"},
+      {n:18, name:"Adversarial Robustness", plain:"Apply mathematical perturbations to test if models can be pushed into wrong answers. SVM flipped 32.4%. Random Forest held at 0.05%", desc:"Fast Gradient Sign Method at 6 epsilon levels (0.001 to 0.1). SVM (RBF) flip rate: 32.4% at eps=0.1. RF flip rate: 0.05%. Tree models effectively immune due to discrete leaf structure.", input:"FGSM ε=0.001–0.1", output:"RF immune"},
     ]},
     {phase:"Simulation & Export", color:"#67e8f9", stages:[
       {n:"18b", name:"Deployment Simulation", plain:"Simulate 120 batches of real-world deployment: gradual drift, adversarial perturbation, and sudden regime change, all at once", desc:"3 layer, 120 sequential batches. Gradual tau drift from batch 40. FGSM adversarial perturbation at batch 65. Abrupt regime shift at batch 80. SCADA noise, missing data, quantisation and latency all simulated.", input:"Clean model", output:"120 batch results"},
@@ -2409,7 +2409,7 @@ function CommandCentre(props) {
     cov:{
       title:"What is Coverage telling you?",
       plain:"Conformal coverage is a mathematical guarantee. It says: at least 95% of the time, the model's prediction interval contains the true answer. It's not a promise about any single prediction it's a statistical guarantee across all predictions.",
-      insight:"When the grid is stable, coverage holds at 96%+. When the data shifts too far outside training (regime collapse, batch 80), it drops to 83%. That means 1 in 6 predictions has an uncertainty the model can't quantify. W.R.E.N. flags this instantly so operators know when the safety guarantee has expired.",
+      insight:"When the grid is stable, coverage holds at 92%+. When the data shifts too far outside training (regime collapse, batch 80), it drops to 85%. That means 1 in 7 predictions has an uncertainty the model can't quantify. W.R.E.N. flags this instantly so operators know when the safety guarantee has expired.",
     },
   };
 
@@ -2417,14 +2417,14 @@ function CommandCentre(props) {
   var FINDINGS = [
     {metric:"AUC fell from 0.9999 to 0.8834",   color:$.rd, 
      consequence:"The model was near perfect in the lab. Under real deployment drift, 1 in 9 predictions deteriorated. A model that looks production ready on a static benchmark can still fail silently once deployed. This is the gap W.R.E.N. exists to close."},
-    {metric:"ECE increased 214×",                color:$.rd, 
-     consequence:"Calibration error is how wrong the model's confidence is. 214× baseline means when it said '90% stable', it was right far less often. Decisions made on uncalibrated confidence are decisions made on false certainty. LaSCal recalibration brought this back under control."},
+    {metric:"ECE increased 279×",                color:$.rd, 
+     consequence:"Calibration error is how wrong the model's confidence is. 279× baseline means when it said '90% stable', it was right far less often. Decisions made on uncalibrated confidence are decisions made on false certainty. LaSCal recalibration brought this back under control."},
     {metric:"PSI crossed 0.25 at batch 55",      color:$.glow,icon:"",
      consequence:"26 batches before accuracy dropped, the data started looking different. PSI caught it first. That 26-batch head start is the difference between a controlled recalibration and an emergency shutdown. Early warning is the economic value of deployment monitoring."},
-    {metric:"RF adversarial flip rate: 0.04%",   color:$.gn, 
-     consequence:"Under FGSM adversarial testing, the SVM was flipped 19.8% of the time. The Random Forest: 0.04%. Tree models don't use gradients there's no slope to attack. When adversarial conditions are possible, the fallback model is the RF, not the SVM."},
-    {metric:"Conformal coverage dropped to 83%", color:$.ac, 
-     consequence:"1 in 6 predictions during regime collapse had no valid uncertainty bound. The conformal guarantee expired. This isn't a model failure it's the model honestly admitting it is out of its depth. A model that tells you when to stop trusting it is more valuable than one that doesn't."},
+    {metric:"RF adversarial flip rate: 0.05%",   color:$.gn, 
+     consequence:"Under FGSM adversarial testing at ε=0.1, the SVM was flipped 32.4% of the time. The Random Forest: 0.05%. Tree models don't use gradients there's no slope to attack. When adversarial conditions are possible, the fallback model is the RF, not the SVM."},
+    {metric:"Conformal coverage dropped to 85%", color:$.ac, 
+     consequence:"1 in 7 predictions during regime collapse had no valid uncertainty bound. The conformal guarantee expired. This isn't a model failure it's the model honestly admitting it is out of its depth. A model that tells you when to stop trusting it is more valuable than one that doesn't."},
     {metric:"F_gain_mean dominated all phases",  color:$.glow,icon:"",
      consequence:"SHAP showed that the physics formula F_gain = τ·g remained the top feature across every drift phase, every attack, every regime. The physics didn't break even when the statistics did. The model's core reasoning was sound only its calibration drifted."},
   ];
@@ -2748,7 +2748,7 @@ function CommandCentre(props) {
             <div style={{position:"absolute",top:24,right:72,width:7,height:7,borderRadius:"50%",background:$.rd,animation:"findingPulse 2.2s ease-in-out infinite .3s"}}/>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===2?14:0}}>
               <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.rd,display:"inline-block",animation:"numPop .7s cubic-bezier(.16,1,.3,1) .6s both"}}>Confidence error increased 214×</div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.rd,display:"inline-block",animation:"numPop .7s cubic-bezier(.16,1,.3,1) .6s both"}}>Confidence error increased 279×</div>
                 <div style={{fontSize:13,color:$.tx,marginTop:4}}>The model was still saying "90% sure" while being wrong</div>
               </div>
               <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===2?"Close":"See proof"}</span>
@@ -2763,7 +2763,7 @@ function CommandCentre(props) {
                   </div>
                   <div style={{background:"rgba(248,113,113,.04)",borderRadius:8,padding:"16px",textAlign:"center",animation:"findingIn .5s cubic-bezier(.16,1,.3,1) .2s both"}}>
                     <div style={{fontFamily:F.m,fontSize:8,color:$.rd,letterSpacing:1,marginBottom:6}}>DEPLOYED (DRIFT)</div>
-                    <div style={{fontFamily:F.m,fontSize:28,fontWeight:700,color:$.rd,animation:"numPop .9s cubic-bezier(.16,1,.3,1) .55s both"}}>214×</div>
+                    <div style={{fontFamily:F.m,fontSize:28,fontWeight:700,color:$.rd,animation:"numPop .9s cubic-bezier(.16,1,.3,1) .55s both"}}>279×</div>
                     <div style={{fontSize:11,color:$.tx3,marginTop:4}}>Model says 90%, is right far less often</div>
                   </div>
                 </div>
@@ -2819,7 +2819,7 @@ function CommandCentre(props) {
             <div style={{position:"absolute",top:24,right:72,width:7,height:7,borderRadius:"50%",background:$.gn,animation:"findingPulse 2.2s ease-in-out infinite .9s"}}/>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===4?14:0}}>
               <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.gn,display:"inline-block",animation:"numPop .7s cubic-bezier(.16,1,.3,1) .8s both"}}>SVM 19.8% flipped vs RF 0.04%</div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.gn,display:"inline-block",animation:"numPop .7s cubic-bezier(.16,1,.3,1) .8s both"}}>SVM 32.4% flipped vs RF 0.05%</div>
                 <div style={{fontSize:13,color:$.tx,marginTop:4}}>Same test, completely different resilience</div>
               </div>
               <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===4?"Close":"See proof"}</span>
@@ -2828,21 +2828,21 @@ function CommandCentre(props) {
               <div style={{animation:"findingIn .4s ease both"}}>
                 <div style={{display:"flex",gap:12,marginBottom:12}}>
                   {[
-                    {name:"SVM",val:19.8,color:"#a78bfa"},
-                    {name:"Hybrid",val:3.3,color:$.glow},
-                    {name:"LGBM",val:1.2,color:"#67e8f9"},
-                    {name:"RF",val:0.04,color:$.gn},
+                    {name:"SVM",val:32.4,color:"#a78bfa"},
+                    {name:"Hybrid",val:7.6,color:$.glow},
+                    {name:"LGBM",val:0.26,color:"#67e8f9"},
+                    {name:"RF",val:0.05,color:$.gn},
                   ].map(function(m,i){return (
                     <div key={m.name} style={{flex:1,textAlign:"center"}}>
                       <div style={{height:100,display:"flex",alignItems:"flex-end",justifyContent:"center",marginBottom:6}}>
-                        <div style={{width:"100%",maxWidth:40,height:Math.max(2,m.val/19.8*90),background:m.color,opacity:0.5,borderRadius:"3px 3px 0 0",animation:"barGrowH .9s cubic-bezier(.16,1,.3,1) "+(0.15+i*0.12)+"s both"}}/>
+                        <div style={{width:"100%",maxWidth:40,height:Math.max(2,m.val/32.4*90),background:m.color,opacity:0.5,borderRadius:"3px 3px 0 0",animation:"barGrowH .9s cubic-bezier(.16,1,.3,1) "+(0.15+i*0.12)+"s both"}}/>
                       </div>
                       <div style={{fontFamily:F.m,fontSize:12,fontWeight:700,color:m.color,animation:"numPop .6s cubic-bezier(.16,1,.3,1) "+(0.9+i*0.12)+"s both"}}>{m.val}%</div>
                       <div style={{fontFamily:F.m,fontSize:8,color:$.dim,marginTop:2,animation:"softFadeIn .4s ease "+(1+i*0.12)+"s both"}}>{m.name}</div>
                     </div>
                   );})}
                 </div>
-                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>Under FGSM adversarial perturbation testing at ε=0.1, the SVM had its predictions flipped almost 20% of the time. The Random Forest held at 0.04%. Tree-based models have no gradient to exploit. This is why the system keeps RF as the automatic fallback when adversarial conditions are detected</div>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7}}>Under FGSM adversarial perturbation testing at ε=0.1, the SVM had its predictions flipped 32.4% of the time. The Random Forest held at 0.05%. Tree-based models have no gradient to exploit. This is why the system keeps RF as the automatic fallback when adversarial conditions are detected</div>
               </div>
             )}
           </div>
@@ -2857,8 +2857,8 @@ function CommandCentre(props) {
             <div style={{position:"absolute",top:24,right:72,width:7,height:7,borderRadius:"50%",background:$.ac,animation:"findingPulse 2.2s ease-in-out infinite 1.2s"}}/>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:findOpen===5?14:0}}>
               <div>
-                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.ac,display:"inline-block",animation:"numPop .7s cubic-bezier(.16,1,.3,1) .9s both"}}>Coverage dropped from 96% to 83%</div>
-                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The safety guarantee expired. 1 in 6 predictions had no bound</div>
+                <div style={{fontFamily:F.m,fontSize:11,fontWeight:700,color:$.ac,display:"inline-block",animation:"numPop .7s cubic-bezier(.16,1,.3,1) .9s both"}}>Coverage dropped from 92% to 85%</div>
+                <div style={{fontSize:13,color:$.tx,marginTop:4}}>The safety guarantee expired. 1 in 7 predictions had no bound</div>
               </div>
               <span style={{fontFamily:F.m,fontSize:9,color:$.dim}}>{findOpen===5?"Close":"See proof"}</span>
             </div>
@@ -2872,7 +2872,7 @@ function CommandCentre(props) {
                     <Area type="monotone" dataKey="C" stroke={$.glow} fill={$.glowD} strokeWidth={2} animationDuration={1600}/>
                   </AreaChart>
                 </ResponsiveContainer>
-                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7,marginTop:8}}>Conformal prediction guarantees that at least 95% of predictions have a reliable confidence bound. When the data shifts far enough, that guarantee breaks. At batch 95, coverage was 83%, meaning 1 in 6 predictions had no valid safety net. A model that can tell you when its own guarantee has expired is more valuable than one that cannot</div>
+                <div style={{fontSize:12,color:$.tx3,lineHeight:1.7,marginTop:8}}>Conformal prediction guarantees that at least 95% of predictions have a reliable confidence bound. When the data shifts far enough, that guarantee breaks. By the abrupt-shift phase, coverage averaged 85%, meaning 1 in 7 predictions had no valid safety net. A model that can tell you when its own guarantee has expired is more valuable than one that cannot</div>
               </div>
             )}
           </div>
@@ -2897,10 +2897,10 @@ function CommandCentre(props) {
                 <div style={{marginBottom:12}}>
                   {[
                     {name:"F_gain_mean",val:100,phase:"All phases"},
-                    {name:"tau_std",val:72,phase:"Drift + Regime"},
-                    {name:"g_mean",val:58,phase:"Stable + Drift"},
-                    {name:"H_net",val:41,phase:"Regime only"},
-                    {name:"V_weak",val:33,phase:"Attack only"},
+                    {name:"tau_std",val:72,phase:"All phases"},
+                    {name:"tau_mean",val:58,phase:"All phases"},
+                    {name:"g_mean",val:41,phase:"Stable + Drift"},
+                    {name:"D_eff_std",val:33,phase:"Clean only"},
                   ].map(function(f,i){return (
                     <div key={f.name} style={{display:"flex",alignItems:"center",gap:10,marginBottom:6,animation:"softFadeIn .4s ease "+(0.1+i*0.08)+"s both"}}>
                       <div style={{fontFamily:F.m,fontSize:9,color:$.tx2,width:90,textAlign:"right"}}>{f.name}</div>
@@ -3282,17 +3282,17 @@ function StressTestWidget() {
       : mode === "noise" ? 0.9999 - st * 0.08 - st * st * 0.04 + noise * 2
       : 0.9999 - st * st * st * 0.22 + noise;
     // SVM - degrades fast, especially under attack
-    var svmVal = mode === "drift" ? 0.9488 - st * st * 0.22 + noise * 1.5
-      : mode === "noise" ? 0.9488 - st * 0.12 - st * st * 0.06 + noise * 2.5
-      : 0.9488 - st * st * 0.35 + noise;
+    var svmVal = mode === "drift" ? 0.9259 - st * st * 0.22 + noise * 1.5
+      : mode === "noise" ? 0.9259 - st * 0.12 - st * st * 0.06 + noise * 2.5
+      : 0.9259 - st * st * 0.35 + noise;
     // RF - holds under attack, decent under drift
-    var rfVal = mode === "drift" ? 0.9899 - st * st * 0.18 + noise
-      : mode === "noise" ? 0.9899 - st * 0.06 - st * st * 0.03 + noise * 1.5
-      : 0.9899 - st * st * st * 0.04 + noise;
+    var rfVal = mode === "drift" ? 0.9607 - st * st * 0.18 + noise
+      : mode === "noise" ? 0.9607 - st * 0.06 - st * st * 0.03 + noise * 1.5
+      : 0.9607 - st * st * st * 0.04 + noise;
     // LGBM - between hybrid and SVM
-    var lgbmVal = mode === "drift" ? 0.9856 - st * st * 0.19 + noise * 1.2
-      : mode === "noise" ? 0.9856 - st * 0.09 - st * st * 0.05 + noise * 1.8
-      : 0.9856 - st * st * st * 0.18 + noise;
+    var lgbmVal = mode === "drift" ? 0.9592 - st * st * 0.19 + noise * 1.2
+      : mode === "noise" ? 0.9592 - st * 0.09 - st * st * 0.05 + noise * 1.8
+      : 0.9592 - st * st * st * 0.18 + noise;
     sparkHybrid.push(Math.max(0.7, Math.min(1, hVal)));
     sparkSVM.push(Math.max(0.7, Math.min(1, svmVal)));
     sparkRF.push(Math.max(0.7, Math.min(1, rfVal)));
@@ -3672,7 +3672,7 @@ const INCIDENTS = [
         why: "This feels safe, but every minute that passes makes the gap between what the AI believes and what is true wider. There is a window to fix this easily. That window is closing.",
         outcome: "bad", consequence: "Wrong call. But because A.G.N.E.S. caught the drift early, the damage is contained. The AI's confidence is unreliable, but the system flags every prediction it is not sure about. Operators know which readings to double check. Without A.G.N.E.S., this would have gone unnoticed until something broke." },
     ],
-    research: "Measured result: Expected Calibration Error increased 214\u00d7 from baseline across 120 streaming batches (Chapter 4, Section 4.3). AUC degraded from 0.9999 to 0.8834 (Table 6).",
+    research: "Measured result: Expected Calibration Error increased 279\u00d7 from baseline across 120 streaming batches (Chapter 4, Section 4.3). AUC degraded from 0.9999 to 0.8834 (Table 6).",
     lesson: "The AI kept saying 'I am 90% sure this grid is safe.' But it was wrong more and more often. The accuracy dropped a little. The confidence became a lie. That is the most dangerous kind of failure: a system that looks certain while quietly falling apart."
   },
   {
@@ -3700,8 +3700,8 @@ const INCIDENTS = [
         why: "Resetting confidence fixes a different problem. It fixes the gap between how sure the AI is and how right it is. But this attack is not about confidence. It is tricking the AI into giving the wrong actual answer. Resetting confidence does not help if the answers themselves are wrong.",
         outcome: "bad", consequence: "Wrong call. The attack continues and predictions are unreliable. But A.G.N.E.S. detected the attack pattern and is flagging every suspicious prediction. Operators can see which answers are likely corrupted instead of trusting them blindly. Without A.G.N.E.S., nobody would even know an attack was happening." },
     ],
-    research: "Measured result: SVM flip rate 32.4% vs Random Forest 0.04% under FGSM at \u03b5=0.10, an 800\u00d7 vulnerability difference (Chapter 4, Section 4.5, Table 5).",
-    lesson: "Two different AIs looked at the exact same attack. One was tricked a third of the time. The other was tricked 0.04% of the time, basically never. Same attack, completely different result. The type of AI you choose is not just about accuracy. It is about security."
+    research: "Measured result: SVM flip rate 32.4% vs Random Forest 0.05% under FGSM at \u03b5=0.10, a ~650\u00d7 vulnerability difference (Chapter 4, Section 4.5, Table 5).",
+    lesson: "Two different AIs looked at the exact same attack. One was tricked a third of the time. The other was tricked 0.05% of the time, basically never. Same attack, completely different result. The type of AI you choose is not just about accuracy. It is about security."
   },
   {
     id: "collapse",
@@ -3729,7 +3729,7 @@ const INCIDENTS = [
         why: "The AI is still producing answers. But those answers are based on a world that no longer exists. It is like following GPS directions in a city that has been completely rebuilt. The directions look confident. They are meaningless.",
         outcome: "bad", consequence: "Wrong call. The AI's predictions are meaningless in this new regime. But A.G.N.E.S. has already triggered all three warning systems and is showing exactly how far outside normal the grid has moved. The situation is serious, but visible. Without A.G.N.E.S., this would have looked like normal operation right up until the blackout." },
     ],
-    research: "Measured result: Page Hinkley triggered at batch 9, CUSUM at batch 34, PSI at batch 55. Conformal coverage fell from 99.97% to 85.05% (Chapter 4, Sections 4.6\u20134.7, Tables 6\u20138).",
+    research: "Measured result: Page Hinkley triggered at batch 9, CUSUM at batch 34, PSI at batch 55. Conformal coverage fell from 99.95% to 85.05% (Chapter 4, Sections 4.6\u20134.7, Tables 6\u20138).",
     lesson: "Three different warning systems spotted trouble at three different times. The earliest caught it 71 steps before the worst damage. The warnings were there the whole time. Everything came down to whether someone was listening and whether someone acted."
   },
 ];
@@ -4549,7 +4549,7 @@ export default function App() {
       <section id="honour" style={{ padding: "60px 24px 80px", textAlign: "center" }}>
         <div style={{ maxWidth: 420, margin: "0 auto" }}>
           <Rv><div style={{ width: 24, height: 1, background: $.glow, margin: "0 auto 28px", opacity: 0.15 }} /></Rv>
-          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939-1945.</p></Rv>
+          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939–1945.</p></Rv>
           <Rv d={0.2}><p style={{ fontSize: 13, lineHeight: 1.9, color: $.dim }}>They sat in signals rooms, detecting anomalies in the noise and warning of danger before it arrived.</p></Rv>
         </div>
       </section>
