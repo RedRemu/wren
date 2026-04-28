@@ -2397,8 +2397,8 @@ function CommandCentre(props) {
   var CARDS = {
     auc:{
       title:"What is this chart telling you?",
-      plain:"This is the model's accuracy score over time AUC goes from 0 (random guessing) to 1.0 (perfect). In the lab, the Hybrid model scored 0.9999. Nearly perfect.",
-      insight:"But then the real world happened. As the grid data drifts (batch 40), gets attacked (batch 65), and shifts regime entirely (batch 80), accuracy falls to 0.8834. That's not a failure. It is what deployment actually looks like. A static benchmark would never show you this. W.R.E.N. tracks it in real time so you know when to trust the model and when to escalate.",
+      plain:"This is the model's accuracy (AUC) over 120 deployment batches, smoothed across a 10-batch rolling window. AUC of 1.0 is perfect; 0.5 is random guessing. The dashed gold line at the top is the static lab baseline of 0.9999 the number every prior study reports. The Hybrid (yellow) is the strongest model.",
+      insight:"Then deployment happens. As the data drifts (batch 40), the system gets attacked (batch 65), and the regime shifts entirely (batch 80), the rolling AUC falls steadily; by the post-abrupt phase it averages 0.8834 a 11.7 percentage-point loss invisible to any static benchmark. The vertical purple, cyan and gold dashed lines mark when each drift detector fired (PH, CUSUM, PSI). W.R.E.N. tracks all of this in real time so you know when to trust the model and when to escalate.",
       lines:[{c:$.glow,l:"Hybrid: your best model"},{c:"#a78bfa",l:"SVM: smooth boundaries, vulnerable to attacks"},{c:$.gn,l:"RF: immune to gradient attacks"},{c:"#67e8f9",l:"LGBM: gradient boosting, fast and competitive"}],
     },
     psi:{
@@ -2595,8 +2595,19 @@ function CommandCentre(props) {
                 <LineChart data={aucData.slice(0,batch+1)} margin={{top:8,right:8,bottom:4,left:0}}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(251,191,36,.04)"/>
                   <XAxis dataKey="b" tick={TK} tickLine={false} domain={[0,119]} type="number"/>
-                  <YAxis domain={["dataMin - 0.01","dataMax + 0.01"]} tick={TK} tickLine={false} width={36}/>
-                  <Tooltip contentStyle={TT}/>
+                  <YAxis
+                    domain={[function(dataMin){return Math.max(0.5, Math.floor((dataMin - 0.02) * 100) / 100);}, 1.01]}
+                    ticks={[0.85, 0.90, 0.95, 1.00]}
+                    tickFormatter={function(v){return v.toFixed(2);}}
+                    tick={TK}
+                    tickLine={false}
+                    width={36}
+                    allowDataOverflow={false}/>
+                  <Tooltip
+                    contentStyle={TT}
+                    position={{x: 70, y: 8}}
+                    cursor={{stroke: $.glow, strokeOpacity: 0.3, strokeWidth: 1}}/>
+                  <ReferenceLine y={0.9999} stroke="#fbbf24" strokeDasharray="4 4" strokeOpacity={.45} label={{value:"Static baseline 0.9999",position:"insideTopRight",fill:"#fbbf24",fontSize:8}}/>
                   {batch>=9  && <ReferenceLine x={9}  stroke="#a78bfa" strokeDasharray="2 3" strokeOpacity={.4} label={{value:"PH",position:"insideBottomLeft",fill:"#a78bfa",fontSize:7}}/>}
                   {batch>=34 && <ReferenceLine x={34} stroke="#67e8f9" strokeDasharray="2 3" strokeOpacity={.4} label={{value:"CUSUM",position:"insideBottomLeft",fill:"#67e8f9",fontSize:7}}/>}
                   {batch>=40 && <ReferenceLine x={40} stroke={$.ac} strokeDasharray="4 4" strokeOpacity={.35} label={{value:"Drift",position:"insideTopLeft",fill:$.ac,fontSize:8}}/>}
@@ -4549,7 +4560,7 @@ export default function App() {
       <section id="honour" style={{ padding: "60px 24px 80px", textAlign: "center" }}>
         <div style={{ maxWidth: 420, margin: "0 auto" }}>
           <Rv><div style={{ width: 24, height: 1, background: $.glow, margin: "0 auto 28px", opacity: 0.15 }} /></Rv>
-          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939–1945.</p></Rv>
+          <Rv d={0.1}><p style={{ fontSize: 15, fontStyle: "italic", lineHeight: 2, color: $.tx3, marginBottom: 16 }}>Named for the Women's Royal Naval Service, who served at HMS Vernon, Portsmouth, 1939-1945.</p></Rv>
           <Rv d={0.2}><p style={{ fontSize: 13, lineHeight: 1.9, color: $.dim }}>They sat in signals rooms, detecting anomalies in the noise and warning of danger before it arrived.</p></Rv>
         </div>
       </section>
@@ -4560,7 +4571,7 @@ export default function App() {
           <BeaconSmall s={12} />
           <span style={{ fontSize: 9, letterSpacing: 2, color: $.dim, fontFamily: F.m }}>W.R.E.N.</span>
         </div>
-        <div style={{ fontSize: 9, color: $.dim }}>University of Portsmouth | 2025–2026</div>
+        <div style={{ fontSize: 9, color: $.dim }}>University of Portsmouth | 2025-2026</div>
         <div style={{ fontSize: 9, color: $.dim, opacity: 0.5 }}>Powered by A.G.N.E.S. v4.2</div>
       </footer>
     </div>
